@@ -1,93 +1,105 @@
 package com.web4x.integration.im;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import com.seekweb4.chat.config.properties.AppProperites;
 import com.seekweb4.chat.modules.sys.entity.Menu;
+import com.seekweb4.chat.modules.sys.utils.MenuUtils;
 import com.seekweb4.chat.modules.sys.utils.UserUtils;
 import com.web4x.common.core.domain.entity.SysMenu;
 import com.web4x.common.core.domain.entity.SysUser;
 
 /**
- * 若依首页侧栏菜单：数据来自 IM {@code sys_menu_two}（{@link UserUtils#getMenuList()}）。
+ * 若依首页侧栏菜单：与 IM 后台相同树形（{@link MenuUtils#getMenus()} / treeData2）。
  */
 @Component
 @ConditionalOnProperty(name = "im.shiro.enabled", havingValue = "true", matchIfMissing = true)
 public class ImMenuTreeBridge
 {
+    private static final String ROOT_MENU_ID = "1";
+
     public List<SysMenu> selectMenusForUser(SysUser user)
     {
-        List<Menu> imMenus = UserUtils.getMenuList();
-        List<SysMenu> flat = new ArrayList<>();
-        for (Menu menu : imMenus)
+        List<Menu> imRoots = buildImMenuTree(UserUtils.getMenuList());
+        List<SysMenu> menus = new ArrayList<>();
+        for (Menu imRoot : imRoots)
         {
-            if (menu == null || !"1".equals(menu.getIsShow()))
+            menus.add(convertTree(imRoot));
+        }
+        return menus;
+    }
+
+    /**
+     * 与 {@code MenuController.formatListToTree} 一致：按 parent.id 分组，从根节点 1 展开。
+     */
+    static List<Menu> buildImMenuTree(List<Menu> allList)
+    {
+        Map<String, List<Menu>> treeMap = new LinkedHashMap<>();
+        for (Menu menu : allList)
+        {
+            if (menu == null || !"1".equals(menu.getIsShow()) || "3".equals(menu.getType()))
             {
                 continue;
             }
-            if ("3".equals(menu.getType()))
-            {
-                continue;
-            }
-            flat.add(toSysMenu(menu));
+            String parentKey = resolveParentKey(menu);
+            treeMap.computeIfAbsent(parentKey, k -> new LinkedList<>()).add(menu);
         }
-        long rootParentId = resolveRootParentId(flat);
-        return buildTree(flat, rootParentId);
-    }
-
-    private static long resolveRootParentId(List<SysMenu> flat)
-    {
-        for (SysMenu m : flat)
+        List<Menu> roots = treeMap.get(ROOT_MENU_ID);
+        if (roots == null || roots.isEmpty())
         {
-            if (m.getParentId() != null && (m.getParentId() == 0L || m.getParentId() == 1L))
-            {
-                return m.getParentId();
-            }
+            return new ArrayList<>();
         }
-        return 0L;
-    }
-
-    private static List<SysMenu> buildTree(List<SysMenu> list, long parentId)
-    {
-        List<SysMenu> roots = new LinkedList<>();
-        for (SysMenu item : list)
+        for (Menu parent : roots)
         {
-            if (item.getParentId() != null && item.getParentId() == parentId)
-            {
-                attachChildren(list, item);
-                roots.add(item);
-            }
-        }
-        if (roots.isEmpty() && parentId == 0L)
-        {
-            for (SysMenu item : list)
-            {
-                if (item.getParentId() != null && item.getParentId() == 1L)
-                {
-                    attachChildren(list, item);
-                    roots.add(item);
-                }
-            }
+            fillImChildren(parent, treeMap);
         }
         return roots;
     }
 
-    private static void attachChildren(List<SysMenu> list, SysMenu parent)
+    private static String resolveParentKey(Menu menu)
     {
-        List<SysMenu> children = new ArrayList<>();
-        for (SysMenu n : list)
+        if (menu.getParent() != null && StringUtils.isNotBlank(menu.getParent().getId()))
         {
-            if (n.getParentId() != null && n.getParentId().equals(parent.getMenuId()))
+            return menu.getParent().getId();
+        }
+        String parentId = menu.getParentId();
+        return StringUtils.isNotBlank(parentId) ? parentId : "0";
+    }
+
+    private static void fillImChildren(Menu parent, Map<String, List<Menu>> treeMap)
+    {
+        List<Menu> children = treeMap.get(parent.getId());
+        parent.setChildren(children == null ? new ArrayList<>() : children);
+        for (Menu child : parent.getChildren())
+        {
+            fillImChildren(child, treeMap);
+        }
+    }
+
+    private static SysMenu convertTree(Menu im)
+    {
+        SysMenu menu = toSysMenu(im);
+        if (im.getChildren() != null && !im.getChildren().isEmpty())
+        {
+            List<SysMenu> children = new ArrayList<>();
+            for (Menu child : im.getChildren())
             {
-                attachChildren(list, n);
-                children.add(n);
+                children.add(convertTree(child));
+            }
+            menu.setChildren(children);
+            if (StringUtils.isBlank(im.getPath()))
+            {
+                menu.setUrl("#");
             }
         }
-        parent.setChildren(children);
+        return menu;
     }
 
     static SysMenu toSysMenu(Menu im)
@@ -98,38 +110,44 @@ public class ImMenuTreeBridge
             menu.setMenuId(Long.parseLong(im.getId()));
         }
         long parentId = 0L;
-        if (StringUtils.isNotBlank(im.getParentId()) && NumberUtils.isCreatable(im.getParentId()))
+        String imParentId = resolveParentKey(im);
+        if (NumberUtils.isCreatable(imParentId))
         {
-            parentId = Long.parseLong(im.getParentId());
-            if (parentId == 1L)
-            {
-                parentId = 0L;
-            }
+            parentId = Long.parseLong(imParentId);
         }
         menu.setParentId(parentId);
         menu.setMenuName(im.getName());
-        menu.setUrl(StringUtils.defaultIfBlank(im.getPath(), "#"));
+        String url = StringUtils.defaultIfBlank(im.getPath(), "#");
+        menu.setUrl(url);
         menu.setTarget(im.getTarget());
-        menu.setIcon(im.getIcon());
+        menu.setIcon(StringUtils.defaultIfBlank(im.getIcon(), "fa fa-folder-o"));
         menu.setPerms(im.getPermission());
-        menu.setVisible("1".equals(im.getIsShow()) ? "0" : "1");
+        menu.setVisible(AppProperites.NO.equals(im.getIsShow()) ? "1" : "0");
         menu.setMenuType(mapMenuType(im.getType()));
         if (im.getSort() != null)
         {
             menu.setOrderNum(String.valueOf(im.getSort()));
         }
+        if ("M".equals(menu.getMenuType()) && !"#".equals(menu.getUrl()))
+        {
+            menu.setUrl("#");
+        }
         return menu;
     }
 
+    /**
+     * IM：1=目录，2=页面，3=按钮（已过滤）。
+     * 若依：M=目录，C=菜单，F=按钮。
+     */
     private static String mapMenuType(String imType)
     {
-        if ("1".equals(imType))
+        if ("2".equals(imType))
         {
             return "C";
         }
-        if ("2".equals(imType))
+        if ("3".equals(imType))
         {
-            return "M";
+            return "F";
         }
         return "M";
     }

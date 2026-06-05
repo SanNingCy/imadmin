@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>web4x-im</artifactId>
-    <description>IM 业务模块（源自 chat-ops，包名保持 com.seekweb4.chat）</description>
+    <description>IM 业务模块</description>
 
     <properties>
         <mybatis-plus.version>3.5.15</mybatis-plus.version>
