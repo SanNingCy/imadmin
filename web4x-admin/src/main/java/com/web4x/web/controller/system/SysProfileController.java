@@ -61,8 +61,8 @@ public class SysProfileController extends BaseController
     @ResponseBody
     public boolean checkPassword(String password)
     {
-        SysUser user = getSysUser();
-        return passwordService.matches(user, password);
+        SysUser user = loadRyUser();
+        return user != null && passwordService.matches(user, password);
     }
 
     @GetMapping("/resetPwd")
@@ -78,7 +78,11 @@ public class SysProfileController extends BaseController
     @ResponseBody
     public AjaxResult resetPwd(String oldPassword, String newPassword)
     {
-        SysUser user = getSysUser();
+        SysUser user = loadRyUser();
+        if (user == null)
+        {
+            return error("用户不存在或已失效，请重新登录");
+        }
         if (!passwordService.matches(user, oldPassword))
         {
             return error("修改密码失败，旧密码错误");
@@ -95,6 +99,17 @@ public class SysProfileController extends BaseController
             return success();
         }
         return error("修改密码异常，请联系管理员");
+    }
+
+    /** 从 sys_user_ry 加载完整用户（会话中的 IM 桥接用户不含 password） */
+    private SysUser loadRyUser()
+    {
+        SysUser sessionUser = getSysUser();
+        if (sessionUser == null || StringUtils.isEmpty(sessionUser.getLoginName()))
+        {
+            return null;
+        }
+        return userService.selectUserByLoginName(sessionUser.getLoginName());
     }
 
     /**

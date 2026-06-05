@@ -12,9 +12,11 @@ import com.web4x.common.core.domain.entity.SysUser;
 import com.web4x.common.exception.user.UserPasswordNotMatchException;
 import com.web4x.common.exception.user.UserPasswordRetryLimitExceedException;
 import com.web4x.common.utils.MessageUtils;
+import com.web4x.common.utils.StringUtils;
 import com.web4x.common.utils.security.Md5Utils;
 import com.web4x.framework.manager.AsyncManager;
 import com.web4x.framework.manager.factory.AsyncFactory;
+import com.web4x.system.service.ISysUserService;
 import jakarta.annotation.PostConstruct;
 
 /**
@@ -27,6 +29,9 @@ public class SysPasswordService
 {
     @Autowired
     private CacheManager cacheManager;
+
+    @Autowired
+    private ISysUserService userService;
 
     private Cache<String, AtomicInteger> loginRecordCache;
 
@@ -70,7 +75,28 @@ public class SysPasswordService
 
     public boolean matches(SysUser user, String newPassword)
     {
-        return user.getPassword().equals(encryptPassword(user.getLoginName(), newPassword, user.getSalt()));
+        if (user == null || StringUtils.isEmpty(newPassword))
+        {
+            return false;
+        }
+        String loginName = user.getLoginName();
+        String storedPassword = user.getPassword();
+        String salt = user.getSalt();
+        if (StringUtils.isEmpty(storedPassword))
+        {
+            SysUser dbUser = userService.selectUserByLoginName(loginName);
+            if (dbUser == null)
+            {
+                return false;
+            }
+            storedPassword = dbUser.getPassword();
+            salt = dbUser.getSalt();
+        }
+        if (StringUtils.isEmpty(storedPassword))
+        {
+            return false;
+        }
+        return StringUtils.equals(storedPassword, encryptPassword(loginName, newPassword, salt));
     }
 
     public void clearLoginRecordCache(String loginName)
