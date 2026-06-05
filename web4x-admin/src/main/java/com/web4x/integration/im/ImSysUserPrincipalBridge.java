@@ -2,8 +2,9 @@ package com.web4x.integration.im;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
+import com.web4x.common.condition.ImShiroEnabledCondition;
 import jakarta.annotation.PostConstruct;
 import com.seekweb4.chat.config.properties.AppProperites;
 import com.seekweb4.chat.modules.sys.entity.User;
@@ -18,7 +19,7 @@ import com.web4x.common.utils.ShiroUtils;
  * IM 用户 → 若依 {@link SysUser}，供 Thymeleaf 与 ShiroUtils 使用。
  */
 @Component
-@ConditionalOnProperty(name = "im.shiro.enabled", havingValue = "true", matchIfMissing = true)
+@Conditional(ImShiroEnabledCondition.class)
 public class ImSysUserPrincipalBridge implements SysUserPrincipalBridge
 {
     @PostConstruct

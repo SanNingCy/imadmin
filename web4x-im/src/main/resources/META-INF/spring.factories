@@ -1,0 +1,2 @@
+org.springframework.boot.EnvironmentPostProcessor=\
+com.seekweb4.chat.config.Web4xIntegrationEnvironmentPostProcessor

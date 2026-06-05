@@ -30,7 +30,7 @@ public class SysPasswordService
 
     private Cache<String, AtomicInteger> loginRecordCache;
 
-    @Value(value = "${user.password.maxRetryCount}")
+    @Value(value = "${user.password.maxRetryCount:5}")
     private String maxRetryCount;
 
     @PostConstruct

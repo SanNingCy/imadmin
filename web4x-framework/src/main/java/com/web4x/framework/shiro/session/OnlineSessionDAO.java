@@ -26,7 +26,7 @@ public class OnlineSessionDAO extends EnterpriseCacheSessionDAO
     /**
      * 同步session到数据库的周期 单位为毫秒（默认1分钟）
      */
-    @Value("${shiro.session.dbSyncPeriod}")
+    @Value("${shiro.session.dbSyncPeriod:1}")
     private int dbSyncPeriod;
 
     /**

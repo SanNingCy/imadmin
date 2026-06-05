@@ -1,26 +1,27 @@
 server:
-  port: 8083
+  port: 8053
   servlet:
     context-path:
-  tomcat:
-    uri-encoding: UTF-8
-    basedir: ./logs/tomcat
-    max-threads: 2000
-    min-spare-threads: 10
-    accesslog:
-      pattern: common
-      enabled: true
-      directory: logs
-      prefix: access_log
-      suffix: .log
-      request-attributes-enabled: true
-      rename-on-rotate: true
-    max-http-form-post-size: 200MB
-logging:
-  level:
-    root: INFO
-    com.seekweb4.chat: DEBUG
-  config: classpath:logback-spring.xml
+    tomcat:
+      uri-encoding: UTF-8
+      basedir: ./logs/tomcat
+      max-threads: 2000
+      min-spare-threads: 10
+      accesslog:
+        pattern: common
+        enabled: true
+        directory: logs
+        prefix: access_log
+        suffix: .log
+        request-attributes-enabled: true
+        rename-on-rotate: true
+      max-http-form-post-size: 200MB
+  logging:
+    level:
+      root: INFO
+      com.seekweb4.chat: DEBUG
+    config: classpath:logback-spring.xml
+
 spring:
   servlet:
     multipart:
@@ -29,6 +30,7 @@ spring:
   devtools:
     restart:
       enabled: false
+
   data:
     mongodb:
       uri: mongodb://admin:admin@localhost:27017/admin
@@ -36,6 +38,7 @@ spring:
     username: root
     password: root
     url: jdbc:mysql://localhost:3306/im?useUnicode=true&characterEncoding=utf-8&useSSL=false&nullCatalogMeansCurrent=true&serverTimezone=Asia/Shanghai
+#    url: jdbc:mysql://localhost:3306/caizongim?useUnicode=true&characterEncoding=utf-8&useSSL=false&nullCatalogMeansCurrent=true&serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
@@ -49,15 +52,18 @@ spring:
       max-lifetime: 900000           # 连接的生命时长（毫秒），超时而且没被使用则被释放（retired），默认:30分钟 1800000ms
       connection-test-query: SELECT 1 FROM dual
       leak-detection-threshold: 30000
+  # redis的配置
   redis:
     host: localhost
     port: 6379
     database: 5
+    password:
     expireTime: 3600000 #单位秒
+    timeout: 6000
+
   mvc.servlet.load-on-startup: 1
   jmx:
     enabled: false
-  # quartz任务配置
   quartz:
     job-store-type: jdbc
     properties:
@@ -94,11 +100,18 @@ mybatis:
 swagger:
   enable: false
 
-filePath: http://api.seekweb4.ai/
-httpsPath: http://api.seekweb4.ai/
+filePath: http://119.45.9.228:82/
+httpsPath: http://119.45.9.228:82/
+
+#filePath: http://119.45.9.228:82/
+#httpsPath: http://119.45.9.228:82/
 
 #演示模式: 不能操作和保存的模块： sys
 demoMode: false
+
+# TODO Shiro权限检查开关（开发阶段可设置为false禁用所有@RequiresPermissions注解）
+shiro:
+  permission-check-enabled: false
 #上传文件绝对路径, 路径中不允许包含“userfiles”
 userfiles:
   basedir:       # 文件上传路径，可以留空
@@ -134,8 +147,8 @@ socket:
 
 im:
   admin:
-    host: http://43.199.50.216:18080
-    password: fyhKop-3kanti-hatzox
+    host: http://localhost:18080
+    password: 123456
 
 # 文件上传配置
 config:
@@ -153,23 +166,30 @@ config:
       bucketName: us-web4x6
       accessUrl: https://d2ixzsnmawz3gt.cloudfront.net
       cdnDomain: static.seekweb4.net
+#    aws: #亚马逊S3
+#      baseDir: file
+#      accessKey: AKIAQT7DQ7UXFDMI7Y5G
+#      secretKey: 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
+#      endpoint: https://s3.ap-east-1.amazonaws.com
+#      bucketName: seekweb4-pro
+#      cdnDomain: static.seekweb4.net
 
+
+asset:
+  appId: im
+  privateKey: MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAIla6sRAtccGVmuutvn+WHooqbt6DebY0sTgcd7c+6UhNX84erEWugG4zpkkyUfM/f3U7USSIrP0U2RufApimZu04J5a2UqDcyJ47PC+c3pLMfiSZ4EvnO/msl4gkJ7NpCu+S2zQ3G6Q9VejIO6biE+fMYtZrYUfDbHaYWzETRujAgMBAAECgYEAiPlEgv9xBw+X4PyzdewhuXiRgub9tAbncPPOOowu2waZ/cuJ9s2OIqd0R546p0KSy62qCyacOs7c1pujUQvw17JoHveFCxB5rPJSO884YX3gsd073xyQP+VNMt/a8iUMMzcxXwC/KoQIpGhGN5b1JIvAkMeKqYuqOGeDA6llxrECQQDF29Bs20V9Xior8BA7Fg76MEIj7hvh2yPfuK7P84uxloGk3Z8qN9tjg1hJ1MtYF7GzrifFCm7/+oJUYEacJb7pAkEAsbelAGoIzz10gM5VeZtUYIeASEKkPtLgpQBR1HZ50a28ArMle5/9rIqzX6oDxgAx7kQ5Y7MLURvLipT3fsAmqwJAUk+f5alSv1TtNlooZmxGzs5Eta3Y65y+z9OE5f3rn3V9eZi5Hlcebce2cwCTl5JD2vwYj2BHzTXqAjALL+qEAQJABX0Oc3zS2NOlDXVR3neVm4WTyKeGOwp4NaBU5qLiED+1VsABoFfIldOSxpmRlEPdRuaEfzfAWbjqCFWhbyCwEQJADTqfVAirnimIqHiOCIz+286G1On1YGun1gsUxmB8Fsbw9LqCZ3QiXs/wzNKLO3Fj7FSgu6Cmmri2KhrJ+3s16Q==
+  publicKey: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDVk0jf/TgUu57T8LYM8jiXhzhxacnegdUvUR9mFuenqhYXTLDlBN89Az6dBonQdEA8rb62rn9nVEd1sdjvQA8pbMiuKV1K+vEoIyw2IjB9vS7EKAnUvLI9/KCQYYBLvw2cjo+1Sa+rHUpdo48CUg/vQ5fwqg2jeGgJR5dgTxJTEQIDAQAB
+  wxPayUrl: https://www.web4x.net/
+
+withdrawal:
+  appId: im
+  #  privateKey: MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAOznQnLhH6eyrJ7ihfy5hKULa41nGfovnZy8JVIxAHC3htFjW2QU+tAi9I+/HYTV+K27RArgtadoAIMvR4WOhKPbiRF/X810NxbxG1YkDt3eY8nTKtj/u2bcIguIEAJKmZK4QmGpXKmP3tdrOGvjHKQXKKrYGsRdhaI87l9kVeFtAgMBAAECgYBdgfqMdaeU/cV9AVR5qJBexN8y9Rsf0WOY1fq1MnpGA2rHgzwziMRnGyUFCB6SrBJ4II5+7KtG5JovLZ5BbTuU3ylfKUZWSl0rPBFP8N5uNGJ4623aKapCX1oo++l2vGpcFhQZyu379X+RRdabxgkFoDfc02hyGPoOaUdGG6LN0QJBAO0N5lf/tkJpjoyN+Vj273ZLv1ZSDUd4BAUvz81nR6P5f0T1a4RrAzKQ7J655JCFxpHSawC4Ka5GYDaZNmCmXmsCQQD/1kWH/SunQjccgEJyhF2I+5sJEjf9u1R+Y1N1wYXnfsePe9UFUThwvt31i7HUx0gm8zxJLmA9/b/z/OPyxgWHAkBnlFc9xEIDKtRanf6B3QQtEFP+h8O9orc+/PEzsxkekPoHS6U7KvcutRxvDpLMg2eMeADBQ7cSqzWHJdMY0BkZAkEAtkCPsevCEFoUZqJcM7Zl57LN5C1tY7zy2UKq7wVY/ewMAARIYYxVt8PQ3R6SJbF9jfnTJZL7Ds5Y01iBjq5QuwJAYu+mIIbpma1+4zlCDAHwtJze392SaNPW4AdQppShn/FHS0yHN4pUIs20nyI7LiKN0f1iQUxn7mXpVw3NWvCSUQ==
+  #  publicKey: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDs50Jy4R+nsqye4oX8uYSlC2uNZxn6L52cvCVSMQBwt4bRY1tkFPrQIvSPvx2E1fitu0QK4LWnaACDL0eFjoSj24kRf1/NdDcW8RtWJA7d3mPJ0yrY/7tm3CILiBACSpmSuEJhqVypj97Xazhr4xykFyiq2BrEXYWiPO5fZFXhbQIDAQAB
+  #  wxPayUrl: https://bsc-webxs-api.web4x.net
+  privateKey: MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBANMV+lza+GDYFeA6sMPHDmHjew/TChgWjkSdhCjtv26YZQXbIP6UsKWbUBHI4clvc0MefSJsvvezFSZI5t1z8jvY/9qFU0RDYjU/22788ucyHe5KdPMKM/lGkqdTqy7ySG734YoXdpAhBPyAtMf2pwKvZHJWeUOE8QK8CSi7+XyfAgMBAAECgYAhWU2OsgGfu0Ppgxw+MgqxqHDe1Sa5G4cqjAA/PyCJZoY/YJlb3z3xTBJgXO5fFr6NEhoPAENDewWSYN4oipLwW9WUB//JJEnk62zAoKaJo/M7rWV0hEA4Sm+MTtMKaD96s3LlpHPQo045AgPnELKTX1mg6Dldx6qlYYg/JjXB0QJBAP+br7iI6KjfPsMZMnSH9G7ef06l7PAcDpKd8oZUKt/Czxy6m8X9Sard1Lo0Tu/O+KRqx0QWbrOIcU+bRJI0NqMCQQDTaNGagT5HNoiT9WpWfpKSRW0Wx7UcZjs9bfAh3XzxygoATG+lDolKHyMFuai7C/WfP+FSUUbSrwH3V5KcE03VAkAI231AWMYvK+VB33qnHRr0SJOCxy8ptt8uZ3jC/OGrdVW1+iVxu/A0kpFPjoZ5uuNU1zpmepyFbiH3DztWEacfAkEAxeWE8ACz762YxAgjdrwdMFdU+tIPM3pvUd2rv8e5wgzCt+zVRckJsxzah+13iUB0uJHvtkLm7Sltyb9sOjXH0QJBAKP25wi3B6s9INjfoW+hYOYupCpP/aZNcn90molmB+NYp/CsObgfeg4jEmpEcs3iyRmTINSDgH/UfP1YtR8lEPU=
+  publicKey: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDTFfpc2vhg2BXgOrDDxw5h43sP0woYFo5EnYQo7b9umGUF2yD+lLClm1ARyOHJb3NDHn0ibL73sxUmSObdc/I72P/ahVNEQ2I1P9tu/PLnMh3uSnTzCjP5RpKnU6su8khu9+GKF3aQIQT8gLTH9qcCr2RyVnlDhPECvAkou/l8nwIDAQAB
+  wxPayUrl: http://54.46.104.145:22300
 # 用户ID号和靓号前缀配置
 user:
   idno:
     prefix-m: false  # 是否在idno和lianghao前面添加M前缀，true表示添加，false表示不添加
-
-asset:
-  appId: im
-  privateKey: MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAL8f5eKXfg/6PcXhYeOdqA4naCgoVbM8uzV6Lk8JVRH5bFzygfAUXGCHvzfYOPiZgIqtBpUh5M3SqPIT4Y9l0zlEvxGY+QruqOILtMmTh4c/bs7LKzqoqO02UpN+cL3t50hH6cXoFzkCjmZLibsv3Le0RisoMTzwMf6DHxbz6dyjAgMBAAECgYBDe5vL2fmk4pKVH/NUTwJbnQZlx3gbBUKEq1NWjNEAu7TLTMUcY9QKMWQO78WN4YVFcbp1RbZoBg2pC+QEoctmPOy6Jw/7gpKNVpp+0yDWKtoSwjmD0iyfLrasdp8S70w8FXopGlFc+/E3Wg255YF7CJPipF3R5QbNppr1ruTEoQJBAN/d6TaqdOqQJDljULcO6BTuMuH9h/Z+D5qpzxmGCW7Cxx64X06plbUxN0SgGN/ZMDVdRbnN1d0pz4OTpWROjq0CQQDajtvJFOWNst+eGi9iYfM/vajUSdHlt3DBKiuTkF5mSC3FPwvVGPJSj7pMHIZagixyIf2LxEpStBMPNAq+ABKPAkEAnxoGsixI9Z/FruePqNo2RRHZJdXa+Gs1SdVfc6NYNtjFTWb5jV1nIaQ9xE8H/qdL5NFKSbgpQ4qAieG4DObr7QJADZs3M52JbPjl0wHuUUGn0yALkqvF1XdGHcByVg120wdLUixKoEmdTGaGQpbEBn50JebX0gu2VM/BIAEtaga3IQJALGQT5PI8pTDMNTiKr5XBmeM8dZWlWc1CXKHv2K8bxW6O5WmITDLNShbeZQu8YhdtSy1yM6fYj/xWUgeULSP+yw==
-  publicKey: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC/H+Xil34P+j3F4WHjnagOJ2goKFWzPLs1ei5PCVUR+Wxc8oHwFFxgh7832Dj4mYCKrQaVIeTN0qjyE+GPZdM5RL8RmPkK7qjiC7TJk4eHP27Oyys6qKjtNlKTfnC97edIR+nF6Bc5Ao5mS4m7L9y3tEYrKDE88DH+gx8W8+ncowIDAQAB
-  wxPayUrl: https://www.web4x.io/
-#  wxPayUrl: https://www.web4x.net/
-#  wxPayUrl: https://hcadmin.web4x.cn # web4x链桥后台测试环境
-
-
-withdrawal:
-  appId: im
-  privateKey: MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAOznQnLhH6eyrJ7ihfy5hKULa41nGfovnZy8JVIxAHC3htFjW2QU+tAi9I+/HYTV+K27RArgtadoAIMvR4WOhKPbiRF/X810NxbxG1YkDt3eY8nTKtj/u2bcIguIEAJKmZK4QmGpXKmP3tdrOGvjHKQXKKrYGsRdhaI87l9kVeFtAgMBAAECgYBdgfqMdaeU/cV9AVR5qJBexN8y9Rsf0WOY1fq1MnpGA2rHgzwziMRnGyUFCB6SrBJ4II5+7KtG5JovLZ5BbTuU3ylfKUZWSl0rPBFP8N5uNGJ4623aKapCX1oo++l2vGpcFhQZyu379X+RRdabxgkFoDfc02hyGPoOaUdGG6LN0QJBAO0N5lf/tkJpjoyN+Vj273ZLv1ZSDUd4BAUvz81nR6P5f0T1a4RrAzKQ7J655JCFxpHSawC4Ka5GYDaZNmCmXmsCQQD/1kWH/SunQjccgEJyhF2I+5sJEjf9u1R+Y1N1wYXnfsePe9UFUThwvt31i7HUx0gm8zxJLmA9/b/z/OPyxgWHAkBnlFc9xEIDKtRanf6B3QQtEFP+h8O9orc+/PEzsxkekPoHS6U7KvcutRxvDpLMg2eMeADBQ7cSqzWHJdMY0BkZAkEAtkCPsevCEFoUZqJcM7Zl57LN5C1tY7zy2UKq7wVY/ewMAARIYYxVt8PQ3R6SJbF9jfnTJZL7Ds5Y01iBjq5QuwJAYu+mIIbpma1+4zlCDAHwtJze392SaNPW4AdQppShn/FHS0yHN4pUIs20nyI7LiKN0f1iQUxn7mXpVw3NWvCSUQ==
-  publicKey: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDs50Jy4R+nsqye4oX8uYSlC2uNZxn6L52cvCVSMQBwt4bRY1tkFPrQIvSPvx2E1fitu0QK4LWnaACDL0eFjoSj24kRf1/NdDcW8RtWJA7d3mPJ0yrY/7tm3CILiBACSpmSuEJhqVypj97Xazhr4xykFyiq2BrEXYWiPO5fZFXhbQIDAQAB
-  wxPayUrl: https://bsc-webxs-api.web4x.net

@@ -116,9 +116,9 @@ public class MyBatisConfig
     @Bean
     public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception
     {
-        String typeAliasesPackage = env.getProperty("mybatis.typeAliasesPackage");
-        String mapperLocations = env.getProperty("mybatis.mapperLocations");
-        String configLocation = env.getProperty("mybatis.configLocation");
+        String typeAliasesPackage = resolveTypeAliasesPackage();
+        String mapperLocations = resolveMapperLocationsProperty();
+        String configLocation = resolveConfigLocation();
         typeAliasesPackage = setTypeAliasesPackage(typeAliasesPackage);
         VFS.addImplClass(SpringBootVFS.class);
 
@@ -128,5 +128,79 @@ public class MyBatisConfig
         sessionFactory.setMapperLocations(resolveMapperLocations(StringUtils.split(mapperLocations, ",")));
         sessionFactory.setConfigLocation(new DefaultResourceLoader().getResource(configLocation));
         return sessionFactory.getObject();
+    }
+
+    /**
+     * 兼容若依 camelCase 与 IM kebab-case（type-aliases-package），并合并双栈包路径。
+     */
+    private String resolveTypeAliasesPackage()
+    {
+        String packages = firstNonBlank(
+                env.getProperty("mybatis.typeAliasesPackage"),
+                env.getProperty("mybatis.type-aliases-package"));
+        if (StringUtils.isEmpty(packages))
+        {
+            packages = "com.web4x.**.domain,com.seekweb4.chat.modules";
+        }
+        else if (!packages.contains("com.web4x"))
+        {
+            packages = "com.web4x.**.domain," + packages;
+        }
+        return packages;
+    }
+
+    private String resolveMapperLocationsProperty()
+    {
+        String locations = firstNonBlank(
+                env.getProperty("mybatis.mapperLocations"),
+                joinIndexedProperties("mybatis.mapper-locations"));
+        if (StringUtils.isEmpty(locations))
+        {
+            locations = "classpath*:mapper/**/*Mapper.xml,classpath*:com/seekweb4/chat/modules/**/*Mapper.xml";
+        }
+        else if (!locations.contains("mapper/"))
+        {
+            locations = locations + ",classpath*:mapper/**/*Mapper.xml";
+        }
+        return locations;
+    }
+
+    private String resolveConfigLocation()
+    {
+        return firstNonBlank(
+                env.getProperty("mybatis.configLocation"),
+                env.getProperty("mybatis.config-location"),
+                "classpath:mybatis/mybatis-config.xml");
+    }
+
+    private String joinIndexedProperties(String prefix)
+    {
+        List<String> values = new ArrayList<>();
+        for (int i = 0; i < 32; i++)
+        {
+            String value = env.getProperty(prefix + "[" + i + "]");
+            if (StringUtils.isEmpty(value))
+            {
+                break;
+            }
+            values.add(value.trim());
+        }
+        if (values.isEmpty())
+        {
+            return env.getProperty(prefix);
+        }
+        return String.join(",", values);
+    }
+
+    private static String firstNonBlank(String... candidates)
+    {
+        for (String candidate : candidates)
+        {
+            if (StringUtils.isNotEmpty(candidate))
+            {
+                return candidate.trim();
+            }
+        }
+        return null;
     }
 }

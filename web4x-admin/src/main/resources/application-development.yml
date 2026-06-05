@@ -1,3 +1,4 @@
+#aws亚马逊
 server:
   port: 8083
   servlet:
@@ -34,8 +35,8 @@ spring:
       uri: mongodb://admin:admin@localhost:27017/admin
   datasource:
     username: root
-    password: root
-    url: jdbc:mysql://localhost:3306/im?useUnicode=true&characterEncoding=utf-8&useSSL=false&nullCatalogMeansCurrent=true&serverTimezone=Asia/Shanghai
+    password: root123456
+    url: jdbc:mysql://localhost:3306/caizongim?useUnicode=true&characterEncoding=utf-8&useSSL=false&nullCatalogMeansCurrent=true&serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
@@ -49,11 +50,14 @@ spring:
       max-lifetime: 900000           # 连接的生命时长（毫秒），超时而且没被使用则被释放（retired），默认:30分钟 1800000ms
       connection-test-query: SELECT 1 FROM dual
       leak-detection-threshold: 30000
+  # redis的配置
   redis:
     host: localhost
     port: 6379
     database: 5
+    password:
     expireTime: 3600000 #单位秒
+    timeout: 6000
   mvc.servlet.load-on-startup: 1
   jmx:
     enabled: false
@@ -154,6 +158,7 @@ config:
       accessUrl: https://d2ixzsnmawz3gt.cloudfront.net
       cdnDomain: static.seekweb4.net
 
+
 # 用户ID号和靓号前缀配置
 user:
   idno:
@@ -163,9 +168,8 @@ asset:
   appId: im
   privateKey: MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAL8f5eKXfg/6PcXhYeOdqA4naCgoVbM8uzV6Lk8JVRH5bFzygfAUXGCHvzfYOPiZgIqtBpUh5M3SqPIT4Y9l0zlEvxGY+QruqOILtMmTh4c/bs7LKzqoqO02UpN+cL3t50hH6cXoFzkCjmZLibsv3Le0RisoMTzwMf6DHxbz6dyjAgMBAAECgYBDe5vL2fmk4pKVH/NUTwJbnQZlx3gbBUKEq1NWjNEAu7TLTMUcY9QKMWQO78WN4YVFcbp1RbZoBg2pC+QEoctmPOy6Jw/7gpKNVpp+0yDWKtoSwjmD0iyfLrasdp8S70w8FXopGlFc+/E3Wg255YF7CJPipF3R5QbNppr1ruTEoQJBAN/d6TaqdOqQJDljULcO6BTuMuH9h/Z+D5qpzxmGCW7Cxx64X06plbUxN0SgGN/ZMDVdRbnN1d0pz4OTpWROjq0CQQDajtvJFOWNst+eGi9iYfM/vajUSdHlt3DBKiuTkF5mSC3FPwvVGPJSj7pMHIZagixyIf2LxEpStBMPNAq+ABKPAkEAnxoGsixI9Z/FruePqNo2RRHZJdXa+Gs1SdVfc6NYNtjFTWb5jV1nIaQ9xE8H/qdL5NFKSbgpQ4qAieG4DObr7QJADZs3M52JbPjl0wHuUUGn0yALkqvF1XdGHcByVg120wdLUixKoEmdTGaGQpbEBn50JebX0gu2VM/BIAEtaga3IQJALGQT5PI8pTDMNTiKr5XBmeM8dZWlWc1CXKHv2K8bxW6O5WmITDLNShbeZQu8YhdtSy1yM6fYj/xWUgeULSP+yw==
   publicKey: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC/H+Xil34P+j3F4WHjnagOJ2goKFWzPLs1ei5PCVUR+Wxc8oHwFFxgh7832Dj4mYCKrQaVIeTN0qjyE+GPZdM5RL8RmPkK7qjiC7TJk4eHP27Oyys6qKjtNlKTfnC97edIR+nF6Bc5Ao5mS4m7L9y3tEYrKDE88DH+gx8W8+ncowIDAQAB
-  wxPayUrl: https://www.web4x.io/
 #  wxPayUrl: https://www.web4x.net/
-#  wxPayUrl: https://hcadmin.web4x.cn # web4x链桥后台测试环境
+  wxPayUrl: https://hcadmin.web4x.cn # web4x链桥后台测试环境
 
 
 withdrawal:

@@ -1,8 +1,9 @@
 package com.web4x.integration.im;
 
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
+import com.web4x.common.condition.ImShiroEnabledCondition;
 import com.seekweb4.chat.common.utils.CookieUtils;
 import com.seekweb4.chat.modules.sys.security.util.JWTUtil;
 import com.seekweb4.chat.modules.sys.utils.UserUtils;
@@ -11,7 +12,7 @@ import com.seekweb4.chat.modules.sys.utils.UserUtils;
  * 若依表单登录成功后写入 IM JWT Cookie，供 {@code JWTFilter} 鉴权后续页面请求。
  */
 @Component
-@ConditionalOnProperty(name = "im.shiro.enabled", havingValue = "true", matchIfMissing = true)
+@Conditional(ImShiroEnabledCondition.class)
 public class ImWebLoginHelper
 {
     public void writeTokenCookie(HttpServletResponse response)

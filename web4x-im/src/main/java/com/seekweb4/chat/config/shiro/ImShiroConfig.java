@@ -15,10 +15,12 @@ import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
+import com.web4x.common.condition.ImShiroEnabledCondition;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.web.filter.DelegatingFilterProxy;
@@ -31,7 +33,7 @@ import java.util.*;
  * Created by lixin
  */
 @Configuration
-@ConditionalOnProperty(name = "im.shiro.enabled", havingValue = "true", matchIfMissing = true)
+@Conditional(ImShiroEnabledCondition.class)
 public class ImShiroConfig {
     @Bean
     public static LifecycleBeanPostProcessor getLifecycleBeanPostProcessor() {

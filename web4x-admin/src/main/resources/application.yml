@@ -1,182 +1,115 @@
-# 项目相关配置
-web4x:
-  # 名称
-  name: Web4x
-  # 版本
-  version: 4.8.3
-  # 版权年份
-  copyrightYear: 2026
-  # 实例演示开关
-  demoEnabled: false
-  # 文件路径 示例（ Windows配置D:/web4x/uploadPath，Linux配置 /home/web4x/uploadPath）
-  profile: D:/web4x/uploadPath
-  # 获取ip地址开关
-  addressEnabled: false
-
-# 开发环境配置
-server:
-  # 服务器的HTTP端口，默认为80
-  port: 80
-  servlet:
-    # 应用的访问路径
-    context-path: /
-  tomcat:
-    # tomcat的URI编码
-    uri-encoding: UTF-8
-    # 连接数满后的排队数，默认为100
-    accept-count: 1000
-    threads:
-      # tomcat最大线程数，默认为200
-      max: 800
-      # Tomcat启动初始化的线程数，默认值10
-      min-spare: 100
- 
-# 日志配置
-logging:
-  level:
-    com.web4x: info
-    org.springframework: warn
-
-# 用户配置
-user:
-  password:
-    # 密码错误{maxRetryCount}次锁定10分钟
-    maxRetryCount: 5
-  idno:
-    prefix-m: false
-
-# Spring配置
 spring:
-  jackson:
-    date-format: yyyy-MM-dd HH:mm:ss
-    time-zone: GMT+8
-  # 模板引擎
-  thymeleaf:
-    mode: HTML
-    encoding: utf-8
-    # 禁用缓存
-    cache: false
-  # 资源信息
-  messages:
-    # 国际化资源文件路径
-    basename: static/i18n/messages
   profiles:
     active: dev
-  # IM 配置引用 chat-ops（由 web4x-im 模块打包到 classpath:chat-ops/）
-  config:
-    import:
-      - optional:classpath:chat-ops/application.yml
-  # 文件上传
-  servlet:
-    multipart:
-      # 单个文件大小
-      max-file-size: 10MB
-      # 设置总上传的文件大小
-      max-request-size: 20MB
-  # IM Shiro Redis 缓存（秒），兼容旧占位符 spring.redis / spring.data.redis.expireTime
-  data:
-    redis:
-      expireTime: 3600000
-  redis:
-    expireTime: 3600000
+#    active: env82
+# thymeleaf静态资源配置
+# 默认路径
+spring.thymeleaf.prefix: classpath:/templates/
+# 后缀
+spring.thymeleaf.suffix: .html
+# 模板格式
+spring.thymeleaf.mode: HTML5
+spring.thymeleaf.encoding: UTF-8
+# 项目访问路径
+#filePath: http://119.45.9.228:84/
+#httpsPath: http://119.45.9.228:84/
+num: caizongim
 
-# IM 模块使用 chat-ops 安全栈；为 false 时回退若依 Shiro
-im:
-  shiro:
-    enabled: true
-  redis:
-    cache-expire-seconds: 3600000
-  admin:
-    host: http://127.0.0.1:18080
-    password: change-me
+chatRoom:
+  domain: https://a41.chat.agora.io
 
-# MyBatis（若依 + IM 共存）
-mybatis:
-  typeAliasesPackage: com.web4x.**.domain,com.seekweb4.chat.modules
-  mapperLocations: classpath*:mapper/**/*Mapper.xml,classpath*:com/seekweb4/chat/modules/**/*Mapper.xml
-  configLocation: classpath:mybatis/mybatis-config.xml
+kickOut:
+  domain: https://api.agora.io
 
-mybatis-plus:
-  configuration:
-    map-underscore-to-camel-case: true
-  global-config:
-    db-config:
-      logic-delete-field: delFlag
-      logic-delete-value: 1
-      logic-not-delete-value: 0
+token:
+  expirationInSeconds: 86400
+  privilegeExpirationInSeconds: 86400
 
-# PageHelper分页插件
-pagehelper:
-  helperDialect: mysql
-  supportMethodsArguments: true
-  params: count=countSql
+# Agora Webhook Configuration
+agora:
+  webhook:
+    # 客户密钥，用于webhook签名验证（需要替换为实际的密钥）
+    customer-key: "0040aa35a98749ecb5b207948d5351f2"
 
-# Shiro
+    # 签名验证配置
+    signature-verification:
+      # 是否启用签名验证，生产环境建议启用
+      enabled: true
+      # 优先使用的签名算法: sha1, sha256, auto
+      preferred-algorithm: "auto"
+      # 严格模式：要求所有签名都验证通过
+      strict-mode: false
+
+    # 事件处理配置
+    event-handling:
+      # 是否启用异步处理
+      async-processing: true
+      # 线程池核心大小
+      core-pool-size: 2
+      # 线程池最大大小
+      max-pool-size: 10
+      # 队列容量
+      queue-capacity: 100
+      # 线程名称前缀
+      thread-name-prefix: "webhook-event-"
+      # 事件处理超时时间（秒）
+      timeout-seconds: 30
+      # 失败重试次数
+      max-retries: 3
+      # 重试间隔（毫秒）
+      retry-interval: 1000
+
+    # 缓存清理间隔（毫秒）- 1小时
+    cache-cleanup-interval: 3600000
+    # 通知ID缓存时间（毫秒）- 24小时
+    notice-id-cache-time: 86400000
+# TODO Shiro权限检查开关（开发阶段可设置为false禁用所有@RequiresPermissions注解）
 shiro:
   permission-check-enabled: false
-  user:
-    # 登录地址
-    loginUrl: /login
-    # 权限认证失败地址
-    unauthorizedUrl: /unauth
-    # 首页地址
-    indexUrl: /index
-    # 验证码开关
-    captchaEnabled: true
-    # 验证码类型 math 数字计算 char 字符验证
-    captchaType: math
-  cookie:
-    # 设置Cookie的域名 默认空，即当前访问的域名
-    domain:
-    # 设置cookie的有效访问路径
-    path: /
-    # 设置HttpOnly属性
-    httpOnly: true
-    # 设置Cookie的过期时间，天为单位
-    maxAge: 30
-    # 设置密钥，务必保持唯一性（生成方式，直接拷贝到main运行即可）Base64.encodeToString(CipherUtils.generateNewKey(128, "AES").getEncoded()) （默认启动生成随机秘钥，随机秘钥会导致之前客户端RememberMe Cookie无效，如设置固定秘钥RememberMe Cookie则有效）
-    cipherKey:
-  session:
-    # Session超时时间，-1代表永不过期（默认30分钟）
-    expireTime: 30
-    # 同步session到数据库的周期（默认1分钟）
-    dbSyncPeriod: 1
-    # 相隔多久检查一次session的有效性，默认就是10分钟
-    validationInterval: 10
-    # 同一个用户最大会话数，比如2的意思是同一个账号允许最多同时两个人登录（默认-1不限制）
-    maxSession: -1
-    # 踢出之前登录的/之后登录的用户，默认踢出之前登录的用户
-    kickoutAfter: false
-  rememberMe:
-    # 是否开启记住我
-    enabled: true
 
-# Springdoc配置
-springdoc:
-  api-docs:
-    path: /v3/api-docs
-  swagger-ui:
-    enabled: true
-    path: /swagger-ui.html
-    tags-sorter: alpha
-  group-configs:
-    - group: 'default'
-      display-name: '测试模块'
-      paths-to-match: '/**'
-      packages-to-scan: com.web4x.web.controller.tool
+# 自定义配置 - 朋友圈默认背景图
+custom:
+  moment:
+    default-bg-url: https://d1iabhld7916na.cloudfront.net/file/app/1768792747065.png
 
-# 防止XSS攻击
-xss:
-  # 过滤开关
-  enabled: true
-  # 排除链接（多个用逗号分隔）
-  excludes: /system/notice/*
-  # 匹配链接
-  urlPatterns: /system/*,/monitor/*,/tool/*
+meeting:
+  maxUser: 3
 
-# 防止csrf攻击
-csrf:
-  # 过滤开关
-  enabled: false
-  # 白名单（多个用逗号分隔）
-  whites: /druid
+whitelist:
+  token:
+    appId: 91d54a270a4b41ea809164bd0c2486ed
+    appCert: a22b2b5d67614df2a123c7b7a88644d6
+    expirePeriod: 86400
+  chatRoom:
+    appId: 91d54a270a4b41ea809164bd0c2486ed
+    orgName: 411369491
+    appName: 1597850
+    clientId: 0040aa35a98749ecb5b207948d5351f2
+    clientSecret: aed98e56a615417aa0c9ace3fb5359cd
+  rtcKickOutAuth:
+    appId: 91d54a270a4b41ea809164bd0c2486ed
+    basicAuth: Basic MDA0MGFhMzVhOTg3NDllY2I1YjIwNzk0OGQ1MzUxZjI6YWVkOThlNTZhNjE1NDE3YWEwYzlhY2UzZmI1MzU5Y2Q=
+
+# 外部API配置
+external:
+  api:
+    base-url: https://wallet.web4x.cn
+
+asset:
+  appId: im
+  privateKey: MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAL8f5eKXfg/6PcXhYeOdqA4naCgoVbM8uzV6Lk8JVRH5bFzygfAUXGCHvzfYOPiZgIqtBpUh5M3SqPIT4Y9l0zlEvxGY+QruqOILtMmTh4c/bs7LKzqoqO02UpN+cL3t50hH6cXoFzkCjmZLibsv3Le0RisoMTzwMf6DHxbz6dyjAgMBAAECgYBDe5vL2fmk4pKVH/NUTwJbnQZlx3gbBUKEq1NWjNEAu7TLTMUcY9QKMWQO78WN4YVFcbp1RbZoBg2pC+QEoctmPOy6Jw/7gpKNVpp+0yDWKtoSwjmD0iyfLrasdp8S70w8FXopGlFc+/E3Wg255YF7CJPipF3R5QbNppr1ruTEoQJBAN/d6TaqdOqQJDljULcO6BTuMuH9h/Z+D5qpzxmGCW7Cxx64X06plbUxN0SgGN/ZMDVdRbnN1d0pz4OTpWROjq0CQQDajtvJFOWNst+eGi9iYfM/vajUSdHlt3DBKiuTkF5mSC3FPwvVGPJSj7pMHIZagixyIf2LxEpStBMPNAq+ABKPAkEAnxoGsixI9Z/FruePqNo2RRHZJdXa+Gs1SdVfc6NYNtjFTWb5jV1nIaQ9xE8H/qdL5NFKSbgpQ4qAieG4DObr7QJADZs3M52JbPjl0wHuUUGn0yALkqvF1XdGHcByVg120wdLUixKoEmdTGaGQpbEBn50JebX0gu2VM/BIAEtaga3IQJALGQT5PI8pTDMNTiKr5XBmeM8dZWlWc1CXKHv2K8bxW6O5WmITDLNShbeZQu8YhdtSy1yM6fYj/xWUgeULSP+yw==
+  publicKey: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC/H+Xil34P+j3F4WHjnagOJ2goKFWzPLs1ei5PCVUR+Wxc8oHwFFxgh7832Dj4mYCKrQaVIeTN0qjyE+GPZdM5RL8RmPkK7qjiC7TJk4eHP27Oyys6qKjtNlKTfnC97edIR+nF6Bc5Ao5mS4m7L9y3tEYrKDE88DH+gx8W8+ncowIDAQAB
+  #  wxPayUrl: http://192.168.2.21:8070
+  wxPayUrl: https://www.web4x.cn
+
+
+withdrawal:
+  appId: im
+  privateKey: MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAOznQnLhH6eyrJ7ihfy5hKULa41nGfovnZy8JVIxAHC3htFjW2QU+tAi9I+/HYTV+K27RArgtadoAIMvR4WOhKPbiRF/X810NxbxG1YkDt3eY8nTKtj/u2bcIguIEAJKmZK4QmGpXKmP3tdrOGvjHKQXKKrYGsRdhaI87l9kVeFtAgMBAAECgYBdgfqMdaeU/cV9AVR5qJBexN8y9Rsf0WOY1fq1MnpGA2rHgzwziMRnGyUFCB6SrBJ4II5+7KtG5JovLZ5BbTuU3ylfKUZWSl0rPBFP8N5uNGJ4623aKapCX1oo++l2vGpcFhQZyu379X+RRdabxgkFoDfc02hyGPoOaUdGG6LN0QJBAO0N5lf/tkJpjoyN+Vj273ZLv1ZSDUd4BAUvz81nR6P5f0T1a4RrAzKQ7J655JCFxpHSawC4Ka5GYDaZNmCmXmsCQQD/1kWH/SunQjccgEJyhF2I+5sJEjf9u1R+Y1N1wYXnfsePe9UFUThwvt31i7HUx0gm8zxJLmA9/b/z/OPyxgWHAkBnlFc9xEIDKtRanf6B3QQtEFP+h8O9orc+/PEzsxkekPoHS6U7KvcutRxvDpLMg2eMeADBQ7cSqzWHJdMY0BkZAkEAtkCPsevCEFoUZqJcM7Zl57LN5C1tY7zy2UKq7wVY/ewMAARIYYxVt8PQ3R6SJbF9jfnTJZL7Ds5Y01iBjq5QuwJAYu+mIIbpma1+4zlCDAHwtJze392SaNPW4AdQppShn/FHS0yHN4pUIs20nyI7LiKN0f1iQUxn7mXpVw3NWvCSUQ==
+  publicKey: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDs50Jy4R+nsqye4oX8uYSlC2uNZxn6L52cvCVSMQBwt4bRY1tkFPrQIvSPvx2E1fitu0QK4LWnaACDL0eFjoSj24kRf1/NdDcW8RtWJA7d3mPJ0yrY/7tm3CILiBACSpmSuEJhqVypj97Xazhr4xykFyiq2BrEXYWiPO5fZFXhbQIDAQAB
+  wxPayUrl: https://bscapi.web4x.cn
+  # 提现手动审核时允许验签的 BSC 钱包地址（预留，配置后仅该地址签名可通过）
+  auditWalletAddress: 0x74e67668E1f02286E6208f90afb3499892C6b120
+
+# ----- web4x 若依集成（仅追加，勿改上文 IM 配置）-----
+im.shiro.enabled: true

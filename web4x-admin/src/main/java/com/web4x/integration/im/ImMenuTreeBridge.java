@@ -7,8 +7,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
+import com.web4x.common.condition.ImShiroEnabledCondition;
 import com.seekweb4.chat.config.properties.AppProperites;
 import com.seekweb4.chat.modules.sys.entity.Menu;
 import com.seekweb4.chat.modules.sys.utils.MenuUtils;
@@ -20,7 +21,7 @@ import com.web4x.common.core.domain.entity.SysUser;
  * 若依首页侧栏菜单：与 IM 后台相同树形（{@link MenuUtils#getMenus()} / treeData2）。
  */
 @Component
-@ConditionalOnProperty(name = "im.shiro.enabled", havingValue = "true", matchIfMissing = true)
+@Conditional(ImShiroEnabledCondition.class)
 public class ImMenuTreeBridge
 {
     private static final String ROOT_MENU_ID = "1";

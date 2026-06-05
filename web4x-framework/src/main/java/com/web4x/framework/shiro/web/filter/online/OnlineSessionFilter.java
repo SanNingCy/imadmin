@@ -25,7 +25,7 @@ public class OnlineSessionFilter extends AccessControlFilter
     /**
      * 强制退出后重定向的地址
      */
-    @Value("${shiro.user.loginUrl}")
+    @Value("${shiro.user.loginUrl:/login}")
     private String loginUrl;
 
     private OnlineSessionDAO onlineSessionDAO;

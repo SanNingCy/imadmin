@@ -1,0 +1,75 @@
+# 若依 + web4x 集成补充（可选）。
+# 业务 IM 配置请只维护本目录下的 application.yml / application-{profile}.yml。
+# 本文件仅补充若依 Thymeleaf 后台所需项，可按需修改。
+
+web4x:
+  name: Web4x
+  version: 4.8.3
+  copyrightYear: 2026
+  demoEnabled: false
+  profile: D:/web4x/uploadPath
+  addressEnabled: false
+
+im:
+  shiro:
+    enabled: true
+
+shiro:
+  session:
+    expireTime: 30
+    validationInterval: 10
+    maxSession: -1
+    kickoutAfter: false
+    dbSyncPeriod: 1
+  cookie:
+    domain:
+    path: /
+    httpOnly: true
+    maxAge: 30
+    cipherKey:
+  user:
+    loginUrl: /login
+    unauthorizedUrl: /unauth
+    indexUrl: /index
+    captchaEnabled: true
+    captchaType: math
+  rememberMe:
+    enabled: true
+
+user:
+  password:
+    maxRetryCount: 5
+
+xss:
+  enabled: true
+  excludes: /system/notice/*
+  urlPatterns: /system/*,/monitor/*,/tool/*
+
+csrf:
+  enabled: false
+  whites: /druid
+
+# 若依 Druid 连接池默认（IM yml 无此项时自动使用，有配置则以 IM yml 为准）
+spring:
+  datasource:
+    druid:
+      initialSize: 5
+      minIdle: 5
+      maxActive: 20
+      maxWait: 60000
+      connectTimeout: 30000
+      socketTimeout: 60000
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      maxEvictableIdleTimeMillis: 900000
+      validationQuery: SELECT 1 FROM DUAL
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      slave:
+        enabled: false
+
+mybatis:
+  typeAliasesPackage: com.web4x.**.domain,com.seekweb4.chat.modules
+  mapperLocations: classpath*:mapper/**/*Mapper.xml,classpath*:com/seekweb4/chat/modules/**/*Mapper.xml
+  configLocation: classpath:mybatis/mybatis-config.xml

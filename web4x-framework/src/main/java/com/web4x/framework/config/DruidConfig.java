@@ -10,6 +10,8 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.env.Environment;
+import org.springframework.util.StringUtils;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.spring.boot4.autoconfigure.properties.DruidStatProperties;
 import com.alibaba.druid.util.Utils;
@@ -40,11 +42,50 @@ public class DruidConfig
     }
 
     @Bean
-    @ConfigurationProperties("spring.datasource.druid.master")
-    public DataSource masterDataSource(DruidProperties druidProperties)
+    public DataSource masterDataSource(DruidProperties druidProperties, Environment environment)
     {
         DruidDataSource dataSource = new DruidDataSource();
+        applyMasterConnectionProperties(dataSource, environment);
         return druidProperties.dataSource(dataSource);
+    }
+
+    /** IM 扁平 spring.datasource.* 与若依 druid.master.* 兼容，无需改业务 yml */
+    private static void applyMasterConnectionProperties(DruidDataSource dataSource, Environment environment)
+    {
+        String url = firstProperty(environment, "spring.datasource.druid.master.url", "spring.datasource.url");
+        if (StringUtils.hasText(url))
+        {
+            dataSource.setUrl(url);
+        }
+        String username = firstProperty(environment, "spring.datasource.druid.master.username", "spring.datasource.username");
+        if (StringUtils.hasText(username))
+        {
+            dataSource.setUsername(username);
+        }
+        String password = firstProperty(environment, "spring.datasource.druid.master.password", "spring.datasource.password");
+        if (StringUtils.hasText(password))
+        {
+            dataSource.setPassword(password);
+        }
+        String driver = firstProperty(environment, "spring.datasource.druid.master.driver-class-name",
+                "spring.datasource.driver-class-name");
+        if (StringUtils.hasText(driver))
+        {
+            dataSource.setDriverClassName(driver);
+        }
+    }
+
+    private static String firstProperty(Environment environment, String... keys)
+    {
+        for (String key : keys)
+        {
+            String value = environment.getProperty(key);
+            if (StringUtils.hasText(value))
+            {
+                return value;
+            }
+        }
+        return null;
     }
 
     @Bean

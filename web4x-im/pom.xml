@@ -380,15 +380,6 @@
             <resource>
                 <directory>src/main/resources</directory>
             </resource>
-            <!-- 构建时引用 chat-ops 配置（不复制源码，不改 chat-ops 文件内容） -->
-            <resource>
-                <directory>${chat.ops.resources}</directory>
-                <targetPath>chat-ops</targetPath>
-                <includes>
-                    <include>application.yml</include>
-                    <include>application-*.yml</include>
-                </includes>
-            </resource>
         </resources>
     </build>
 </project>

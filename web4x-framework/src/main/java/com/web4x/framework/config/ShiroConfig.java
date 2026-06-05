@@ -12,8 +12,9 @@ import org.apache.shiro.web.servlet.SimpleCookie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
+import com.web4x.common.condition.ImShiroDisabledCondition;
 import org.springframework.context.annotation.Configuration;
 import com.web4x.common.constant.Constants;
 import com.web4x.common.constant.ShiroConstants;
@@ -45,7 +46,7 @@ import org.springframework.data.redis.core.RedisTemplate;
  * @author web4x
  */
 @Configuration
-@ConditionalOnProperty(name = "im.shiro.enabled", havingValue = "false")
+@Conditional(ImShiroDisabledCondition.class)
 public class ShiroConfig
 {
     /**

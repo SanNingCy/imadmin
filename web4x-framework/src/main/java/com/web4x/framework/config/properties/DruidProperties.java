@@ -12,43 +12,43 @@ import com.alibaba.druid.pool.DruidDataSource;
 @Configuration
 public class DruidProperties
 {
-    @Value("${spring.datasource.druid.initialSize}")
+    @Value("${spring.datasource.druid.initialSize:5}")
     private int initialSize;
 
-    @Value("${spring.datasource.druid.minIdle}")
+    @Value("${spring.datasource.druid.minIdle:5}")
     private int minIdle;
 
-    @Value("${spring.datasource.druid.maxActive}")
+    @Value("${spring.datasource.druid.maxActive:20}")
     private int maxActive;
 
-    @Value("${spring.datasource.druid.maxWait}")
+    @Value("${spring.datasource.druid.maxWait:60000}")
     private int maxWait;
 
-    @Value("${spring.datasource.druid.connectTimeout}")
+    @Value("${spring.datasource.druid.connectTimeout:30000}")
     private int connectTimeout;
 
-    @Value("${spring.datasource.druid.socketTimeout}")
+    @Value("${spring.datasource.druid.socketTimeout:60000}")
     private int socketTimeout;
 
-    @Value("${spring.datasource.druid.timeBetweenEvictionRunsMillis}")
+    @Value("${spring.datasource.druid.timeBetweenEvictionRunsMillis:60000}")
     private int timeBetweenEvictionRunsMillis;
 
-    @Value("${spring.datasource.druid.minEvictableIdleTimeMillis}")
+    @Value("${spring.datasource.druid.minEvictableIdleTimeMillis:300000}")
     private int minEvictableIdleTimeMillis;
 
-    @Value("${spring.datasource.druid.maxEvictableIdleTimeMillis}")
+    @Value("${spring.datasource.druid.maxEvictableIdleTimeMillis:900000}")
     private int maxEvictableIdleTimeMillis;
 
-    @Value("${spring.datasource.druid.validationQuery}")
+    @Value("${spring.datasource.druid.validationQuery:SELECT 1 FROM DUAL}")
     private String validationQuery;
 
-    @Value("${spring.datasource.druid.testWhileIdle}")
+    @Value("${spring.datasource.druid.testWhileIdle:true}")
     private boolean testWhileIdle;
 
-    @Value("${spring.datasource.druid.testOnBorrow}")
+    @Value("${spring.datasource.druid.testOnBorrow:false}")
     private boolean testOnBorrow;
 
-    @Value("${spring.datasource.druid.testOnReturn}")
+    @Value("${spring.datasource.druid.testOnReturn:false}")
     private boolean testOnReturn;
 
     public DruidDataSource dataSource(DruidDataSource datasource)
