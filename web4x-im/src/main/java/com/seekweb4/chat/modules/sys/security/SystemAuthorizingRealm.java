@@ -132,12 +132,17 @@ public class SystemAuthorizingRealm extends AuthorizingRealm {
 		User user = getUserService().getUserByLoginName(username);
 		if (user != null) {
 			SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-			List<Menu> list = UserUtils.getMenuList();
-			for (Menu menu : list){
-				if (StringUtils.isNotBlank(menu.getPermission())){
-					// 添加基于Permission的权限信息
-					for (String permission : StringUtils.split(menu.getPermission(),",")){
-						info.addStringPermission(permission);
+			// 与若依 UserRealm 一致：超级管理员拥有全部权限
+			if (user.isAdmin()) {
+				info.addRole("admin");
+				info.addStringPermission("*:*:*");
+			} else {
+				List<Menu> list = UserUtils.getMenuList();
+				for (Menu menu : list) {
+					if (StringUtils.isNotBlank(menu.getPermission())) {
+						for (String permission : StringUtils.split(menu.getPermission(), ",")) {
+							info.addStringPermission(permission);
+						}
 					}
 				}
 			}

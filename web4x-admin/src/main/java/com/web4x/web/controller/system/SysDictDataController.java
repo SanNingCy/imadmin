@@ -19,6 +19,7 @@ import com.web4x.common.core.page.TableDataInfo;
 import com.web4x.common.enums.BusinessType;
 import com.web4x.common.utils.poi.ExcelUtil;
 import com.web4x.system.service.ISysDictDataService;
+import com.web4x.system.service.ISysDictTypeService;
 
 /**
  * 数据字典信息
@@ -34,10 +35,14 @@ public class SysDictDataController extends BaseController
     @Autowired
     private ISysDictDataService dictDataService;
 
+    @Autowired
+    private ISysDictTypeService dictTypeService;
+
     @RequiresPermissions("system:dict:view")
     @GetMapping()
-    public String dictData()
+    public String dictData(ModelMap mmap)
     {
+        mmap.put("dictList", dictTypeService.selectDictTypeAll());
         return prefix + "/data";
     }
 

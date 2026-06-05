@@ -9,6 +9,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.ModelAndView;
 import com.web4x.common.core.domain.AjaxResult;
@@ -29,6 +30,17 @@ import com.web4x.common.utils.security.PermissionUtils;
 public class GlobalExceptionHandler
 {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    /**
+     * 静态资源未找到（Spring 6+ 抛出 NoResourceFoundException）
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public AjaxResult handleNoResourceFoundException(NoResourceFoundException e, HttpServletRequest request)
+    {
+        String requestURI = request.getRequestURI();
+        log.warn("请求地址'{}',静态资源未找到'{}'", requestURI, e.getMessage());
+        return AjaxResult.error("请求的资源不存在");
+    }
 
     /**
      * 权限校验异常（ajax请求返回json，redirect请求跳转页面）

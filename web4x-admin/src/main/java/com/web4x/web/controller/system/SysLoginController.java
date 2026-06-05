@@ -18,6 +18,7 @@ import com.web4x.common.core.controller.BaseController;
 import com.web4x.common.core.domain.AjaxResult;
 import com.web4x.common.core.text.Convert;
 import com.web4x.common.utils.ServletUtils;
+import com.web4x.common.utils.ShiroUtils;
 import com.web4x.common.utils.StringUtils;
 import com.web4x.framework.web.service.ConfigService;
 
@@ -80,6 +81,20 @@ public class SysLoginController extends BaseController
             }
             return error(msg);
         }
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request, HttpServletResponse response)
+    {
+        if (imWebLoginHelper != null)
+        {
+            imWebLoginHelper.logout(response);
+        }
+        else
+        {
+            ShiroUtils.logout();
+        }
+        return "redirect:/login";
     }
 
     @GetMapping("/unauth")

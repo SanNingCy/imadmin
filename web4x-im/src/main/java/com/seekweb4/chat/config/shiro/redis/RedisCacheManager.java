@@ -16,7 +16,7 @@ public class RedisCacheManager implements CacheManager {
 
 
     @Resource(name = "redisTemplate")
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Value("${im.redis.cache-expire-seconds:${spring.data.redis.expireTime:${spring.redis.expireTime:3600}}}")
     private long redisExpireTime;

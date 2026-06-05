@@ -27,7 +27,7 @@ import com.web4x.system.service.ISysDictTypeService;
  * @author web4x
  */
 @Controller
-@RequestMapping("/system/dict")
+@RequestMapping("/system/dict/type")
 public class SysDictTypeController extends BaseController
 {
     private String prefix = "system/dict/type";

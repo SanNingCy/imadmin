@@ -1,6 +1,7 @@
 package com.web4x.integration.im;
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.shiro.subject.Subject;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 import com.web4x.common.condition.ImShiroEnabledCondition;
@@ -27,5 +28,31 @@ public class ImWebLoginHelper
     public void clearTokenCookie(HttpServletResponse response)
     {
         CookieUtils.setCookie(response, JWTUtil.TOKEN, "", 0);
+    }
+
+    /**
+     * 完整退出：清理 IM 用户缓存、注销 Shiro 会话并清除 JWT Cookie。
+     */
+    public void logout(HttpServletResponse response)
+    {
+        try
+        {
+            Subject subject = UserUtils.getSubject();
+            if (subject != null && subject.getPrincipal() != null)
+            {
+                try
+                {
+                    UserUtils.clearCache();
+                }
+                catch (Exception ignored)
+                {
+                }
+                subject.logout();
+            }
+        }
+        catch (Exception ignored)
+        {
+        }
+        clearTokenCookie(response);
     }
 }

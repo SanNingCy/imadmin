@@ -12,16 +12,23 @@ public class RedisCache<K, V> implements Cache<K, V> {
 
     private long expireTime = 3600;// 缓存的超时时间，单位为s
 
-    private RedisTemplate<K, V> redisTemplate;// 通过构造方法注入该对象
+    private RedisTemplate<String, Object> redisTemplate;// 通过构造方法注入该对象
 
     public RedisCache() {
         super();
     }
 
-    public RedisCache(long expireTime, RedisTemplate<K, V> redisTemplate) {
+    public RedisCache(long expireTime, RedisTemplate<String, Object> redisTemplate) {
         super();
         this.expireTime = expireTime;
         this.redisTemplate = redisTemplate;
+    }
+
+    /**
+     * 将key转换为Redis可用的String类型key，避免Shiro的SimplePrincipalCollection等复杂对象无法序列化的问题
+     */
+    private String getRedisKey(Object key) {
+        return String.valueOf(key);
     }
 
     /**
@@ -30,7 +37,7 @@ public class RedisCache<K, V> implements Cache<K, V> {
      */
     @Override
     public V get(K key) throws CacheException {
-        return redisTemplate.opsForValue().get(key);
+        return (V) redisTemplate.opsForValue().get(getRedisKey(key));
     }
 
     /**
@@ -38,7 +45,7 @@ public class RedisCache<K, V> implements Cache<K, V> {
      */
     @Override
     public V put(K key, V value) throws CacheException {
-        redisTemplate.opsForValue().set(key, value, this.expireTime, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(getRedisKey(key), value, this.expireTime, TimeUnit.SECONDS);
         return value;
     }
 
@@ -47,8 +54,9 @@ public class RedisCache<K, V> implements Cache<K, V> {
      */
     @Override
     public V remove(K key) throws CacheException {
-        V v = redisTemplate.opsForValue().get(key);
-        redisTemplate.opsForValue().getOperations().delete(key);
+        String redisKey = getRedisKey(key);
+        V v = (V) redisTemplate.opsForValue().get(redisKey);
+        redisTemplate.delete(redisKey);
         return v;
     }
 

@@ -58,6 +58,10 @@ public class SysIndexController extends BaseController
     {
         // 取身份信息
         SysUser user = getSysUser();
+        if (user == null)
+        {
+            return "redirect:/login";
+        }
         // 根据用户id取出菜单（IM 启用时用 sys_menu_two）
         List<SysMenu> menus = imMenuTreeBridge != null
                 ? imMenuTreeBridge.selectMenusForUser(user)
@@ -153,6 +157,13 @@ public class SysIndexController extends BaseController
     {
         mmap.put("version", Web4xConfig.getVersion());
         return "main";
+    }
+
+    // IM 菜单 /dictionary → 若依字典管理
+    @GetMapping("/dictionary")
+    public String dictionary()
+    {
+        return "redirect:/system/dict/data";
     }
 
     // content-main class

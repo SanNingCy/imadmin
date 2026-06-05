@@ -145,18 +145,44 @@ public class GlobalErrorController{
     }
 
     /**
-     * 没有登录跳转到402
+     * 没有登录：浏览器页面跳转登录页，接口/Ajax 返回 402 JSON。
      */
     public static void response4021(ServletRequest req, ServletResponse resp) {
         try {
             HttpServletRequest request = (HttpServletRequest) req;
             HttpServletResponse response = (HttpServletResponse) resp;
-            request.getRequestDispatcher("/402/1").forward(request,response);
+            if (isBrowserPageRequest(request)) {
+                String contextPath = request.getContextPath();
+                String loginUrl = (contextPath == null || contextPath.isEmpty()) ? "/login" : contextPath + "/login";
+                response.sendRedirect(loginUrl);
+            } else {
+                request.getRequestDispatcher("/402/1").forward(request, response);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ServletException e) {
             e.printStackTrace();
         }
+    }
+
+    private static boolean isBrowserPageRequest(HttpServletRequest request) {
+        String xRequestedWith = request.getHeader("X-Requested-With");
+        if (xRequestedWith != null && xRequestedWith.contains("XMLHttpRequest")) {
+            return false;
+        }
+        String accept = request.getHeader("Accept");
+        if (accept != null && accept.contains("application/json")) {
+            return false;
+        }
+        String uri = request.getRequestURI();
+        if (uri != null && uri.startsWith(request.getContextPath() + "/api")) {
+            return false;
+        }
+        if (uri != null && uri.startsWith("/api")) {
+            return false;
+        }
+        return "GET".equalsIgnoreCase(request.getMethod())
+                || (accept != null && accept.contains("text/html"));
     }
 
     /**

@@ -138,7 +138,6 @@ public class ImShiroConfig {
         filterRuleMap.put("/web4x/**", "anon");
         filterRuleMap.put("/favicon.ico**", "anon");
         filterRuleMap.put("/im/**", "anon");
-        filterRuleMap.put("/index", "anon");
         filterRuleMap.put("/logout", "anon");
         // 首页控制台统计（与 IM 后台 /api/topData 等同，内网管理页使用）
         filterRuleMap.put("/chatlog/chatLog/topData", "anon");
