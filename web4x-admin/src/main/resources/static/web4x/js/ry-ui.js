@@ -33,6 +33,54 @@ var table = {
         bttTable: {},
         // 表格封装处理
         table: {
+            // 表头 halign 与数据 align 同步（columnAlign 为 center 时生效）
+            normalizeColumnsAlign: function(columns, columnAlign) {
+                if ($.common.isEmpty(columns) || columnAlign !== 'center') {
+                    return columns;
+                }
+                $.each(columns, function(index, column) {
+                    if ($.common.isEmpty(column)) {
+                        return;
+                    }
+                    column.align = 'center';
+                    column.halign = 'center';
+                    var originalCellStyle = column.cellStyle;
+                    column.cellStyle = function(value, row, rowIndex) {
+                        var style = { css: { 'text-align': 'center', 'vertical-align': 'middle' } };
+                        if (typeof originalCellStyle === 'function') {
+                            var custom = originalCellStyle(value, row, rowIndex);
+                            if (custom && custom.css) {
+                                $.extend(style.css, custom.css);
+                            }
+                        }
+                        return style;
+                    };
+                });
+                return columns;
+            },
+            isCenterAlign: function(tableId) {
+                var config = table.config[tableId];
+                return !config || config.columnAlign !== 'left';
+            },
+            // 渲染后强制单元格居中（兜底，防止样式未命中）
+            applyCenterAlign: function(tableId) {
+                if (!$.table.isCenterAlign(tableId)) {
+                    return;
+                }
+                var $table = $('#' + tableId);
+                if ($table.length === 0) {
+                    return;
+                }
+                var $wrap = $table.closest('.select-table');
+                if ($wrap.length === 0) {
+                    $wrap = $table.closest('.bootstrap-table');
+                }
+                $wrap.find('.fixed-table-container th, .fixed-table-container td').css({
+                    'text-align': 'center',
+                    'vertical-align': 'middle'
+                });
+                $wrap.find('.fixed-table-container .th-inner').css('text-align', 'center');
+            },
             // 初始化表格参数
             init: function(options) {
                 var defaults = {
@@ -67,16 +115,18 @@ var table = {
                     exportTypes: ['csv', 'txt', 'doc', 'excel'],
                     clickToSelect: false,
                     singleSelect: false,
-                    mobileResponsive: true,
+                    mobileResponsive: false,
                     maintainSelected: false,
                     rememberSelected: false,
                     fixedColumns: false,
                     fixedNumber: 0,
                     fixedRightNumber: 0,
                     queryParams: $.table.queryParams,
-                    rowStyle: undefined
+                    rowStyle: undefined,
+                    columnAlign: 'center'
                 };
                 var options = $.extend(defaults, options);
+                options.columns = $.table.normalizeColumnsAlign(options.columns, options.columnAlign);
                 table.options = options;
                 table.config[options.id] = options;
                 $.table.initEvent();
@@ -133,7 +183,14 @@ var table = {
                     onDblClickCell: options.onDblClickCell,             // 双击某格触发的事件
                     onEditableSave: options.onEditableSave,             // 行内编辑保存的事件
                     onExpandRow: options.onExpandRow,                   // 点击详细视图的事件
-                    onPostBody: options.onPostBody,                     // 渲染完成后执行的事件
+                    onPostBody: function() {
+                        if (options.columnAlign === 'center') {
+                            $.table.applyCenterAlign(options.id);
+                        }
+                        if (typeof options.onPostBody === 'function') {
+                            options.onPostBody.apply(this, arguments);
+                        }
+                    },
                     maintainSelected: options.maintainSelected,         // 前端翻页时保留所选行
                     rememberSelected: options.rememberSelected,         // 启用翻页记住前面的选择
                     fixedColumns: options.fixedColumns,                 // 是否启用冻结列（左侧）
@@ -143,7 +200,16 @@ var table = {
                     queryParams: options.queryParams,                   // 传递参数（*）
                     rowStyle: options.rowStyle,                         // 通过自定义函数设置行样式
                     footerStyle: options.footerStyle,                   // 通过自定义函数设置页脚样式
-                    headerStyle: options.headerStyle,                   // 通过自定义函数设置标题样式
+                    headerStyle: options.columnAlign === 'center' ? function(column) {
+                        var style = { css: { 'text-align': 'center', 'vertical-align': 'middle' } };
+                        if (typeof options.headerStyle === 'function') {
+                            var custom = options.headerStyle(column);
+                            if (custom && custom.css) {
+                                $.extend(style.css, custom.css);
+                            }
+                        }
+                        return style;
+                    } : options.headerStyle,
                     selectItemName: options.selectItemName,             // 自定义radio/checkbox的name值
                     columns: options.columns,                           // 显示列信息（*）
                     data: options.data,                                 // 被加载的数据
@@ -211,6 +277,9 @@ var table = {
                     table.set($(this).attr("id"));
                 });
                 // 在表格体渲染完成，并在 DOM 中可见后触发（事件）
+                $(optionsIds).off("post-body.bs.table.tableAlign").on("post-body.bs.table.tableAlign", function (e) {
+                    $.table.applyCenterAlign($(this).attr("id"));
+                });
                 $(optionsIds).on("post-body.bs.table", function (e, args) {
                     // 浮动提示框特效
                     $(".table [data-toggle='tooltip']").tooltip();
@@ -290,6 +359,7 @@ var table = {
                 if (typeof table.options.onLoadSuccess == "function") {
                     table.options.onLoadSuccess(data);
                 }
+                $.table.applyCenterAlign(table.options.id);
             },
             // 表格销毁
             destroy: function (tableId) {
