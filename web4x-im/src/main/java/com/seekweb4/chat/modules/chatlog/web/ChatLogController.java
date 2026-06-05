@@ -172,8 +172,13 @@ public class ChatLogController extends BaseController {
 	 * 用户地区分布图
 	 * @return
 	 */
+	@GetMapping("/memberMap")
+	public AjaxJson memberMapGet() {
+		return memberMap(new ReqJson());
+	}
+
 	@RequestMapping("/memberMap")
-	public AjaxJson memberMap(@RequestBody ReqJson req) {
+	public AjaxJson memberMap(@RequestBody(required = false) ReqJson req) {
 		List<Map<String, Object>> dataList = Lists.newArrayList();
 		List<MemberTongji> cityList = memberService.getCityList();
 		Map<String, Object> map = null;
@@ -189,8 +194,13 @@ public class ChatLogController extends BaseController {
 	 * 设备使用情况
 	 * @return
 	 */
+	@GetMapping("/eqMap")
+	public AjaxJson eqMapGet() {
+		return eqMap(new ReqJson());
+	}
+
 	@RequestMapping("/eqMap")
-	public AjaxJson eqMap(@RequestBody ReqJson req) {
+	public AjaxJson eqMap(@RequestBody(required = false) ReqJson req) {
 		List<Map<String, Object>> dataList = Lists.newArrayList();
 		List<MemberTongji> cityList = memberService.getEqList();
 		Map<String, Object> map = null;

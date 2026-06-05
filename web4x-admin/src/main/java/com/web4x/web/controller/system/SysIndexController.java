@@ -73,8 +73,10 @@ public class SysIndexController extends BaseController
         mmap.put("mainClass", contentMainClass(footer, tagsView));
         mmap.put("copyrightYear", Web4xConfig.getCopyrightYear());
         mmap.put("demoEnabled", Web4xConfig.isDemoEnabled());
-        mmap.put("isDefaultModifyPwd", initPasswordIsModify(user.getPwdUpdateDate()));
-        mmap.put("isPasswordExpired", passwordIsExpiration(user.getPwdUpdateDate()));
+        // IM 登录用户无若依 pwdUpdateDate，跳过初始/过期密码弹窗
+        boolean imIntegrated = imUserBridge != null;
+        mmap.put("isDefaultModifyPwd", imIntegrated ? false : initPasswordIsModify(user.getPwdUpdateDate()));
+        mmap.put("isPasswordExpired", imIntegrated ? false : passwordIsExpiration(user.getPwdUpdateDate()));
         mmap.put("isMobile", ServletUtils.checkAgentIsMobile(ServletUtils.getRequest().getHeader("User-Agent")));
 
         // 菜单导航显示风格

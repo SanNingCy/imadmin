@@ -140,6 +140,13 @@ public class ImShiroConfig {
         filterRuleMap.put("/im/**", "anon");
         filterRuleMap.put("/index", "anon");
         filterRuleMap.put("/logout", "anon");
+        // 首页控制台统计（与 IM 后台 /api/topData 等同，内网管理页使用）
+        filterRuleMap.put("/chatlog/chatLog/topData", "anon");
+        filterRuleMap.put("/chatlog/chatLog/memberMap", "anon");
+        filterRuleMap.put("/chatlog/chatLog/eqMap", "anon");
+        filterRuleMap.put("/api/topData", "anon");
+        filterRuleMap.put("/api/memberMap", "anon");
+        filterRuleMap.put("/api/eqMap", "anon");
         // 所有请求通过我们自己的JWT Filter
         filterRuleMap.put("/**", "jwt,kickout");
         factoryBean.setFilterChainDefinitionMap(filterRuleMap);
