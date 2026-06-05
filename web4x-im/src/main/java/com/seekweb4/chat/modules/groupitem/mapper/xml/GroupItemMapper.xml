@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.groupitem.mapper.GroupItemMapper">
+
+	<sql id="groupItemColumns">
+		a.id AS "id",
+		a.uid AS "u.id",
+		a.group_id AS "group.id",
+		a.nickname AS "nickname",
+		a.type AS "type",
+		a.isjy AS "isjy",
+		a.jy_time AS "jyTime",
+		a.zimu AS "zimu",
+		a.isfanyi AS "isfanyi",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+
+		u.nickname AS "u.nickname",
+		u.idno AS "u.idno",
+		u.icon AS "u.icon",
+		u.sex AS "u.sex",
+
+		`group`.name AS "group.name",
+		`group`.icon AS "group.icon",
+		`group`.idno AS "group.idno"
+	</sql>
+
+	<sql id="groupItemJoins">
+
+		LEFT JOIN t_member u ON u.id = a.uid
+		LEFT JOIN t_group `group` ON `group`.id = a.group_id
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.groupitem.entity.GroupItem" >
+		SELECT
+			<include refid="groupItemColumns"/>
+		FROM t_group_item a
+		<include refid="groupItemJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.groupitem.entity.GroupItem" >
+		SELECT
+			<include refid="groupItemColumns"/>
+		FROM t_group_item a
+		<include refid="groupItemJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="u != null and u.id != null and u.id != ''">
+				AND a.uid = #{u.id}
+			</if>
+			<if test="u != null and u.idno != null and u.idno != ''">
+				AND (u.idno = #{u.idno} OR u.lianghao = #{u.idno})
+			</if>
+			<if test="group != null and group.id != null and group.id != ''">
+				AND a.group_id = #{group.id}
+			</if>
+			<if test="group != null and group.idno != null and group.idno != ''">
+				AND `group`.idno LIKE concat('%', #{group.idno}, '%')
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="isjy != null and isjy != ''">
+				AND a.isjy = #{isjy}
+			</if>
+			<if test="zimu != null and zimu != ''">
+				AND a.zimu = #{zimu}
+			</if>
+			<if test="key != null and key != ''">
+				AND (`group`.name LIKE concat('%',#{key},'%')
+					OR `group`.idno LIKE concat('%',#{key},'%'))
+			</if>
+			<if test="nickname != null and nickname != ''">
+				AND a.nickname LIKE concat('%',#{nickname},'%')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.type
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.groupitem.entity.GroupItem" >
+		SELECT
+			<include refid="groupItemColumns"/>
+		FROM t_group_item a
+		<include refid="groupItemJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="u != null and u.id != null and u.id != ''">
+				AND a.uid = #{u.id}
+			</if>
+			<if test="u != null and u.idno != null and u.idno != ''">
+				AND (u.idno = #{u.idno} OR u.lianghao = #{u.idno})
+			</if>
+			<if test="group != null and group.id != null and group.id != ''">
+				AND a.group_id = #{group.id}
+			</if>
+			<if test="group != null and group.idno != null and group.idno != ''">
+				AND `group`.idno LIKE concat('%', #{group.idno}, '%')
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="isjy != null and isjy != ''">
+				AND a.isjy = #{isjy}
+			</if>
+			<if test="zimu != null and zimu != ''">
+				AND a.zimu = #{zimu}
+			</if>
+			<if test="key != null and key != ''">
+				AND (`group`.name LIKE concat('%',#{key},'%')
+					OR `group`.idno LIKE concat('%',#{key},'%'))
+			</if>
+			<if test="nickname != null and nickname != ''">
+				AND a.nickname LIKE concat('%',#{nickname},'%')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_group_item(
+			id,
+			uid,
+			group_id,
+			nickname,
+			`type`,
+			isjy,
+			jy_time,
+			zimu,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{u.id},
+			#{group.id},
+			#{nickname},
+			#{type},
+			#{isjy},
+			#{jyTime},
+			#{zimu},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_group_item SET
+			uid = #{u.id},
+			group_id = #{group.id},
+			nickname = #{nickname},
+			`type` = #{type},
+			isjy = #{isjy},
+			jy_time = #{jyTime},
+			zimu = #{zimu},
+			isfanyi = #{isfanyi},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_group_item
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_group_item SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.groupitem.entity.GroupItem">
+		SELECT
+			<include refid="groupItemColumns"/>
+		FROM t_group_item a
+		<include refid="groupItemJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+	<!-- 解除群成员禁言 -->
+	<update id="unbanMember">
+		UPDATE t_group_item SET
+			isjy = '0',
+			jy_time = NULL,
+			update_date = NOW()
+		WHERE id = #{id}
+	</update>
+
+</mapper>

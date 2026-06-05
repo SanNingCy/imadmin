@@ -1,0 +1,73 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>[[${title}]]</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+	<meta name="viewport" content="initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui">
+	<meta http-equiv="Cache-Control" content="no-siteapp"/>
+	<meta name="renderer" content="webkit">
+</head>
+<body th:utext="${content}">
+</body>
+<script type="text/javascript">
+
+    window.onload = function () {
+
+        var imglist = document.getElementsByTagName("img");
+        var videolist =document.getElementsByTagName("video");
+        //安卓4.0+等高版本不支持window.screen.width，安卓2.3.3系统支持
+        var _width;
+        doDraw();
+
+        window.onresize = function () {
+            //捕捉屏幕窗口变化，始终保证图片根据屏幕宽度合理显示
+            doDraw();
+        }
+        function doDraw() {
+            _width = window.innerWidth;
+            for (var i = 0, len = imglist.length; i < len; i++) {
+                DrawImage(imglist[i], _width);
+            }
+            for( var i = 0, len = videolist.length; i < len; i++){
+		 		DrawVideo(videolist[i],_width);
+		 	}
+        }
+
+        function DrawImage(ImgD,_width){ 
+		 	var image=new Image(); 
+		 	image.src=ImgD.src; 
+		 	image.onload = function(){
+		 		ImgD.style.width="";
+		 		//ImgD.style.height="";
+		 		if(image.width>30 && image.height>30){
+                    ImgD.width=_width;
+                    // if(image.width>_width){
+		 			// 	ImgD.width=_width;
+		 			// 	ImgD.height=(image.height*_width)/image.width;
+		 			// }else{
+		 			// 	ImgD.width=_width;
+		 			// 	ImgD.height=(image.height*_width)/image.width;
+		 			// }
+		 		}	
+		 	}
+		 }
+		 function DrawVideo(videoD,_width){ 
+		 	var video=document.createElement("VIDEO"); 
+		 	video.src=videoD.src; 
+		 	//video.width=videoD.width;
+		 	//video.height=videoD.height;
+	 		if(video.width>30 && video.height>30){
+                videoD.width=_width;
+                // if(video.width>_width){
+	 			// 	videoD.width=_width;
+	 			// 	videoD.height=(video.height*_width)/video.width;
+	 			// }else{
+	 			// 	videoD.width=_width;
+	 			// 	videoD.height=(video.height*_width)/video.width;
+	 			// }
+	 		}	
+		 }
+    }
+</script>
+</html>

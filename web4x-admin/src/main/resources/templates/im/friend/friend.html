@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('好友关系')" />
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js}"></script>
+<script th:inline="javascript">
+    var prefix = ctx + "friend/friend";
+    $(function () {
+        $.table.init({
+            url: prefix + "/list",
+            modalName: "好友",
+            responseHandler: imPageResponse,
+            ajaxOptions: { beforeSend: imTableBeforeSend },
+            columns: [
+                {field: 'id', title: 'ID'},
+                {field: 'uId', title: '用户'},
+                {field: 'fId', title: '好友'},
+                {field: 'createDate', title: '创建时间'}
+            ]
+        });
+    });
+</script>
+</body>
+</html>

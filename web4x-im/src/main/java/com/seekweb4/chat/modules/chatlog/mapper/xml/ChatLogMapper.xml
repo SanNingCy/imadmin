@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.chatlog.mapper.ChatLogMapper">
+
+	<sql id="chatLogColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.uid AS "u.id",
+		a.group_id AS "group.id",
+		a.uid2 AS "uid2.id",
+		a.random AS "random",
+		a.msg_seq AS "msgSeq",
+		a.msg_time AS "msgTime",
+		a.msg_body AS "msgBody",
+		a.msg_type AS "msgType",
+		a.msg_contend AS "msgContend",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+
+
+		u.idno AS "u.idno",
+		u.nickname AS "u.nickname",
+		u.icon AS "u.icon",
+
+		group.name AS "group.name",
+		group.idno AS "group.idno",
+
+		uid2.idno AS "uid2.idno",
+		uid2.nickname AS "uid2.nickname",
+		uid2.icon AS "uid2.icon"
+	</sql>
+
+	<sql id="chatLogJoins">
+
+		LEFT JOIN t_member u ON u.id = a.uid
+		LEFT JOIN t_group group ON group.id = a.group_id
+		LEFT JOIN t_member uid2 ON uid2.id = a.uid2
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.chatlog.entity.ChatLog" >
+		SELECT
+			<include refid="chatLogColumns"/>
+		FROM t_chat_log a
+		<include refid="chatLogJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.chatlog.entity.ChatLog" >
+		SELECT
+			<include refid="chatLogColumns"/>
+		FROM t_chat_log a
+		<include refid="chatLogJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="u != null and u.id != null and u.id != ''">
+				AND a.uid = #{u.id}
+			</if>
+			<if test="group != null and group.id != null and group.id != ''">
+				AND a.group_id = #{group.id}
+			</if>
+			<if test="uid2 != null and uid2.id != null and uid2.id != ''">
+				AND a.uid2 = #{uid2.id}
+			</if>
+			<if test="msgSeq != null and msgSeq != ''">
+				AND a.msg_seq = #{msgSeq}
+			</if>
+			<if test="beginCreateDate != null and endCreateDate != null ">
+				AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.chatlog.entity.ChatLog" >
+		SELECT
+			<include refid="chatLogColumns"/>
+		FROM t_chat_log a
+		<include refid="chatLogJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_chat_log(
+			id,
+			type,
+			uid,
+			group_id,
+			uid2,
+			random,
+			msg_seq,
+			msg_time,
+			msg_body,
+			msg_type,
+			msg_contend,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{type},
+			#{u.id},
+			#{group.id},
+			#{uid2.id},
+			#{random},
+			#{msgSeq},
+			#{msgTime},
+			#{msgBody},
+			#{msgType},
+			#{msgContend},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_chat_log SET
+			type = #{type},
+			uid = #{u.id},
+			group_id = #{group.id},
+			uid2 = #{uid2.id},
+			random = #{random},
+			msg_seq = #{msgSeq},
+			msg_time = #{msgTime},
+			msg_body = #{msgBody},
+			msg_type = #{msgType},
+			msg_contend = #{msgContend},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_chat_log
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_chat_log SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.chatlog.entity.ChatLog">
+		SELECT
+			<include refid="chatLogColumns"/>
+		FROM t_chat_log a
+		<include refid="chatLogJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

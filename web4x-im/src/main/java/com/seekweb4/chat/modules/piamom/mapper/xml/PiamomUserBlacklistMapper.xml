@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.piamom.mapper.PiamomUserBlacklistMapper">
+
+    <resultMap id="BaseResultMap" type="com.seekweb4.chat.modules.piamom.entity.PiamomUserBlacklist">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="black_user_id" property="blackUserId"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="user_idno" property="userIdno"/>
+        <result column="user_nickname" property="userNickname"/>
+        <result column="black_user_idno" property="blackUserIdno"/>
+        <result column="black_user_nickname" property="blackUserNickname"/>
+    </resultMap>
+
+    <sql id="adminWhere">
+        <where>
+            <if test="id != null">and b.id = #{id}</if>
+            <if test="userId != null and userId != ''">and b.user_id = #{userId}</if>
+            <if test="userIdno != null and userIdno != ''">and um.idno like concat('%', #{userIdno}, '%')</if>
+            <if test="blackUserId != null and blackUserId != ''">and b.black_user_id = #{blackUserId}</if>
+            <if test="blackUserIdno != null and blackUserIdno != ''">and bm.idno like concat('%', #{blackUserIdno}, '%')</if>
+        </where>
+    </sql>
+
+    <select id="selectAdminPageList" resultMap="BaseResultMap">
+        select b.id, b.user_id, b.black_user_id, b.created_at,
+               IFNULL(um.idno, '') AS user_idno, IFNULL(um.nickname, '') AS user_nickname,
+               IFNULL(bm.idno, '') AS black_user_idno, IFNULL(bm.nickname, '') AS black_user_nickname
+        from t_piamom_user_blacklist b
+        left join t_member um on um.id = b.user_id
+        left join t_member bm on bm.id = b.black_user_id
+        <include refid="adminWhere"/>
+        <choose>
+            <when test="orderBy != null and orderBy != ''">order by ${orderBy}</when>
+            <otherwise>order by b.created_at desc</otherwise>
+        </choose>
+        <if test="pageNo != null and pageSize != null">limit #{pageNo}, #{pageSize}</if>
+    </select>
+
+    <select id="selectAdminCount" resultType="java.lang.Long">
+        select count(1) from t_piamom_user_blacklist b
+        left join t_member um on um.id = b.user_id
+        left join t_member bm on bm.id = b.black_user_id
+        <include refid="adminWhere"/>
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select b.id, b.user_id, b.black_user_id, b.created_at,
+               IFNULL(um.idno, '') AS user_idno, IFNULL(um.nickname, '') AS user_nickname,
+               IFNULL(bm.idno, '') AS black_user_idno, IFNULL(bm.nickname, '') AS black_user_nickname
+        from t_piamom_user_blacklist b
+        left join t_member um on um.id = b.user_id
+        left join t_member bm on bm.id = b.black_user_id
+        where b.id = #{id}
+    </select>
+
+    <delete id="deleteByPrimaryKey">delete from t_piamom_user_blacklist where id = #{id}</delete>
+</mapper>

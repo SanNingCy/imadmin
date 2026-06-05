@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.PaymentTransaction.mapper.PaymentTransactionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.seekweb4.chat.modules.PaymentTransaction.entity.PaymentTransaction">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="transaction_number" property="transactionNumber"/>
+        <result column="actual_amount" property="actualAmount"/>
+        <result column="amount" property="amount"/>
+        <result column="rate_amount" property="rateAmount"/>
+        <result column="payment_status" property="paymentStatus"/>
+        <result column="rate_info" property="rateInfo"/>
+        <result column="payment_address" property="paymentAddress"/>
+        <result column="receiving_address" property="receivingAddress"/>
+
+        <result column="customer_user_name" property="customerUserName"/>
+        <result column="customer_uid" property="customerUid"/>
+        <result column="customer_user_id" property="customerUserId"/>
+        <result column="is_interior" property="isInterior"/>
+
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        , user_id, transaction_number, actual_amount, amount, rate_amount,
+        payment_status, rate_info, payment_address, receiving_address,
+        customer_user_name,customer_uid,customer_user_id,is_interior,
+        create_time, update_time, create_by, update_by, is_deleted
+    </sql>
+
+    <!-- 后台管理 - 分页查询交易记录 -->
+    <select id="selectAdminPageList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_payment_transaction
+        <where>
+            is_deleted = 0
+            and is_interior = 0
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="idno != null and idno != ''">
+                and CAST(user_id AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_general_ci in (select CAST(id AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_general_ci from t_member where idno COLLATE utf8mb4_general_ci = CAST(#{idno} AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_general_ci)
+            </if>
+            <if test="transactionNumber != null and transactionNumber != ''">
+                and transaction_number like concat('%', #{transactionNumber}, '%')
+            </if>
+            <if test="paymentAddress != null and paymentAddress != ''">
+                and payment_address like concat('%', #{paymentAddress}, '%')
+            </if>
+            <if test="actualAmount != null">
+                and actual_amount = #{actualAmount}
+            </if>
+            <if test="amount != null">
+                and amount = #{amount}
+            </if>
+            <if test="rateAmount != null">
+                and rate_amount = #{rateAmount}
+            </if>
+            <if test="rateInfo != null and rateInfo != ''">
+                and rate_info = #{rateInfo}
+            </if>
+            <if test="receivingAddress != null and receivingAddress != ''">
+                and receiving_address like concat('%', #{receivingAddress}, '%')
+            </if>
+            <if test="paymentStatus != null">
+                and payment_status = #{paymentStatus}
+            </if>
+            <if test="createTimeStart != null">
+                and create_time >= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and create_time &lt;= #{createTimeEnd}
+            </if>
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+        <if test="orderBy == null or orderBy == ''">
+            order by create_time desc
+        </if>
+        <if test="pageNo != null and pageSize != null">
+            limit #{pageNo}, #{pageSize}
+        </if>
+    </select>
+
+    <!-- 后台管理 - 分页查询交易记录IM列表 -->
+    <select id="selectIMAdminPageList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_payment_transaction
+        <where>
+            is_deleted = 0
+            and is_interior = 1
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="idno != null and idno != ''">
+                and CAST(user_id AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_general_ci in (select CAST(id AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_general_ci from t_member where idno COLLATE utf8mb4_general_ci = CAST(#{idno} AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_general_ci)
+            </if>
+            <if test="transactionNumber != null and transactionNumber != ''">
+                and transaction_number like concat('%', #{transactionNumber}, '%')
+            </if>
+            <if test="paymentAddress != null and paymentAddress != ''">
+                and payment_address like concat('%', #{paymentAddress}, '%')
+            </if>
+            <if test="actualAmount != null">
+                and actual_amount = #{actualAmount}
+            </if>
+            <if test="amount != null">
+                and amount = #{amount}
+            </if>
+            <if test="rateAmount != null">
+                and rate_amount = #{rateAmount}
+            </if>
+            <if test="rateInfo != null and rateInfo != ''">
+                and rate_info = #{rateInfo}
+            </if>
+            <if test="receivingAddress != null and receivingAddress != ''">
+                and receiving_address like concat('%', #{receivingAddress}, '%')
+            </if>
+            <if test="paymentStatus != null">
+                and payment_status = #{paymentStatus}
+            </if>
+            <if test="createTimeStart != null">
+                and create_time >= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and create_time &lt;= #{createTimeEnd}
+            </if>
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+        <if test="orderBy == null or orderBy == ''">
+            order by create_time desc
+        </if>
+        <if test="pageNo != null and pageSize != null">
+            limit #{pageNo}, #{pageSize}
+        </if>
+    </select>
+
+    <!-- 后台管理 - 统计交易记录总数IM记录总数 -->
+    <select id="selectIMAdminCount" resultType="java.lang.Long">
+        select count(1)
+        from t_payment_transaction
+        <where>
+            is_deleted = 0
+            and is_interior = 1
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="transactionNumber != null and transactionNumber != ''">
+                and transaction_number like concat('%', #{transactionNumber}, '%')
+            </if>
+            <if test="paymentAddress != null and paymentAddress != ''">
+                and payment_address like concat('%', #{paymentAddress}, '%')
+            </if>
+            <if test="receivingAddress != null and receivingAddress != ''">
+                and receiving_address like concat('%', #{receivingAddress}, '%')
+            </if>
+            <if test="paymentStatus != null">
+                and payment_status = #{paymentStatus}
+            </if>
+            <if test="createTimeStart != null">
+                and create_time >= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and create_time &lt;= #{createTimeEnd}
+            </if>
+        </where>
+    </select>
+
+    <!-- 后台管理 - 统计交易记录总数 -->
+    <select id="selectAdminCount" resultType="java.lang.Long">
+        select count(1)
+        from t_payment_transaction
+        <where>
+            is_deleted = 0
+            and is_interior = 0
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="transactionNumber != null and transactionNumber != ''">
+                and transaction_number like concat('%', #{transactionNumber}, '%')
+            </if>
+            <if test="paymentAddress != null and paymentAddress != ''">
+                and payment_address like concat('%', #{paymentAddress}, '%')
+            </if>
+            <if test="receivingAddress != null and receivingAddress != ''">
+                and receiving_address like concat('%', #{receivingAddress}, '%')
+            </if>
+            <if test="paymentStatus != null">
+                and payment_status = #{paymentStatus}
+            </if>
+            <if test="createTimeStart != null">
+                and create_time >= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and create_time &lt;= #{createTimeEnd}
+            </if>
+        </where>
+    </select>
+
+    <!-- 后台管理 - 统计交易金额 -->
+    <select id="selectAdminTotalAmount" resultType="java.math.BigDecimal">
+        select ifnull(sum(amount), 0)
+        from t_payment_transaction
+        <where>
+            is_deleted = 0
+            and payment_status = 1
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="transactionNumber != null and transactionNumber != ''">
+                and transaction_number like concat('%', #{transactionNumber}, '%')
+            </if>
+            <if test="paymentAddress != null and paymentAddress != ''">
+                and payment_address like concat('%', #{paymentAddress}, '%')
+            </if>
+            <if test="receivingAddress != null and receivingAddress != ''">
+                and receiving_address like concat('%', #{receivingAddress}, '%')
+            </if>
+            <if test="paymentStatus != null">
+                and payment_status = #{paymentStatus}
+            </if>
+            <if test="createTimeStart != null">
+                and create_time >= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and create_time &lt;= #{createTimeEnd}
+            </if>
+        </where>
+    </select>
+
+    <!-- 后台管理 - 统计手续费 -->
+    <select id="selectAdminTotalFeeAmount" resultType="java.math.BigDecimal">
+        select ifnull(sum(rate_amount), 0)
+        from t_payment_transaction
+        <where>
+            is_deleted = 0
+            and payment_status = 1
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="transactionNumber != null and transactionNumber != ''">
+                and transaction_number like concat('%', #{transactionNumber}, '%')
+            </if>
+            <if test="paymentAddress != null and paymentAddress != ''">
+                and payment_address like concat('%', #{paymentAddress}, '%')
+            </if>
+            <if test="receivingAddress != null and receivingAddress != ''">
+                and receiving_address like concat('%', #{receivingAddress}, '%')
+            </if>
+            <if test="paymentStatus != null">
+                and payment_status = #{paymentStatus}
+            </if>
+            <if test="createTimeStart != null">
+                and create_time >= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and create_time &lt;= #{createTimeEnd}
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据主键查询 -->
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_payment_transaction
+        where id = #{id} and is_deleted = 0
+    </select>
+
+    <!-- 根据主键查询IM根据ID查 -->
+    <select id="selectByPrimaryKeyIMByID" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_payment_transaction
+        where id = #{id} and is_deleted = 0
+    </select>
+
+    <select id="getTransactionPage"
+            resultType="com.seekweb4.chat.modules.PaymentTransaction.entity.PaymentTransaction">
+        select
+        <include refid="Base_Column_List"/>
+        from t_payment_transaction where is_deleted = 0 and user_id=#{userId}
+        order by create_time desc
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="getTransactionPageCount" resultType="java.lang.Long">
+        select count(1)
+        from t_payment_transaction
+        where is_deleted = 0
+          and user_id = #{userId}
+        order by create_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.seekweb4.chat.modules.PaymentTransaction.entity.PaymentTransaction">
+        insert into t_payment_transaction (id, user_id, transaction_number,
+                                           actual_amount, amount, rate_amount,
+                                           payment_status, payment_address, receiving_address,
+                                           create_time, update_time, create_by,
+                                           update_by, is_deleted, rate_info)
+        values (#{id,jdbcType=BIGINT}, #{userId,jdbcType=VARCHAR}, #{transactionNumber,jdbcType=VARCHAR},
+                #{actualAmount,jdbcType=DECIMAL}, #{amount,jdbcType=DECIMAL}, #{rateAmount,jdbcType=DECIMAL},
+                #{paymentStatus,jdbcType=INTEGER}, #{paymentAddress,jdbcType=VARCHAR},
+                #{receivingAddress,jdbcType=VARCHAR},
+                #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{createBy,jdbcType=VARCHAR},
+                #{updateBy,jdbcType=VARCHAR}, #{isDeleted,jdbcType=INTEGER}, #{rateInfo,jdbcType=LONGVARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.seekweb4.chat.modules.PaymentTransaction.entity.PaymentTransaction" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into t_payment_transaction
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="transactionNumber != null">
+                transaction_number,
+            </if>
+            <if test="actualAmount != null">
+                actual_amount,
+            </if>
+            <if test="amount != null">
+                amount,
+            </if>
+            <if test="rateAmount != null">
+                rate_amount,
+            </if>
+            <if test="paymentStatus != null">
+                payment_status,
+            </if>
+            <if test="paymentAddress != null">
+                payment_address,
+            </if>
+            <if test="receivingAddress != null">
+                receiving_address,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="isDeleted != null">
+                is_deleted,
+            </if>
+            <if test="rateInfo != null">
+                rate_info,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=VARCHAR},
+            </if>
+            <if test="transactionNumber != null">
+                #{transactionNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="actualAmount != null">
+                #{actualAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="amount != null">
+                #{amount,jdbcType=DECIMAL},
+            </if>
+            <if test="rateAmount != null">
+                #{rateAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="paymentStatus != null">
+                #{paymentStatus,jdbcType=INTEGER},
+            </if>
+            <if test="paymentAddress != null">
+                #{paymentAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="receivingAddress != null">
+                #{receivingAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=VARCHAR},
+            </if>
+            <if test="isDeleted != null">
+                #{isDeleted,jdbcType=INTEGER},
+            </if>
+            <if test="rateInfo != null">
+                #{rateInfo,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKey"
+            parameterType="com.seekweb4.chat.modules.PaymentTransaction.entity.PaymentTransaction" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        update t_payment_transaction
+        set user_id            = #{userId,jdbcType=VARCHAR},
+            transaction_number = #{transactionNumber,jdbcType=VARCHAR},
+            actual_amount      = #{actualAmount,jdbcType=DECIMAL},
+            amount             = #{amount,jdbcType=DECIMAL},
+            rate_amount        = #{rateAmount,jdbcType=DECIMAL},
+            payment_status     = #{paymentStatus,jdbcType=INTEGER},
+            payment_address    = #{paymentAddress,jdbcType=VARCHAR},
+            receiving_address  = #{receivingAddress,jdbcType=VARCHAR},
+            create_time        = #{createTime,jdbcType=TIMESTAMP},
+            update_time        = #{updateTime,jdbcType=TIMESTAMP},
+            create_by          = #{createBy,jdbcType=VARCHAR},
+            update_by          = #{updateBy,jdbcType=VARCHAR},
+            is_deleted         = #{isDeleted,jdbcType=INTEGER}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKeySelective"
+            parameterType="com.seekweb4.chat.modules.PaymentTransaction.entity.PaymentTransaction">
+        update t_payment_transaction
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=VARCHAR},
+            </if>
+            <if test="transactionNumber != null">
+                transaction_number = #{transactionNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="actualAmount != null">
+                actual_amount = #{actualAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="amount != null">
+                amount = #{amount,jdbcType=DECIMAL},
+            </if>
+            <if test="rateAmount != null">
+                rate_amount = #{rateAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="paymentStatus != null">
+                payment_status = #{paymentStatus,jdbcType=INTEGER},
+            </if>
+            <if test="paymentAddress != null">
+                payment_address = #{paymentAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="receivingAddress != null">
+                receiving_address = #{receivingAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=VARCHAR},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted,jdbcType=INTEGER},
+            </if>
+            <if test="rateInfo != null">
+                rate_info = #{rateInfo,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+</mapper>

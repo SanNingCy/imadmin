@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.sys.mapper.PostMapper">
+
+	<sql id="postColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.code AS "code",
+		a.type AS "type",
+		a.status AS "status",
+		a.sort AS "sort",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="postJoins">
+
+	</sql>
+
+
+	<select id="get" resultType="Post" >
+		SELECT
+			<include refid="postColumns"/>
+		FROM sys_post a
+		<include refid="postJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="Post" >
+		SELECT
+			<include refid="postColumns"/>
+		FROM sys_post a
+		<include refid="postJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="name != null and name != ''">
+				AND a.name LIKE concat('%',#{name},'%')
+			</if>
+			<if test="code != null and code != ''">
+				AND a.code LIKE concat('%',#{code},'%')
+			</if>
+			<if test="status !=null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.sort asc
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="Post" >
+		SELECT
+			<include refid="postColumns"/>
+		FROM sys_post a
+		<include refid="postJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.sort asc
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO sys_post(
+			id,
+			name,
+			code,
+			type,
+			status,
+			sort,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{code},
+			#{type},
+			#{status},
+			#{sort},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE sys_post SET
+			name = #{name},
+			code = #{code},
+			type = #{type},
+			status = #{status},
+			sort = #{sort},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM sys_post
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE sys_post SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="Post">
+		select * FROM sys_post  where ${propertyName} = #{value}
+	</select>
+
+</mapper>

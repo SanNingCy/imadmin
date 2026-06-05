@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.agreement.mapper.AgreementMapper">
+
+	<sql id="agreementColumns">
+		a.id AS "id",
+		a.title AS "title",
+		a.content AS "content",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate"
+	</sql>
+
+	<sql id="agreementJoins">
+
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.agreement.entity.Agreement" >
+		SELECT
+			<include refid="agreementColumns"/>
+		FROM t_agreement a
+		<include refid="agreementJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.agreement.entity.Agreement" >
+		SELECT
+			<include refid="agreementColumns"/>
+		FROM t_agreement a
+		<include refid="agreementJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="title != null and title != ''">
+				AND a.title LIKE concat('%',#{title},'%')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.agreement.entity.Agreement" >
+		SELECT
+			<include refid="agreementColumns"/>
+		FROM t_agreement a
+		<include refid="agreementJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_agreement(
+			id,
+			title,
+			content,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{title},
+			#{content},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_agreement SET
+			title = #{title},
+			content = #{content},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_agreement
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_agreement SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.agreement.entity.Agreement">
+		select * FROM t_agreement  where ${propertyName} = #{value}
+	</select>
+
+</mapper>

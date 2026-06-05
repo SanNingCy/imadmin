@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.rechagelog.mapper.RechageLogMapper">
+
+	<sql id="rechageLogColumns">
+		a.id AS "id",
+		a.uid AS "u.id",
+		a.money AS "money",
+		a.title AS "title",
+		a.sname AS "sname",
+		a.sno AS "sno",
+		a.pingz AS "pingz",
+		a.state AS "state",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+
+		u.nickname AS "u.nickname",
+		u.icon AS "u.icon",
+		u.sex AS "u.sex"
+	</sql>
+
+	<sql id="rechageLogJoins">
+
+		LEFT JOIN t_member u ON u.id = a.uid
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.rechagelog.entity.RechageLog" >
+		SELECT
+			<include refid="rechageLogColumns"/>
+		FROM t_rechage_log a
+		<include refid="rechageLogJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.rechagelog.entity.RechageLog" >
+		SELECT
+			<include refid="rechageLogColumns"/>
+		FROM t_rechage_log a
+		<include refid="rechageLogJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="u != null and u.id != null and u.id != ''">
+				AND a.uid = #{u.id}
+			</if>
+			<if test="state != null and state != ''">
+				AND a.state = #{state}
+			</if>
+			<if test="title != null and title != ''">
+				AND a.title LIKE concat('%',#{title},'%')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.rechagelog.entity.RechageLog" >
+		SELECT
+			<include refid="rechageLogColumns"/>
+		FROM t_rechage_log a
+		<include refid="rechageLogJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_rechage_log(
+			id,
+			uid,
+			money,
+			title,
+			sname,
+			sno,
+			pingz,
+			state,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{u.id},
+			#{money},
+			#{title},
+			#{sname},
+			#{sno},
+			#{pingz},
+			#{state},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+<!--	<update id="update">-->
+<!--		UPDATE t_rechage_log SET-->
+<!--			uid = #{u.id},-->
+<!--			money = #{money},-->
+<!--			title = #{title},-->
+<!--			sname = #{sname},-->
+<!--			sno = #{sno},-->
+<!--			pingz = #{pingz},-->
+<!--			state = #{state},-->
+<!--			update_date = #{updateDate}-->
+<!--		WHERE id = #{id}-->
+<!--	</update>-->
+
+	<update id="update">
+		UPDATE t_rechage_log
+		<!-- set标签：自动剔除最后一个多余逗号，避免SQL语法错误 -->
+		<set>
+			<!-- 每个字段增加非空判断，仅传值时更新，避免覆盖为NULL -->
+			<if test="u != null and u.id != null">
+				uid = #{u.id},
+			</if>
+			<if test="money != null">
+				money = #{money},
+			</if>
+			<if test="title != null and title != ''">
+				title = #{title},
+			</if>
+			<if test="sname != null and sname != ''">
+				sname = #{sname},
+			</if>
+			<if test="sno != null and sno != ''">
+				sno = #{sno},
+			</if>
+			<if test="pingz != null and pingz != ''">
+				pingz = #{pingz},
+			</if>
+			<if test="state != null">
+				state = #{state},
+			</if>
+			<!-- 可选：若无需手动传更新时间，改用数据库自动生成（推荐） -->
+			<!-- update_date = NOW(), -->
+			<!-- 保留手动传参则加非空判断 -->
+			<if test="updateDate != null">
+				update_date = #{updateDate},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_rechage_log
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_rechage_log SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.rechagelog.entity.RechageLog">
+		SELECT
+			<include refid="rechageLogColumns"/>
+		FROM t_rechage_log a
+		<include refid="rechageLogJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

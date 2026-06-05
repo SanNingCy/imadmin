@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.live.mapper.LiveUserTierConfigMapper">
+
+    <resultMap id="BaseResultMap" type="com.seekweb4.chat.modules.live.entity.LiveUserTierConfig">
+        <id column="id" property="id"/>
+        <result column="tier_name" property="tierName"/>
+        <result column="tier_value" property="tierValue"/>
+        <result column="tier_sort" property="tierSort"/>
+        <result column="status" property="status"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, tier_name, tier_value, tier_sort, status, create_by, update_by, create_time, update_time, remark, is_deleted
+    </sql>
+
+    <select id="listEnabled" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_live_user_tier_config
+        where is_deleted = 0 and status = 1
+        order by tier_sort asc, id asc
+    </select>
+
+    <select id="listSelectOptions" resultType="com.seekweb4.chat.modules.live.dto.LiveConfigSelectOptionVo">
+        select id,
+               tier_name as name,
+               tier_value as value
+        from t_live_user_tier_config
+        where is_deleted = 0 and status = 1
+        order by tier_sort asc, id asc
+    </select>
+
+    <select id="selectAdminPageList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_live_user_tier_config
+        <where>
+            is_deleted = 0
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="tierName != null and tierName != ''">
+                and tier_name like concat('%', #{tierName}, '%')
+            </if>
+            <if test="tierValue != null">
+                and tier_value = #{tierValue}
+            </if>
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+        <if test="orderBy == null or orderBy == ''">
+            order by tier_sort asc, tier_value asc
+        </if>
+        <if test="pageNo != null and pageSize != null">
+            limit #{pageNo}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="selectAdminCount" resultType="java.lang.Long">
+        select count(1)
+        from t_live_user_tier_config
+        <where>
+            is_deleted = 0
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="tierName != null and tierName != ''">
+                and tier_name like concat('%', #{tierName}, '%')
+            </if>
+            <if test="tierValue != null">
+                and tier_value = #{tierValue}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_live_user_tier_config
+        where id = #{id} and is_deleted = 0
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.seekweb4.chat.modules.live.entity.LiveUserTierConfig">
+        update t_live_user_tier_config
+        <set>
+            <if test="tierName != null">
+                tier_name = #{tierName},
+            </if>
+            <if test="tierValue != null">
+                tier_value = #{tierValue},
+            </if>
+            <if test="tierSort != null">
+                tier_sort = #{tierSort},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted},
+            </if>
+            update_time = now()
+        </set>
+        where id = #{id}
+    </update>
+
+    <insert id="insert" parameterType="com.seekweb4.chat.modules.live.entity.LiveUserTierConfig" useGeneratedKeys="true" keyProperty="id">
+        insert into t_live_user_tier_config (tier_name, tier_value, tier_sort, status, create_by, update_by, create_time, update_time, remark, is_deleted)
+        values (#{tierName}, #{tierValue}, #{tierSort}, #{status}, #{createBy}, #{updateBy}, now(), now(), #{remark}, #{isDeleted})
+    </insert>
+
+</mapper>
+

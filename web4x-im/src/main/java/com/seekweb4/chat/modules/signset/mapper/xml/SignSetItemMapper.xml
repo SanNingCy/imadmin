@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.signset.mapper.SignSetItemMapper">
+
+	<sql id="signSetItemColumns">
+		a.id AS "id",
+		a.sid AS "sid.id",
+		a.day AS "day",
+		a.money AS "money",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+
+		b.max AS "sid.max"
+	</sql>
+
+	<sql id="signSetItemJoins">
+
+			LEFT JOIN t_sign_set b ON b.id = a.sid
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.signset.entity.SignSetItem" >
+		SELECT
+			<include refid="signSetItemColumns"/>
+		FROM t_sign_set_item a
+		<include refid="signSetItemJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.signset.entity.SignSetItem" >
+		SELECT
+			<include refid="signSetItemColumns"/>
+		FROM t_sign_set_item a
+		<include refid="signSetItemJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="sid != null and sid.id != null and sid.id != ''">
+				AND a.sid = #{sid.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.day ASC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.signset.entity.SignSetItem" >
+		SELECT
+			<include refid="signSetItemColumns"/>
+		FROM t_sign_set_item a
+		<include refid="signSetItemJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_sign_set_item(
+			id,
+			sid,
+			day,
+			money,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{sid.id},
+			#{day},
+			#{money},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_sign_set_item
+		<set>
+			<if test="sid != null and sid.id != null">sid = #{sid.id},</if>
+			<if test="day != null">day = #{day},</if>
+			<if test="money != null">money = #{money},</if>
+			<if test="updateDate != null">update_date = #{updateDate}</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_sign_set_item
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE sid = #{sid.id}
+			</otherwise>
+		</choose>
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_sign_set_item SET
+			del_flag = #{DEL_FLAG_DELETE}
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE sid = #{sid.id}
+			</otherwise>
+		</choose>
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.signset.entity.SignSetItem">
+		SELECT
+			<include refid="signSetItemColumns"/>
+		FROM t_sign_set_item a
+		<include refid="signSetItemJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

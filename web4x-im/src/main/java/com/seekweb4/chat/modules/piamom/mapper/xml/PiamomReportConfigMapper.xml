@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.piamom.mapper.PiamomReportConfigMapper">
+
+    <resultMap id="BaseResultMap" type="com.seekweb4.chat.modules.piamom.entity.PiamomReportConfig">
+        <id column="id" property="id"/>
+        <result column="report_type" property="reportType"/>
+        <result column="description" property="description"/>
+        <result column="status" property="status"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select id, report_type, description, status, created_at
+        from t_piamom_report_config order by id asc
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select id, report_type, description, status, created_at
+        from t_piamom_report_config where id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into t_piamom_report_config (report_type, description, status)
+        values (#{reportType}, #{description}, #{status})
+    </insert>
+
+    <update id="updateByPrimaryKeySelective">
+        update t_piamom_report_config
+        <set>
+            <if test="reportType != null">report_type = #{reportType},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteByPrimaryKey">delete from t_piamom_report_config where id = #{id}</delete>
+</mapper>

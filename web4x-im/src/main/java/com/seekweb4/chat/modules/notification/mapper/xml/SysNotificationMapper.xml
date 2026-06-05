@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.notification.mapper.SysNotificationMapper">
+	<sql id="cols">
+		a.id AS "id",
+		a.notice_title AS "noticeTitle",
+		a.content_url AS "contentUrl",
+		a.content AS "content",
+		a.preview_content AS "previewContent",
+		a.status AS "status",
+		a.image_url AS "imageUrl",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.notice_type AS "noticeType",
+		a.interval_number AS "intervalNumber",
+		a.interval_unit AS "intervalUnit",
+		a.number AS "number",
+		a.force_popup AS "forcePopup",
+		a.target_user_ids AS "targetUserIds",
+		a.create_time AS "createTime",
+		a.update_time AS "updateTime"
+	</sql>
+
+	<select id="get" resultType="com.seekweb4.chat.modules.notification.entity.SysNotification">
+		SELECT <include refid="cols"/> FROM sys_notification a WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.notification.entity.SysNotification">
+		SELECT <include refid="cols"/> FROM sys_notification a
+		<where>
+			${dataScope}
+			<if test="noticeTitle != null and noticeTitle != ''">
+				AND a.notice_title  LIKE concat('%',#{noticeTitle},'%')
+			</if>
+			<if test="previewContent != null and previewContent != ''">
+				AND a.preview_content  LIKE concat('%',#{previewContent},'%')
+			</if>
+			<if test="forcePopup != null ">
+				AND a.force_popup = #{forcePopup}
+			</if>
+			<if test="startTime != null ">
+				AND a.start_time &gt; #{startTime}
+			</if>
+			<if test="endTime != null ">
+				AND a.end_time &lt; #{endTime}
+			</if>
+			<if test="targetUserIdno != null and targetUserIdno != ''">
+				AND EXISTS (
+					SELECT 1
+					FROM t_member m
+					WHERE m.idno LIKE concat('%', #{targetUserIdno}, '%')
+					  AND a.target_user_ids IS NOT NULL
+					  AND a.target_user_ids != ''
+					  AND JSON_CONTAINS(CAST(a.target_user_ids AS JSON), JSON_QUOTE(m.id))
+				)
+			</if>
+		</where>
+
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_time DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO sys_notification (
+			id, notice_title, content_url,content, status, image_url,
+			start_time, end_time, notice_type, interval_number, interval_unit, number, force_popup, target_user_ids, preview_content
+		) VALUES (
+			 #{id}, #{noticeTitle}, #{contentUrl},#{content}, #{status}, #{imageUrl},
+			 #{startTime}, #{endTime}, #{noticeType}, #{intervalNumber}, #{intervalUnit}, #{number}, #{forcePopup}, #{targetUserIds}, #{previewContent}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE sys_notification SET
+			notice_title=#{noticeTitle}, content_url=#{contentUrl},content=#{content}, status=#{status}, image_url=#{imageUrl},
+			start_time=#{startTime}, end_time=#{endTime}, notice_type=#{noticeType}, interval_number=#{intervalNumber}, interval_unit=#{intervalUnit}, number=#{number},
+			update_time=#{updateDate},force_popup=#{forcePopup}, target_user_ids=#{targetUserIds}, preview_content=#{previewContent}
+		WHERE id=#{id}
+	</update>
+
+	<update id="delete">
+		DELETE FROM sys_notification WHERE id=#{id}
+	</update>
+</mapper>

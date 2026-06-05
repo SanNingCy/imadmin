@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.buttonConfig.mapper.ButtonConfigMapper">
+
+    <sql id="buttonConfigColumns">
+        CAST(a.id AS CHAR) AS "id",
+        a.id AS "longId",
+        a.button_key AS "buttonKey",
+        a.button_name AS "buttonName",
+        a.button_status AS "buttonStatus",
+        a.create_time AS "createTime",
+        a.update_time AS "updateTime",
+        a.create_by AS "createById",
+        a.update_by AS "updateById",
+        a.is_deleted AS "isDeleted"
+    </sql>
+
+    <sql id="buttonConfigJoins">
+    </sql>
+
+    <!-- 获取单条数据 -->
+    <select id="get" resultType="com.seekweb4.chat.modules.buttonConfig.entity.ButtonConfig">
+        SELECT
+            <include refid="buttonConfigColumns"/>
+        FROM t_button_config a
+        <include refid="buttonConfigJoins"/>
+        WHERE a.id = CAST(#{id} AS UNSIGNED) AND a.is_deleted = 0
+    </select>
+
+    <!-- 查询数据列表 -->
+    <select id="findList" resultType="com.seekweb4.chat.modules.buttonConfig.entity.ButtonConfig">
+        SELECT
+            <include refid="buttonConfigColumns"/>
+        FROM t_button_config a
+        <include refid="buttonConfigJoins"/>
+        <where>
+            a.is_deleted = 0
+            ${dataScope}
+            <if test="buttonKey != null and buttonKey != ''">
+                AND a.button_key LIKE concat('%',#{buttonKey},'%')
+            </if>
+            <if test="buttonName != null and buttonName != ''">
+                AND a.button_name LIKE concat('%',#{buttonName},'%')
+            </if>
+            <if test="buttonStatus != null">
+                AND a.button_status = #{buttonStatus}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 查询所有数据列表 -->
+    <select id="findAllList" resultType="com.seekweb4.chat.modules.buttonConfig.entity.ButtonConfig">
+        SELECT
+            <include refid="buttonConfigColumns"/>
+        FROM t_button_config a
+        <include refid="buttonConfigJoins"/>
+        <where>
+            a.is_deleted = 0
+            ${dataScope}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 插入数据 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="longId" keyColumn="id">
+        INSERT INTO t_button_config(
+            button_key,
+            button_name,
+            button_status,
+            create_time,
+            update_time,
+            create_by,
+            update_by,
+            is_deleted
+        ) VALUES (
+            #{buttonKey},
+            #{buttonName},
+            #{buttonStatus},
+            NOW(),
+            NOW(),
+            #{createById},
+            #{updateById},
+            0
+        )
+    </insert>
+
+    <!-- 更新数据 -->
+    <update id="update">
+        UPDATE t_button_config SET
+            button_key = #{buttonKey},
+            button_name = #{buttonName},
+            button_status = #{buttonStatus},
+            update_time = NOW(),
+            update_by = #{updateById}
+        WHERE id = #{longId} AND is_deleted = 0
+    </update>
+
+    <!-- 根据按钮标识更新按钮配置 -->
+    <update id="updateKey">
+        UPDATE t_button_config
+            <set>
+                <if test="buttonKey != null and buttonKey != ''">button_key = #{buttonKey},</if>
+                <if test="buttonName != null and buttonName != ''">button_name = #{buttonName},</if>
+                <if test="buttonStatus != null">button_status = #{buttonStatus},</if>
+                update_time = NOW(),
+                <if test="updateById != null and updateById != ''">update_by = #{updateById}</if>
+            </set>
+        WHERE button_key = #{buttonKey} AND is_deleted = 0
+    </update>
+
+
+    <!-- 物理删除 -->
+    <delete id="delete">
+        DELETE FROM t_button_config
+        WHERE id = #{id}
+    </delete>
+
+    <!-- 逻辑删除 -->
+    <update id="deleteByLogic">
+        UPDATE t_button_config SET
+            is_deleted = 1,
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+    <select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.buttonConfig.entity.ButtonConfig">
+        SELECT
+            <include refid="buttonConfigColumns"/>
+        FROM t_button_config a
+        <include refid="buttonConfigJoins"/>
+        WHERE a.${propertyName} = #{value} AND a.is_deleted = 0
+        LIMIT 1
+    </select>
+
+    <!-- 根据按钮标识查询按钮配置 -->
+    <select id="selectByButtonKey" resultType="com.seekweb4.chat.modules.buttonConfig.entity.ButtonConfig">
+        SELECT
+            <include refid="buttonConfigColumns"/>
+        FROM t_button_config a
+        WHERE a.button_key = #{buttonKey} AND a.is_deleted = 0
+        LIMIT 1
+    </select>
+
+    <!-- 批量删除 -->
+    <delete id="batchDelete">
+        DELETE FROM t_button_config
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            CAST(#{id} AS UNSIGNED)
+        </foreach>
+    </delete>
+
+</mapper>
+

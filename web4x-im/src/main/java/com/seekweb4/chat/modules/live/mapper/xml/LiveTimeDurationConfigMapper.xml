@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.live.mapper.LiveTimeDurationConfigMapper">
+
+    <resultMap id="BaseResultMap" type="com.seekweb4.chat.modules.live.entity.LiveTimeDurationConfig">
+        <id column="id" property="id"/>
+        <result column="duration_name" property="durationName"/>
+        <result column="duration_value" property="durationValue"/>
+        <result column="duration_sort" property="durationSort"/>
+        <result column="status" property="status"/>
+        <result column="remark" property="remark"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, duration_name, duration_value, duration_sort, status, remark, create_by, update_by, create_time, update_time, is_deleted
+    </sql>
+
+    <select id="listEnabled" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_live_time_duration_config
+        where is_deleted = 0 and status = 1
+        order by duration_sort asc, id asc
+    </select>
+
+    <select id="listSelectOptions" resultType="com.seekweb4.chat.modules.live.dto.LiveConfigSelectOptionVo">
+        select id,
+               duration_name as name,
+               duration_value as value
+        from t_live_time_duration_config
+        where is_deleted = 0
+        order by duration_sort asc, id asc
+    </select>
+
+    <select id="selectAdminPageList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_live_time_duration_config
+        <where>
+            is_deleted = 0
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="durationName != null and durationName != ''">
+                and duration_name like concat('%', #{durationName}, '%')
+            </if>
+            <if test="durationValue != null">
+                and duration_value = #{durationValue}
+            </if>
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+        <if test="orderBy == null or orderBy == ''">
+            order by duration_sort asc, duration_value asc
+        </if>
+        <if test="pageNo != null and pageSize != null">
+            limit #{pageNo}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="selectAdminCount" resultType="java.lang.Long">
+        select count(1)
+        from t_live_time_duration_config
+        <where>
+            is_deleted = 0
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="durationName != null and durationName != ''">
+                and duration_name like concat('%', #{durationName}, '%')
+            </if>
+            <if test="durationValue != null">
+                and duration_value = #{durationValue}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_live_time_duration_config
+        where id = #{id} and is_deleted = 0
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.seekweb4.chat.modules.live.entity.LiveTimeDurationConfig">
+        update t_live_time_duration_config
+        <set>
+            <if test="durationName != null">
+                duration_name = #{durationName},
+            </if>
+            <if test="durationValue != null">
+                duration_value = #{durationValue},
+            </if>
+            <if test="durationSort != null">
+                duration_sort = #{durationSort},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted},
+            </if>
+            update_time = now()
+        </set>
+        where id = #{id}
+    </update>
+
+    <insert id="insert" parameterType="com.seekweb4.chat.modules.live.entity.LiveTimeDurationConfig" useGeneratedKeys="true" keyProperty="id">
+        insert into t_live_time_duration_config (duration_name, duration_value, duration_sort, status, remark, create_by, update_by, create_time, update_time, is_deleted)
+        values (#{durationName}, #{durationValue}, #{durationSort}, #{status}, #{remark}, #{createBy}, #{updateBy}, now(), now(), #{isDeleted})
+    </insert>
+
+</mapper>
+

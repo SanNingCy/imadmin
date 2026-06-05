@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.piamom.mapper.PiamomHotConfigMapper">
+
+    <resultMap id="BaseResultMap" type="com.seekweb4.chat.modules.piamom.entity.PiamomHotConfig">
+        <id column="id" property="id"/>
+        <result column="like_threshold" property="likeThreshold"/>
+        <result column="view_threshold" property="viewThreshold"/>
+        <result column="total_odic_stake" property="totalOdicStake"/>
+        <result column="stake_tip" property="stakeTip"/>
+        <result column="stake_rule_title" property="stakeRuleTitle"/>
+        <result column="stake_rule_content" property="stakeRuleContent"/>
+        <result column="audit_rule_title" property="auditRuleTitle"/>
+        <result column="audit_rule_content" property="auditRuleContent"/>
+        <result column="complaint_notice" property="complaintNotice"/>
+        <result column="credit_min" property="creditMin"/>
+        <result column="credit_max" property="creditMax"/>
+        <result column="status" property="status"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, like_threshold, view_threshold, total_odic_stake, stake_tip, stake_rule_title,
+        stake_rule_content, audit_rule_title, audit_rule_content, complaint_notice, credit_min, credit_max,
+        status, created_at, updated_at
+    </sql>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from t_piamom_hot_config order by id asc
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from t_piamom_hot_config where id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into t_piamom_hot_config (like_threshold, view_threshold, total_odic_stake, stake_tip,
+            stake_rule_title, stake_rule_content, audit_rule_title, audit_rule_content, complaint_notice,
+            credit_min, credit_max, status)
+        values (#{likeThreshold}, #{viewThreshold}, #{totalOdicStake}, #{stakeTip},
+            #{stakeRuleTitle}, #{stakeRuleContent}, #{auditRuleTitle}, #{auditRuleContent}, #{complaintNotice},
+            #{creditMin}, #{creditMax}, #{status})
+    </insert>
+
+    <update id="updateByPrimaryKeySelective">
+        update t_piamom_hot_config
+        <set>
+            <if test="likeThreshold != null">like_threshold = #{likeThreshold},</if>
+            <if test="viewThreshold != null">view_threshold = #{viewThreshold},</if>
+            <if test="totalOdicStake != null">total_odic_stake = #{totalOdicStake},</if>
+            <if test="stakeTip != null">stake_tip = #{stakeTip},</if>
+            <if test="stakeRuleTitle != null">stake_rule_title = #{stakeRuleTitle},</if>
+            <if test="stakeRuleContent != null">stake_rule_content = #{stakeRuleContent},</if>
+            <if test="auditRuleTitle != null">audit_rule_title = #{auditRuleTitle},</if>
+            <if test="auditRuleContent != null">audit_rule_content = #{auditRuleContent},</if>
+            <if test="complaintNotice != null">complaint_notice = #{complaintNotice},</if>
+            <if test="creditMin != null">credit_min = #{creditMin},</if>
+            <if test="creditMax != null">credit_max = #{creditMax},</if>
+            <if test="status != null">status = #{status},</if>
+            updated_at = now()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteByPrimaryKey">delete from t_piamom_hot_config where id = #{id}</delete>
+</mapper>

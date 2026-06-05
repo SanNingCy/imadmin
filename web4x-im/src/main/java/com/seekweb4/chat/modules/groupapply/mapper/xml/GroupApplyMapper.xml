@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.groupapply.mapper.GroupApplyMapper">
+
+	<sql id="groupApplyColumns">
+		a.id AS "id",
+		a.uid AS "u.id",
+		a.uid2 AS "uid2.id",
+		a.group_id AS "group.id",
+		a.info AS "info",
+		a.state AS "state",
+		a.type AS "type",
+		a.showids AS "showids",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+
+		u.nickname AS "u.nickname",
+		u.icon AS "u.icon",
+		u.sex AS "u.sex",
+
+		uid2.nickname AS "uid2.nickname",
+		uid2.icon AS "uid2.icon",
+		uid2.sex AS "uid2.sex",
+
+		`group`.name AS "group.name"
+	</sql>
+
+	<sql id="groupApplyJoins">
+
+		LEFT JOIN t_member u ON u.id = a.uid
+		LEFT JOIN t_member uid2 ON uid2.id = a.uid2
+		LEFT JOIN t_group `group` ON `group`.id = a.group_id
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.groupapply.entity.GroupApply" >
+		SELECT
+			<include refid="groupApplyColumns"/>
+		FROM t_group_apply a
+		<include refid="groupApplyJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.groupapply.entity.GroupApply" >
+		SELECT
+			<include refid="groupApplyColumns"/>
+		FROM t_group_apply a
+		<include refid="groupApplyJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="u != null and u.id != null and u.id != ''">
+				AND a.uid = #{u.id}
+			</if>
+			<if test="uid2 != null and uid2.id != null and uid2.id != ''">
+				AND a.uid2 = #{uid2.id}
+			</if>
+			<if test="group != null and group.id != null and group.id != ''">
+				AND a.group_id = #{group.id}
+			</if>
+			<if test="state != null and state != ''">
+				AND a.state = #{state}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="showids != null and showids != ''">
+				AND a.showids LIKE concat('%',#{showids},'%')
+			</if>
+			<if test="key != null and key != ''">
+				AND (`group`.name LIKE concat('%',#{key},'%') or `group`.idno = #{key})
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.groupapply.entity.GroupApply" >
+		SELECT
+			<include refid="groupApplyColumns"/>
+		FROM t_group_apply a
+		<include refid="groupApplyJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_group_apply(
+			id,
+			uid,
+			uid2,
+			group_id,
+			info,
+			state,
+			type,
+			showids,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{u.id},
+			#{uid2.id},
+			#{group.id},
+			#{info},
+			#{state},
+			#{type},
+			#{showids},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_group_apply SET
+			uid = #{u.id},
+			uid2 = #{uid2.id},
+			group_id = #{group.id},
+			info = #{info},
+			state = #{state},
+			type = #{type},
+			showids = #{showids},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_group_apply
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_group_apply SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.groupapply.entity.GroupApply">
+		SELECT
+			<include refid="groupApplyColumns"/>
+		FROM t_group_apply a
+		<include refid="groupApplyJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

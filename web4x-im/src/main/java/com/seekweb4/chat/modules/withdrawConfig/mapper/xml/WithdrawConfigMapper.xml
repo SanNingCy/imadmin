@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.withdrawConfig.mapper.WithdrawConfigMapper">
+
+    <resultMap id="BaseResultMap" type="com.seekweb4.chat.modules.withdrawConfig.entity.WithdrawConfig">
+        <id column="id" property="id"/>
+        <result column="min_amount" property="minAmount"/>
+        <result column="max_amount" property="maxAmount"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, min_amount, max_amount, status, create_time, update_time
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from withdraw_config
+        where id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into withdraw_config(
+            min_amount, max_amount, status, create_time, update_time
+        ) values (
+            #{minAmount}, #{maxAmount}, #{status},
+            #{createTime}, #{updateTime}
+        )
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.seekweb4.chat.modules.withdrawConfig.entity.WithdrawConfig">
+        update withdraw_config
+        <set>
+            <if test="minAmount != null">min_amount = #{minAmount},</if>
+            <if test="maxAmount != null">max_amount = #{maxAmount},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteByPrimaryKey">
+        delete from withdraw_config where id = #{id}
+    </delete>
+
+    <select id="selectAdminPageList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from withdraw_config
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="minAmount != null">min_amount = #{minAmount}</if>
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+        <if test="orderBy == null or orderBy == ''">
+            order by update_time desc
+        </if>
+        <if test="pageNo != null and pageSize != null">
+            limit #{pageNo}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="selectAdminCount" resultType="java.lang.Long">
+        select count(1)
+        from withdraw_config
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+</mapper>
+

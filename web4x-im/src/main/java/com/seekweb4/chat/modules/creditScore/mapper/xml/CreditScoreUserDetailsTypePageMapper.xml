@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.creditScore.mapper.CreditScoreUserDetailsTypePageMapper">
+
+    <resultMap id="UserPageResultMap" type="com.seekweb4.chat.modules.creditScore.vo.CreditScoreUserDetailsVo">
+        <result column="userId" property="userId"/>
+        <result column="idno" property="idno"/>
+        <result column="lianghao" property="lianghao"/>
+        <result column="totalCreditScore" property="totalCreditScore"/>
+        <result column="creditStatus" property="creditStatus"/>
+    </resultMap>
+
+    <resultMap id="UserTypeItemResultMap" type="com.seekweb4.chat.modules.creditScore.vo.CreditScoreUserTypeItemVo">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="type" property="type"/>
+        <result column="subtype" property="subtype"/>
+        <result column="current_score" property="currentScore"/>
+        <result column="base_score" property="baseScore"/>
+        <result column="max_limit" property="maxLimit"/>
+        <result column="status" property="status"/>
+        <result column="order_num" property="orderNum"/>
+        <result column="constitute_show" property="constituteShow"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <select id="selectUserPage" resultMap="UserPageResultMap">
+        SELECT
+            d.user_id AS userId,
+            m.idno AS idno,
+            m.lianghao AS lianghao,
+            d.credit_score AS totalCreditScore,
+            d.credit_status AS creditStatus
+        FROM t_member_details d
+        LEFT JOIN t_member m ON m.id = d.user_id
+        <where>
+            d.is_deleted = 0
+            <if test="userId != null and userId != ''">
+                AND d.user_id = #{userId}
+            </if>
+            <if test="idno != null and idno != ''">
+                AND m.idno LIKE CONCAT('%', #{idno}, '%')
+            </if>
+            <if test="lianghao != null and lianghao != ''">
+                AND m.lianghao LIKE CONCAT('%', #{lianghao}, '%')
+            </if>
+
+            <!-- 按类型筛选：只筛选“符合条件的用户”，避免分页主表重复 -->
+            <if test="type != null">
+                AND EXISTS (
+                    SELECT 1
+                    FROM t_member_credit_score_type t
+                    WHERE t.is_deleted = 0
+                      AND t.user_id = d.user_id
+                      AND t.type = #{type}
+                      <if test="subtype != null">
+                          AND t.subtype = #{subtype}
+                      </if>
+                )
+            </if>
+            <if test="type == null and subtype != null">
+                AND EXISTS (
+                    SELECT 1
+                    FROM t_member_credit_score_type t
+                    WHERE t.is_deleted = 0
+                      AND t.user_id = d.user_id
+                      AND t.subtype = #{subtype}
+                )
+            </if>
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            ORDER BY ${orderBy}
+        </if>
+        <if test="orderBy == null or orderBy == ''">
+            ORDER BY (
+                SELECT MAX(t2.update_time)
+                FROM t_member_credit_score_type t2
+                WHERE t2.is_deleted = 0
+                  AND t2.user_id = d.user_id
+            ) DESC,
+            d.id DESC
+        </if>
+        <if test="pageNo != null and pageSize != null">
+            LIMIT #{pageNo}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="selectUserCount" resultType="java.lang.Long">
+        SELECT COUNT(DISTINCT d.user_id)
+        FROM t_member_details d
+        LEFT JOIN t_member m ON m.id = d.user_id
+        <where>
+            d.is_deleted = 0
+            <if test="userId != null and userId != ''">
+                AND d.user_id = #{userId}
+            </if>
+            <if test="idno != null and idno != ''">
+                AND m.idno LIKE CONCAT('%', #{idno}, '%')
+            </if>
+            <if test="lianghao != null and lianghao != ''">
+                AND m.lianghao LIKE CONCAT('%', #{lianghao}, '%')
+            </if>
+
+            <if test="type != null">
+                AND EXISTS (
+                    SELECT 1
+                    FROM t_member_credit_score_type t
+                    WHERE t.is_deleted = 0
+                      AND t.user_id = d.user_id
+                      AND t.type = #{type}
+                      <if test="subtype != null">
+                          AND t.subtype = #{subtype}
+                      </if>
+                )
+            </if>
+            <if test="type == null and subtype != null">
+                AND EXISTS (
+                    SELECT 1
+                    FROM t_member_credit_score_type t
+                    WHERE t.is_deleted = 0
+                      AND t.user_id = d.user_id
+                      AND t.subtype = #{subtype}
+                )
+            </if>
+        </where>
+    </select>
+
+    <select id="selectTypeRowsByUserIds" resultMap="UserTypeItemResultMap">
+        SELECT
+            t.id,
+            t.user_id,
+            t.type,
+            t.subtype,
+            t.current_score,
+            cfg.score AS base_score,
+            cfg.max_limit,
+            cfg.status,
+            cfg.order_num,
+            cfg.constitute_show,
+            t.update_time
+        FROM t_member_credit_score_type t
+        LEFT JOIN t_credit_score_type_config cfg
+            ON cfg.type = t.type AND cfg.subtype = t.subtype AND cfg.is_deleted = 0
+        WHERE t.is_deleted = 0
+          AND t.user_id IN
+          <foreach collection="userIds" item="u" open="(" separator="," close=")">
+              #{u}
+          </foreach>
+        <if test="type != null">
+            AND t.type = #{type}
+        </if>
+        <if test="subtype != null">
+            AND t.subtype = #{subtype}
+        </if>
+        ORDER BY t.update_time DESC, t.id DESC
+    </select>
+
+</mapper>
+

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.upgrade.mapper.UpgradeMapper">
+
+	<sql id="upgradeColumns">
+		a.id AS "id",
+		a.number AS "number",
+		a.version AS "version",
+		a.url AS "url",
+		a.qr_code AS "qrCode",
+		a.content AS "content",
+		a.type AS "type",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate"
+	</sql>
+
+	<sql id="upgradeJoins">
+
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.upgrade.entity.Upgrade" >
+		SELECT
+			<include refid="upgradeColumns"/>
+		FROM t_upgrade a
+		<include refid="upgradeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.upgrade.entity.Upgrade" >
+		SELECT
+			<include refid="upgradeColumns"/>
+		FROM t_upgrade a
+		<include refid="upgradeJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="number != null and number != ''">
+				AND a.number = #{number}
+			</if>
+			<if test="version != null and version != ''">
+				AND a.version = #{version}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.number DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.upgrade.entity.Upgrade" >
+		SELECT
+			<include refid="upgradeColumns"/>
+		FROM t_upgrade a
+		<include refid="upgradeJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_upgrade(
+			number,
+			version,
+			url,
+			qr_code,
+			content,
+			type,
+			create_date,
+			update_date
+		) VALUES (
+			#{number},
+			#{version},
+			#{url},
+			#{qrCode},
+			#{content},
+			#{type},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+<!--	<update id="update">-->
+<!--		UPDATE t_upgrade SET-->
+<!--			number = #{number},-->
+<!--			version = #{version},-->
+<!--			url = #{url},-->
+<!--			content = #{content},-->
+<!--			type = #{type},-->
+<!--			update_date = #{updateDate}-->
+<!--		WHERE id = #{id}-->
+<!--	</update>-->
+
+	<update id="update">
+		UPDATE t_upgrade
+		<set>
+			<if test="number != null">
+				number = #{number},
+			</if>
+			<if test="version != null and version != ''">
+				version = #{version},
+			</if>
+			<if test="url != null and url != ''">
+				url = #{url},
+			</if>
+			<if test="qrCode != null and qrCode != ''">
+				qr_code = #{qrCode},
+			</if>
+			<if test="content != null and content != ''">
+				content = #{content},
+			</if>
+			<if test="type != null">
+				type = #{type},
+			</if>
+			<if test="updateDate != null">
+				update_date = #{updateDate},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_upgrade
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_upgrade SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.upgrade.entity.Upgrade">
+		SELECT
+			<include refid="upgradeColumns"/>
+		FROM t_upgrade a
+		<include refid="upgradeJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

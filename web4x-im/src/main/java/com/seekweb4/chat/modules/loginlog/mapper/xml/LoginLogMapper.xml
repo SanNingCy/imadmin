@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.loginlog.mapper.LoginLogMapper">
+
+	<sql id="loginLogColumns">
+		a.id AS "id",
+		a.uid AS "u.id",
+		a.ip AS "ip",
+		a.ipcity AS "ipcity",
+		a.create_date AS "createDate",
+		a.eqno AS "eqno",
+		a.qrcode AS "qrcode",
+		a.status AS "status",
+		a.fail_remark AS "failRemark",
+
+		u.phone AS "u.phone",
+		u.acount AS "u.acount",
+		u.idno AS "u.idno",
+		u.nickname AS "u.nickname",
+		u.lianghao AS "u.lianghao"
+	</sql>
+
+	<sql id="loginLogJoins">
+
+		LEFT JOIN t_member u ON u.id = a.uid
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.loginlog.entity.LoginLog" >
+		SELECT
+			<include refid="loginLogColumns"/>
+		FROM t_login_log a
+		<include refid="loginLogJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.loginlog.entity.LoginLog" >
+		SELECT
+			<include refid="loginLogColumns"/>
+		FROM t_login_log a
+		<include refid="loginLogJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="u != null and u.id != null and u.id != '' and u.id.length() &lt; 50">
+				AND a.uid = #{u.id}
+			</if>
+			<if test="u != null and u.acount != null and u.acount != ''">
+				AND u.acount LIKE CONCAT('%', #{u.acount}, '%')
+			</if>
+			<if test="u != null and u.idno != null and u.idno != ''">
+				AND u.idno LIKE CONCAT('%', #{u.idno}, '%')
+			</if>
+			<if test="u != null and u.nickname != null and u.nickname != ''">
+				AND u.nickname LIKE CONCAT('%', #{u.nickname}, '%')
+			</if>
+			<if test="u != null and u.lianghao != null and u.lianghao != ''">
+				AND u.lianghao = #{u.lianghao}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.loginlog.entity.LoginLog" >
+		SELECT
+			<include refid="loginLogColumns"/>
+		FROM t_login_log a
+		<include refid="loginLogJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_login_log(
+			id,
+			uid,
+			ip,
+			ipcity,
+			create_date,
+			eqno,
+			qrcode,
+			status,
+			fail_remark
+		) VALUES (
+			#{id},
+			#{u.id},
+			#{ip},
+			#{ipcity},
+			#{createDate},
+			#{eqno},
+			#{qrcode},
+			#{status},
+			#{failRemark}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_login_log SET
+			uid = #{u.id},
+			ip = #{ip},
+			ipcity = #{ipcity},
+			eqno = #{eqno},
+			qrcode = #{qrcode},
+			status = #{status},
+			fail_remark = #{failRemark}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_login_log
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_login_log SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.loginlog.entity.LoginLog">
+		SELECT
+			<include refid="loginLogColumns"/>
+		FROM t_login_log a
+		<include refid="loginLogJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+	<select id="selectLastSuccessLoginByUids" resultType="java.util.HashMap">
+		SELECT uid AS uid, MAX(create_date) AS lastLogin
+		FROM t_login_log
+		WHERE status = 1
+		AND uid IN
+		<foreach collection="uids" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		GROUP BY uid
+	</select>
+
+</mapper>

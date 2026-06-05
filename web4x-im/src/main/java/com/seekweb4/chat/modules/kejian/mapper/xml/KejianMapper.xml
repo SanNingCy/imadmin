@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.kejian.mapper.KejianMapper">
+
+	<sql id="kejianColumns">
+		a.id AS "id",
+		a.send_time AS "sendTime",
+		a.zu_id AS "zu.id",
+		a.title AS "title",
+		a.imgs AS "imgs",
+		a.video AS "video",
+		a.sound AS "sound",
+		a.pdf AS "pdf",
+		a.type AS "type",
+		a.name AS "name",
+		a.size AS "size",
+		a.miao AS "miao",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+
+
+		zu.name AS "zu.name"
+	</sql>
+
+	<sql id="kejianJoins">
+
+		LEFT JOIN t_kejian_zu zu ON zu.id = a.zu_id
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.kejian.entity.Kejian" >
+		SELECT
+			<include refid="kejianColumns"/>
+		FROM t_kejian a
+		<include refid="kejianJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.kejian.entity.Kejian" >
+		SELECT
+			<include refid="kejianColumns"/>
+		FROM t_kejian a
+		<include refid="kejianJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="zu != null and zu.id != null and zu.id != ''">
+				AND a.zu_id = #{zu.id}
+			</if>
+			<if test="title != null and title != ''">
+				AND a.title LIKE concat('%',#{title},'%')
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE concat('%',#{name},'%')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.send_time
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.kejian.entity.Kejian" >
+		SELECT
+			<include refid="kejianColumns"/>
+		FROM t_kejian a
+		<include refid="kejianJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_kejian(
+			id,
+			send_time,
+			zu_id,
+			title,
+			imgs,
+			video,
+			sound,
+			pdf,
+			type,
+			name,
+			size,
+			miao,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{sendTime},
+			#{zu.id},
+			#{title},
+			#{imgs},
+			#{video},
+			#{sound},
+			#{pdf},
+			#{type},
+			#{name},
+			#{size},
+			#{miao},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_kejian SET
+			send_time = #{sendTime},
+			zu_id = #{zu.id},
+			title = #{title},
+			imgs = #{imgs},
+			video = #{video},
+			sound = #{sound},
+			pdf = #{pdf},
+			type = #{type},
+			name = #{name},
+			size = #{size},
+			miao = #{miao},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_kejian
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_kejian SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.kejian.entity.Kejian">
+		SELECT
+			<include refid="kejianColumns"/>
+		FROM t_kejian a
+		<include refid="kejianJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

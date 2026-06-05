@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.dylike.mapper.DyLikeMapper">
+
+	<sql id="dyLikeColumns">
+		a.id AS "id",
+		a.uid AS "u.id",
+		a.dy_id AS "dyId",
+		a.create_date AS "createDate",
+
+		u.nickname AS "u.nickname",
+		u.icon AS "u.icon",
+		u.sex AS "u.sex"
+	</sql>
+
+	<sql id="dyLikeJoins">
+
+		LEFT JOIN t_member u ON u.id = a.uid
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.dylike.entity.DyLike" >
+		SELECT
+			<include refid="dyLikeColumns"/>
+		FROM t_dy_like a
+		<include refid="dyLikeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.dylike.entity.DyLike" >
+		SELECT
+			<include refid="dyLikeColumns"/>
+		FROM t_dy_like a
+		<include refid="dyLikeJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="u != null and u.id != null and u.id != ''">
+				AND a.uid = #{u.id}
+			</if>
+			<if test="dyId != null and dyId != ''">
+				AND a.dy_id = #{dyId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.dylike.entity.DyLike" >
+		SELECT
+			<include refid="dyLikeColumns"/>
+		FROM t_dy_like a
+		<include refid="dyLikeJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_dy_like(
+			id,
+			uid,
+			dy_id,
+			create_date
+		) VALUES (
+			#{id},
+			#{u.id},
+			#{dyId},
+			#{createDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_dy_like SET
+			uid = #{u.id},
+			dy_id = #{dyId}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_dy_like
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_dy_like SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.dylike.entity.DyLike">
+		SELECT
+			<include refid="dyLikeColumns"/>
+		FROM t_dy_like a
+		<include refid="dyLikeJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

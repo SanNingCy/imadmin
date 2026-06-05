@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.PaymentRecord.mapper.PaymentRecordMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.seekweb4.chat.modules.PaymentRecord.entity.PaymentRecord">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="transaction_number" property="transactionNumber" />
+        <result column="partner_number" property="partnerNumber" />
+        <result column="amount" property="amount" />
+        <result column="payment_address" property="paymentAddress" />
+        <result column="receiving_address" property="receivingAddress" />
+        <result column="payment_status" property="paymentStatus" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_by" property="createBy" />
+        <result column="update_by" property="updateBy" />
+        <result column="is_deleted" property="isDeleted" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_id, transaction_number, partner_number, amount,
+        payment_address, receiving_address, payment_status,
+        create_time, update_time, create_by, update_by, is_deleted
+    </sql>
+
+    <insert id="insert" parameterType="com.seekweb4.chat.modules.PaymentRecord.entity.PaymentRecord">
+        INSERT INTO t_payment_record(user_id, transaction_number, partner_number, amount, receiving_address)
+        VALUES(#{userId}, #{transactionNumber}, #{partnerNumber}, #{amount}, #{receivingAddress})
+    </insert>
+
+    <!-- 后台管理 - 分页查询入金记录 -->
+    <select id="selectAdminPageList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_payment_record
+        <where>
+            is_deleted = 0
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="idno != null and idno != ''">
+                and CAST(user_id AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_general_ci in (select CAST(id AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_general_ci from t_member where idno COLLATE utf8mb4_general_ci = CAST(#{idno} AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_general_ci)
+            </if>
+            <if test="transactionNumber != null and transactionNumber != ''">
+                and transaction_number like concat('%', #{transactionNumber}, '%')
+            </if>
+            <if test="partnerNumber != null and partnerNumber != ''">
+                and partner_number like concat('%', #{partnerNumber}, '%')
+            </if>
+            <if test="paymentAddress != null and paymentAddress != ''">
+                and payment_address like concat('%', #{paymentAddress}, '%')
+            </if>
+            <if test="receivingAddress != null and receivingAddress != ''">
+                and receiving_address like concat('%', #{receivingAddress}, '%')
+            </if>
+            <if test="paymentStatus != null">
+                and payment_status = #{paymentStatus}
+            </if>
+            <if test="createTimeStart != null">
+                and create_time >= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and create_time &lt;= #{createTimeEnd}
+            </if>
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+        <if test="orderBy == null or orderBy == ''">
+            order by create_time desc
+        </if>
+        <if test="pageNo != null and pageSize != null">
+            limit #{pageNo}, #{pageSize}
+        </if>
+    </select>
+
+    <!-- 后台管理 - 统计入金记录总数 -->
+    <select id="selectAdminCount" resultType="java.lang.Long">
+        select count(1)
+        from t_payment_record
+        <where>
+            is_deleted = 0
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="transactionNumber != null and transactionNumber != ''">
+                and transaction_number like concat('%', #{transactionNumber}, '%')
+            </if>
+            <if test="partnerNumber != null and partnerNumber != ''">
+                and partner_number like concat('%', #{partnerNumber}, '%')
+            </if>
+            <if test="paymentAddress != null and paymentAddress != ''">
+                and payment_address like concat('%', #{paymentAddress}, '%')
+            </if>
+            <if test="receivingAddress != null and receivingAddress != ''">
+                and receiving_address like concat('%', #{receivingAddress}, '%')
+            </if>
+            <if test="paymentStatus != null">
+                and payment_status = #{paymentStatus}
+            </if>
+            <if test="createTimeStart != null">
+                and create_time >= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and create_time &lt;= #{createTimeEnd}
+            </if>
+        </where>
+    </select>
+
+    <!-- 后台管理 - 统计入金金额 -->
+    <select id="selectAdminTotalAmount" resultType="java.math.BigDecimal">
+        select ifnull(sum(amount), 0)
+        from t_payment_record
+        <where>
+            is_deleted = 0
+            and payment_status = 1
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="transactionNumber != null and transactionNumber != ''">
+                and transaction_number like concat('%', #{transactionNumber}, '%')
+            </if>
+            <if test="partnerNumber != null and partnerNumber != ''">
+                and partner_number like concat('%', #{partnerNumber}, '%')
+            </if>
+            <if test="paymentAddress != null and paymentAddress != ''">
+                and payment_address like concat('%', #{paymentAddress}, '%')
+            </if>
+            <if test="receivingAddress != null and receivingAddress != ''">
+                and receiving_address like concat('%', #{receivingAddress}, '%')
+            </if>
+            <if test="paymentStatus != null">
+                and payment_status = #{paymentStatus}
+            </if>
+            <if test="createTimeStart != null">
+                and create_time >= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and create_time &lt;= #{createTimeEnd}
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据主键查询 -->
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_payment_record
+        where id = #{id} and is_deleted = 0
+    </select>
+
+</mapper>

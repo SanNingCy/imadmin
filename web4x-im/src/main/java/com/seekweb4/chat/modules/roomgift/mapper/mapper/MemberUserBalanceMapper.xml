@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.roomgift.mapper.MemberUserBalanceMapper">
+    <sql id="memberColumns">
+        a.id AS "id",
+		a.phone AS "phone",
+		a.acount AS "acount",
+		a.eqno AS "eqno",
+		a.idno AS "idno",
+		a.qrcode AS "qrcode",
+		a.qrcode2 AS "qrcode2",
+		a.nickname AS "nickname",
+		a.icon AS "icon",
+		a.sex AS "sex",
+		a.img AS "img",
+		a.chat_img AS "chatImg",
+		a.sign AS "sign",
+		a.state AS "state",
+		a.balance AS "balance",
+		a.password AS "password",
+		a.paypwd AS "paypwd",
+		a.mbid AS "mb.id",
+		a.mbname AS "mbname",
+		a.mbda AS "mbda",
+		a.ziti AS "ziti",
+		a.show_quan AS "showQuan",
+		a.is_add_yz AS "isAddYz",
+		a.is_quan_tx AS "isQuanTx",
+		a.is_msg_tx AS "isMsgTx",
+		a.acc_serch AS "accSerch",
+		a.phone_serch AS "phoneSerch",
+		a.gro_add AS "groAdd",
+		a.mp_add AS "mpAdd",
+		a.qr_add AS "qrAdd",
+		a.xcxurl AS "xcxurl",
+		a.eqid AS "eqid",
+		a.kfid AS "kfid",
+		a.invitid AS "invitid",
+		a.huanying AS "huanying",
+		a.isneibu AS "isneibu",
+		a.ipwhite AS "ipwhite",
+		a.city AS "city",
+		a.model AS "model",
+		a.regip AS "regip",
+		a.noadd AS "noadd",
+		a.isvip AS "isvip",
+		a.viptime AS "viptime",
+		a.lianghao AS "lianghao",
+		a.endtime AS "endtime",
+		a.autofanyi AS "autofanyi",
+		a.biandabianyi AS "biandabianyi",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+
+		mb.title AS "mb.title"
+    </sql>
+
+    <sql id="memberJoins">
+        LEFT JOIN t_mibao_faq mb ON mb.id = a.mbid
+    </sql>
+
+    <select id="selectMemberById" resultType="Member">
+        SELECT balance FROM t_member WHERE id = #{id}
+    </select>
+    
+    <!-- 获取用户余额 -->
+    <select id="getUserBalance" resultType="java.math.BigDecimal">
+        SELECT balance FROM t_member WHERE id = #{userId}
+    </select>
+    
+    <!-- 扣除用户余额 -->
+    <update id="deductUserBalance">
+        UPDATE t_member SET balance = balance - #{amount} WHERE id = #{userId}
+    </update>
+    
+    <!-- 增加用户余额 -->
+    <update id="addUserBalance">
+        UPDATE t_member SET balance = balance + #{amount} WHERE id = #{userId}
+    </update>
+    
+    <!-- 记录余额日志 -->
+    <insert id="recordBalanceLog">
+        INSERT INTO t_balance_log (id, uid, title, money, state, type, create_date, update_date, info) 
+        VALUES (#{logId}, #{userId}, #{title}, #{amount}, #{state}, #{type}, NOW(), NOW(), #{info})
+    </insert>
+</mapper>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.live.mapper.LiveFixedPriceConfigMapper">
+
+    <resultMap id="BaseResultMap" type="com.seekweb4.chat.modules.live.entity.LiveFixedPriceConfig">
+        <id column="id" property="id"/>
+        <result column="duration_id" property="durationId"/>
+        <result column="tier_id" property="tierId"/>
+        <result column="fixed_price" property="fixedPrice"/>
+        <result column="status" property="status"/>
+        <result column="remark" property="remark"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <resultMap id="VoResultMap" type="com.seekweb4.chat.modules.live.dto.LiveFixedPriceConfigVo" extends="BaseResultMap">
+        <result column="join_duration_name" property="durationName"/>
+        <result column="join_duration_value" property="durationValue"/>
+        <result column="join_tier_name" property="tierName"/>
+        <result column="join_tier_value" property="tierValue"/>
+    </resultMap>
+
+    <sql id="Join_From">
+        from t_live_fixed_price_config c
+        left join t_live_time_duration_config d on d.id = c.duration_id and d.is_deleted = 0
+        left join t_live_user_tier_config t on t.id = c.tier_id and t.is_deleted = 0
+    </sql>
+
+    <sql id="Admin_Where">
+        <where>
+            c.is_deleted = 0
+            <if test="id != null">
+                and c.id = #{id}
+            </if>
+            <if test="durationId != null">
+                and c.duration_id = #{durationId}
+            </if>
+            <if test="tierId != null">
+                and c.tier_id = #{tierId}
+            </if>
+            <if test="status != null">
+                and c.status = #{status}
+            </if>
+            <if test="fixedPrice != null">
+                and c.fixed_price = #{fixedPrice}
+            </if>
+            <if test="createBy != null and createBy != ''">
+                and c.create_by = #{createBy}
+            </if>
+            <if test="updateBy != null and updateBy != ''">
+                and c.update_by = #{updateBy}
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectAdminPageList" resultMap="VoResultMap">
+        select
+        c.id, c.duration_id, c.tier_id, c.fixed_price, c.status, c.remark,
+        c.create_by, c.update_by, c.create_time, c.update_time, c.is_deleted,
+        d.duration_name as join_duration_name,
+        d.duration_value as join_duration_value,
+        t.tier_name as join_tier_name,
+        t.tier_value as join_tier_value
+        <include refid="Join_From"/>
+        <include refid="Admin_Where"/>
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+        <if test="orderBy == null or orderBy == ''">
+            order by c.create_time desc, c.id desc
+        </if>
+        <if test="pageNo != null and pageSize != null">
+            limit #{pageNo}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="selectAdminCount" resultType="java.lang.Long">
+        select count(1)
+        <include refid="Join_From"/>
+        <include refid="Admin_Where"/>
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="VoResultMap">
+        select
+        c.id, c.duration_id, c.tier_id, c.fixed_price, c.status, c.remark,
+        c.create_by, c.update_by, c.create_time, c.update_time, c.is_deleted,
+        d.duration_name as join_duration_name,
+        d.duration_value as join_duration_value,
+        t.tier_name as join_tier_name,
+        t.tier_value as join_tier_value
+        <include refid="Join_From"/>
+        where c.id = #{id} and c.is_deleted = 0
+    </select>
+
+    <select id="countByDurationAndTier" resultType="long">
+        select count(1)
+        from t_live_fixed_price_config
+        where is_deleted = 0
+          and duration_id = #{durationId}
+          and tier_id = #{tierId}
+        <if test="excludeId != null">
+            and id != #{excludeId}
+        </if>
+    </select>
+
+    <insert id="insert" parameterType="com.seekweb4.chat.modules.live.entity.LiveFixedPriceConfig" useGeneratedKeys="true" keyProperty="id">
+        insert into t_live_fixed_price_config (
+            duration_id, tier_id, fixed_price, status, remark, create_by, update_by, create_time, update_time, is_deleted
+        )
+        values (
+            #{durationId}, #{tierId}, #{fixedPrice}, #{status}, #{remark}, #{createBy}, #{updateBy}, now(), now(), #{isDeleted}
+        )
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.seekweb4.chat.modules.live.entity.LiveFixedPriceConfig">
+        update t_live_fixed_price_config
+        <set>
+            <if test="durationId != null">
+                duration_id = #{durationId},
+            </if>
+            <if test="tierId != null">
+                tier_id = #{tierId},
+            </if>
+            <if test="fixedPrice != null">
+                fixed_price = #{fixedPrice},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted},
+            </if>
+            update_time = now()
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>

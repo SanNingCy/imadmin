@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.roomgift.mapper.GiftConfigMapper">
+    <sql id="giftConfigColumns">
+        a.id AS "id",
+        a.config_name AS "configName",
+        a.gift_guidelines AS "giftGuidelines",
+        a.conversion_rate AS "conversionRate",
+        a.status AS "status",
+        a.is_non_pay_pwd AS "isNonPayPwd",
+        a.remark AS "remark",
+        a.create_by AS "createBy",
+        a.create_date AS "createDate",
+        a.update_by AS "updateBy",
+        a.update_date AS "updateDate",
+        a.remarks AS "remarks",
+        a.del_flag AS "delFlag"
+    </sql>
+
+    <sql id="giftConfigJoins">
+    </sql>
+
+    <select id="get" resultType="GiftConfig">
+        SELECT
+            <include refid="giftConfigColumns"/>
+        FROM gift_config a
+        <include refid="giftConfigJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="GiftConfig">
+        SELECT
+            <include refid="giftConfigColumns"/>
+        FROM gift_config a
+        <include refid="giftConfigJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="configName != null and configName != ''">
+                AND a.config_name LIKE CONCAT('%', #{configName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+        </where>
+        ORDER BY a.create_date DESC
+    </select>
+
+    <select id="findEnabledConfig" resultType="GiftConfig">
+        SELECT
+            <include refid="giftConfigColumns"/>
+        FROM gift_config a
+        <include refid="giftConfigJoins"/>
+        WHERE a.del_flag = "0"
+        AND a.status = "1"
+        ORDER BY a.create_date DESC
+        LIMIT 1
+    </select>
+
+    <insert id="insert">
+        INSERT INTO gift_config(
+            id,
+            config_name,
+            gift_guidelines,
+            conversion_rate,
+            status,
+            isNonPayPwd,
+            remark,
+            create_by,
+            create_date,
+            update_by,
+            update_date,
+            remarks,
+            del_flag
+        ) VALUES (
+            #{id},
+            #{configName},
+            #{giftGuidelines},
+            #{conversionRate},
+            #{status},
+            #{isNonPayPwd},
+            #{remark},
+            #{createBy},
+            #{createDate},
+            #{updateBy},
+            #{updateDate},
+            #{remarks},
+            #{delFlag}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE gift_config
+        <set>
+            <if test="configName != null">
+                config_name = #{configName},
+            </if>
+            <if test="giftGuidelines != null">
+                gift_guidelines = #{giftGuidelines},
+            </if>
+            <if test="conversionRate != null">
+                conversion_rate = #{conversionRate},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="isNonPayPwd != null">
+                isNonPayPwd = #{isNonPayPwd},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate},
+            </if>
+            <if test="remarks != null">
+                remarks = #{remarks},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete">
+        UPDATE gift_config SET
+            del_flag = #{DEL_FLAG_DELETE}
+        WHERE id = #{id}
+    </update>
+</mapper>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.piamom.mapper.PiamomUserLikeRecordMapper">
+
+    <resultMap id="BaseResultMap" type="com.seekweb4.chat.modules.piamom.entity.PiamomUserLikeRecord">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="from_user_id" property="fromUserId"/>
+        <result column="target_type" property="targetType"/>
+        <result column="target_id" property="targetId"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="user_idno" property="userIdno"/>
+        <result column="user_nickname" property="userNickname"/>
+        <result column="from_user_idno" property="fromUserIdno"/>
+        <result column="from_user_nickname" property="fromUserNickname"/>
+    </resultMap>
+
+    <sql id="adminWhere">
+        <where>
+            <if test="id != null">and r.id = #{id}</if>
+            <if test="userId != null and userId != ''">and r.user_id = #{userId}</if>
+            <if test="userIdno != null and userIdno != ''">and um.idno like concat('%', #{userIdno}, '%')</if>
+            <if test="fromUserId != null and fromUserId != ''">and r.from_user_id = #{fromUserId}</if>
+            <if test="fromUserIdno != null and fromUserIdno != ''">and fm.idno like concat('%', #{fromUserIdno}, '%')</if>
+            <if test="targetType != null and targetType != ''">and r.target_type = #{targetType}</if>
+            <if test="targetId != null">and r.target_id = #{targetId}</if>
+        </where>
+    </sql>
+
+    <select id="selectAdminPageList" resultMap="BaseResultMap">
+        select r.id, r.user_id, r.from_user_id, r.target_type, r.target_id, r.created_at,
+               IFNULL(um.idno, '') AS user_idno, IFNULL(um.nickname, '') AS user_nickname,
+               IFNULL(fm.idno, '') AS from_user_idno, IFNULL(fm.nickname, '') AS from_user_nickname
+        from t_piamom_user_like_record r
+        left join t_member um on um.id = r.user_id
+        left join t_member fm on fm.id = r.from_user_id
+        <include refid="adminWhere"/>
+        <choose>
+            <when test="orderBy != null and orderBy != ''">order by ${orderBy}</when>
+            <otherwise>order by r.created_at desc</otherwise>
+        </choose>
+        <if test="pageNo != null and pageSize != null">limit #{pageNo}, #{pageSize}</if>
+    </select>
+
+    <select id="selectAdminCount" resultType="java.lang.Long">
+        select count(1)
+        from t_piamom_user_like_record r
+        left join t_member um on um.id = r.user_id
+        left join t_member fm on fm.id = r.from_user_id
+        <include refid="adminWhere"/>
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select r.id, r.user_id, r.from_user_id, r.target_type, r.target_id, r.created_at,
+               IFNULL(um.idno, '') AS user_idno, IFNULL(um.nickname, '') AS user_nickname,
+               IFNULL(fm.idno, '') AS from_user_idno, IFNULL(fm.nickname, '') AS from_user_nickname
+        from t_piamom_user_like_record r
+        left join t_member um on um.id = r.user_id
+        left join t_member fm on fm.id = r.from_user_id
+        where r.id = #{id}
+    </select>
+
+    <delete id="deleteByPrimaryKey">delete from t_piamom_user_like_record where id = #{id}</delete>
+</mapper>
+

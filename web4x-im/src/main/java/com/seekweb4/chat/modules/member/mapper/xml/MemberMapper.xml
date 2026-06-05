@@ -1,0 +1,726 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.member.mapper.MemberMapper">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        , phone, acount, eqno, idno, qrcode, nickname, icon, sex, img,
+    chat_img, sign, state, balance, password, paypwd, mbid, mbname, mbda, ziti,
+    show_quan, is_add_yz, is_quan_tx, is_msg_tx, acc_serch, phone_serch, gro_add, mp_add, qr_add, xcxurl,
+    eqid, kfid, invitid, huanying, create_date, update_date, isneibu, ipwhite, city, model,
+    regip, noadd, isvip, viptime, qrcode2, lianghao, endtime, autofanyi, biandabianyi, withhold,
+    payment_Address, receiving_Address,two_factor_code,point_total,two_factor_time
+    </sql>
+
+    <sql id="memberColumns">
+        a
+        .
+        id
+        AS "id",
+		a.phone AS "phone",
+		a.acount AS "acount",
+		a.eqno AS "eqno",
+		a.idno AS "idno",
+		a.qrcode AS "qrcode",
+		a.qrcode2 AS "qrcode2",
+		a.nickname AS "nickname",
+		a.icon AS "icon",
+		a.sex AS "sex",
+		a.img AS "img",
+		a.chat_img AS "chatImg",
+		a.sign AS "sign",
+		a.state AS "state",
+		a.balance AS "balance",
+		a.password AS "password",
+		a.paypwd AS "paypwd",
+		a.mbid AS "mb.id",
+		a.mbname AS "mbname",
+		a.mbda AS "mbda",
+		a.ziti AS "ziti",
+		a.show_quan AS "showQuan",
+		a.is_add_yz AS "isAddYz",
+		a.is_quan_tx AS "isQuanTx",
+		a.is_msg_tx AS "isMsgTx",
+		a.acc_serch AS "accSerch",
+		a.phone_serch AS "phoneSerch",
+		a.gro_add AS "groAdd",
+		a.mp_add AS "mpAdd",
+		a.qr_add AS "qrAdd",
+		a.xcxurl AS "xcxurl",
+		a.eqid AS "eqid",
+		a.kfid AS "kfid",
+		a.invitid AS "invitid",
+		a.huanying AS "huanying",
+		a.isneibu AS "isneibu",
+		a.ipwhite AS "ipwhite",
+		a.city AS "city",
+		a.model AS "model",
+		a.regip AS "regip",
+		a.noadd AS "noadd",
+		a.isvip AS "isvip",
+		a.viptime AS "viptime",
+		a.lianghao AS "lianghao",
+		a.endtime AS "endtime",
+		a.autofanyi AS "autofanyi",
+		a.biandabianyi AS "biandabianyi",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+
+		mb.title AS "mb.title",
+        a.mbid  AS mbid,
+        a.payment_Address as paymentAddress,
+        a.receiving_Address as receivingAddress,
+        a.two_factor_code as twoFactorCode,
+        a.point_total as pointTotal,
+        a.two_factor_time as twoFactorTime
+    </sql>
+
+    <sql id="memberJoins">
+        LEFT JOIN t_mibao_faq mb ON mb.id = a.mbid
+    </sql>
+
+    <!-- 最近登录成功时间（t_login_log.status=1） -->
+    <sql id="memberLoginAggJoin">
+        LEFT JOIN (
+            SELECT uid, MAX(create_date) AS last_login_date
+            FROM t_login_log
+            WHERE status = 1
+            GROUP BY uid
+        ) ll ON ll.uid = a.id
+    </sql>
+
+    <select id="selectBasicById" resultType="com.seekweb4.chat.modules.member.entity.Member">
+        SELECT
+            id,
+            nickname,
+            idno
+        FROM t_member
+        WHERE id = #{id}
+            LIMIT 1
+    </select>
+
+    <select id="get" resultType="com.seekweb4.chat.modules.member.entity.Member">
+        SELECT
+        <include refid="memberColumns"/>
+        FROM t_member a
+        <include refid="memberJoins"/>
+        <include refid="memberLoginAggJoin"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="com.seekweb4.chat.modules.member.entity.Member">
+        SELECT
+        <include refid="memberColumns"/>
+        FROM t_member a
+        <include refid="memberJoins"/>
+        <include refid="memberLoginAggJoin"/>
+        <where>
+
+            ${dataScope}
+            <if test="phone != null and phone != ''">
+                AND a.phone = #{phone}
+            </if>
+<!--            <if test="eqno != null and eqno != ''">-->
+<!--                AND a.eqno = #{eqno}-->
+<!--            </if>-->
+            <if test="eqno != null and eqno != ''">
+                AND a.eqno LIKE CONCAT('%', #{eqno}, '%')
+            </if>
+            <if test="acount != null and acount != ''">
+                AND a.acount = #{acount}
+            </if>
+            <if test="idno != null and idno != ''">
+                AND a.idno = #{idno}
+            </if>
+            <if test="regip != null and regip != ''">
+                AND a.regip = #{regip}
+            </if>
+            <if test="nickname != null and nickname != ''">
+                AND a.nickname LIKE concat('%',#{nickname},'%')
+            </if>
+            <if test="city != null and city != ''">
+                AND a.city LIKE concat('%',#{city},'%')
+            </if>
+            <if test="key != null and key != ''">
+                AND (a.nickname = #{key} or a.phone = #{key} or a.acount = #{key} or a.idno = #{key} or a.lianghao =
+                #{key})
+            </if>
+            <if test="state != null and state != ''">
+                AND a.state = #{state}
+            </if>
+            <if test="invitid != null and invitid != ''">
+                AND a.invitid = #{invitid}
+            </if>
+            <if test="isneibu != null and isneibu != ''">
+                AND a.isneibu = #{isneibu}
+            </if>
+            <if test="noadd != null and noadd != ''">
+                AND a.noadd = #{noadd}
+            </if>
+            <if test="isvip != null and isvip != ''">
+                AND a.isvip = #{isvip}
+            </if>
+            <if test="lianghao != null and lianghao != ''">
+                AND a.lianghao = #{lianghao}
+            </if>
+            <if test="idno != null and idno != ''">
+                OR a.lianghao = #{idno}
+            </if>
+            <if test="beginCreateDate != null and endCreateDate != null ">
+                AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+            </if>
+            <if test="inactiveDays != null and inactiveDays &gt; 0">
+                AND (
+                    ll.last_login_date IS NULL
+                    OR ll.last_login_date &lt; DATE_SUB(NOW(), INTERVAL #{inactiveDays} DAY)
+                )
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.create_date DESC
+            </otherwise>
+        </choose>
+    </select>
+    <select id="cityList" resultType="com.seekweb4.chat.modules.member.entity.MemberTongji">
+        SELECT DISTINCT city,
+                        count(1) as `count`
+        FROM t_member
+        WHERE city != ''
+        GROUP BY
+            city
+    </select>
+    <select id="eqList" resultType="com.seekweb4.chat.modules.member.entity.MemberTongji">
+        SELECT DISTINCT model,
+                        count(1) as `count`
+        FROM t_member
+        WHERE model != ''
+        GROUP BY
+            model
+    </select>
+
+    <select id="findAllList" resultType="com.seekweb4.chat.modules.member.entity.Member">
+        SELECT
+        <include refid="memberColumns"/>
+        FROM t_member a
+        <include refid="memberJoins"/>
+        <include refid="memberLoginAggJoin"/>
+        <where>
+
+            ${dataScope}
+            <if test="inactiveDays != null and inactiveDays &gt; 0">
+                AND (
+                    ll.last_login_date IS NULL
+                    OR ll.last_login_date &lt; DATE_SUB(NOW(), INTERVAL #{inactiveDays} DAY)
+                )
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO t_member(id,
+                             phone,
+                             acount,
+                             eqno,
+                             idno,
+                             qrcode,
+                             qrcode2,
+                             nickname,
+                             icon,
+                             sex,
+                             img,
+                             chat_img,
+                             sign,
+                             state,
+                             balance,
+                             password,
+                             paypwd,
+                             mbid,
+                             mbda,
+                             ziti,
+                             show_quan,
+                             is_add_yz,
+                             is_quan_tx,
+                             is_msg_tx,
+                             acc_serch,
+                             phone_serch,
+                             gro_add,
+                             mp_add,
+                             qr_add,
+                             xcxurl,
+                             eqid,
+                             kfid,
+                             invitid,
+                             city,
+                             model,
+                             regip,
+                             create_date,
+                             update_date)
+        VALUES (#{id},
+                #{phone},
+                #{acount},
+                #{eqno},
+                #{idno},
+                #{qrcode},
+                #{qrcode2},
+                #{nickname},
+                #{icon},
+                #{sex},
+                #{img},
+                #{chatImg},
+                #{sign},
+                #{state},
+                #{balance},
+                #{password},
+                #{paypwd},
+                #{mb.id},
+                #{mbda},
+                #{ziti},
+                #{showQuan},
+                #{isAddYz},
+                #{isQuanTx},
+                #{isMsgTx},
+                #{accSerch},
+                #{phoneSerch},
+                #{groAdd},
+                #{mpAdd},
+                #{qrAdd},
+                #{xcxurl},
+                #{eqid},
+                #{kfid},
+                #{invitid},
+                #{city},
+                #{model},
+                #{regip},
+                #{createDate},
+                #{updateDate})
+    </insert>
+
+<!--    <update id="update">-->
+<!--        UPDATE t_member-->
+<!--        SET phone        = #{phone},-->
+<!--            acount       = #{acount},-->
+<!--            eqno         = #{eqno},-->
+<!--            idno         = #{idno},-->
+<!--            qrcode       = #{qrcode},-->
+<!--            qrcode2      = #{qrcode2},-->
+<!--            nickname     = #{nickname},-->
+<!--            icon         = #{icon},-->
+<!--            sex          = #{sex},-->
+<!--            img          = #{img},-->
+<!--            chat_img     = #{chatImg},-->
+<!--            sign         = #{sign},-->
+<!--            state        = #{state},-->
+<!--            balance      = #{balance},-->
+<!--            password     = #{password},-->
+<!--            paypwd       = #{paypwd},-->
+<!--            mbid         = #{mb.id},-->
+<!--            mbname       = #{mbname},-->
+<!--            mbda         = #{mbda},-->
+<!--            ziti         = #{ziti},-->
+<!--            show_quan    = #{showQuan},-->
+<!--            is_add_yz    = #{isAddYz},-->
+<!--            is_quan_tx   = #{isQuanTx},-->
+<!--            is_msg_tx    = #{isMsgTx},-->
+<!--            acc_serch    = #{accSerch},-->
+<!--            phone_serch  = #{phoneSerch},-->
+<!--            gro_add      = #{groAdd},-->
+<!--            mp_add       = #{mpAdd},-->
+<!--            qr_add       = #{qrAdd},-->
+<!--            xcxurl       = #{xcxurl},-->
+<!--            eqid         = #{eqid},-->
+<!--            kfid         = #{kfid},-->
+<!--            invitid      = #{invitid},-->
+<!--            huanying     = #{huanying},-->
+<!--            isneibu      = #{isneibu},-->
+<!--            ipwhite      = #{ipwhite},-->
+<!--            city         = #{city},-->
+<!--            model        = #{model},-->
+<!--            regip        = #{regip},-->
+<!--            noadd        = #{noadd},-->
+<!--            isvip        = #{isvip},-->
+<!--            viptime      = #{viptime},-->
+<!--            lianghao     = #{lianghao},-->
+<!--            endtime      = #{endtime},-->
+<!--            autofanyi    = #{autofanyi},-->
+<!--            biandabianyi = #{biandabianyi},-->
+<!--            update_date  = #{updateDate}-->
+<!--        WHERE id = #{id}-->
+<!--    </update>-->
+
+    <update id="update">
+        UPDATE t_member
+        <set>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="acount != null">acount = #{acount},</if>
+            <if test="eqno != null">eqno = #{eqno},</if>
+            <if test="idno != null">idno = #{idno},</if>
+            <if test="qrcode != null">qrcode = #{qrcode},</if>
+            <if test="qrcode2 != null">qrcode2 = #{qrcode2},</if>
+            <if test="nickname != null">nickname = #{nickname},</if>
+            <if test="icon != null">icon = #{icon},</if>
+            <if test="sex != null">sex = #{sex},</if>
+            <if test="img != null">img = #{img},</if>
+            <if test="chatImg != null">chat_img = #{chatImg},</if>
+            <if test="sign != null">sign = #{sign},</if>
+            <if test="state != null">state = #{state},</if>
+            <if test="balance != null">balance = #{balance},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="paypwd != null">paypwd = #{paypwd},</if>
+            <if test="mb != null and mb.id != null">mbid = #{mb.id},</if>
+            <if test="mbname != null">mbname = #{mbname},</if>
+            <if test="mbda != null">mbda = #{mbda},</if>
+            <if test="ziti != null">ziti = #{ziti},</if>
+            <if test="showQuan != null">show_quan = #{showQuan},</if>
+            <if test="isAddYz != null">is_add_yz = #{isAddYz},</if>
+            <if test="isQuanTx != null">is_quan_tx = #{isQuanTx},</if>
+            <if test="isMsgTx != null">is_msg_tx = #{isMsgTx},</if>
+            <if test="accSerch != null">acc_serch = #{accSerch},</if>
+            <if test="phoneSerch != null">phone_serch = #{phoneSerch},</if>
+            <if test="groAdd != null">gro_add = #{groAdd},</if>
+            <if test="mpAdd != null">mp_add = #{mpAdd},</if>
+            <if test="qrAdd != null">qr_add = #{qrAdd},</if>
+            <if test="xcxurl != null">xcxurl = #{xcxurl},</if>
+            <if test="eqid != null">eqid = #{eqid},</if>
+            <if test="kfid != null">kfid = #{kfid},</if>
+            <if test="invitid != null">invitid = #{invitid},</if>
+            <if test="huanying != null">huanying = #{huanying},</if>
+            <if test="isneibu != null">isneibu = #{isneibu},</if>
+            <if test="ipwhite != null">ipwhite = #{ipwhite},</if>
+            <if test="city != null">city = #{city},</if>
+            <if test="model != null">model = #{model},</if>
+            <if test="regip != null">regip = #{regip},</if>
+            <if test="noadd != null">noadd = #{noadd},</if>
+            <if test="isvip != null">isvip = #{isvip},</if>
+            <if test="viptime != null">viptime = #{viptime},</if>
+            <if test="lianghao != null">lianghao = #{lianghao},</if>
+            <if test="endtime != null">endtime = #{endtime},</if>
+            <if test="autofanyi != null">autofanyi = #{autofanyi},</if>
+            <if test="biandabianyi != null">biandabianyi = #{biandabianyi},</if>
+            <if test="updateDate != null">update_date = #{updateDate}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+
+    <!--物理删除-->
+    <update id="delete">
+        DELETE
+        FROM t_member
+        WHERE id = #{id}
+    </update>
+
+    <!--逻辑删除-->
+    <update id="deleteByLogic">
+        UPDATE t_member
+        SET del_flag = #{DEL_FLAG_DELETE}
+        WHERE id = #{id}
+    </update>
+
+    <!--防止余额为负-->
+    <update id="updateBalanceByUserId">
+        UPDATE t_member
+        SET balance = balance + #{amount}
+        WHERE id = #{id}
+          AND balance + #{amount} >= 0
+    </update>
+
+    <update id="updateTwoFactorCode">
+        UPDATE t_member
+        SET two_factor_code = #{twoFactorCode},
+            two_factor_time = #{twoFactorTime}
+        WHERE id = #{id}
+    </update>
+
+
+    <!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+    <select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.member.entity.Member">
+        SELECT
+        <include refid="memberColumns"/>
+        FROM t_member a
+        <include refid="memberJoins"/>
+        <include refid="memberLoginAggJoin"/>
+        WHERE a.${propertyName} = #{value}
+    </select>
+
+    <!--通过收款地址查询 -->
+    <select id="selectByReceivingAddress" resultType="com.seekweb4.chat.modules.member.entity.Member">
+        select
+        <include refid="Base_Column_List"/>
+        from t_member
+        where receiving_address = #{receivingAddress}
+        limit 1
+    </select>
+    <select id="getCustomer" resultType="com.seekweb4.chat.modules.member.entity.Member">
+        select
+        <include refid="Base_Column_List"/>
+        from t_member
+        where nickname like '%客服%' limit 1;
+    </select>
+
+
+    <update id="updateMember" parameterType="com.seekweb4.chat.modules.member.entity.Member">
+        UPDATE t_member
+        <set>
+            <if test="phone != null and phone != ''">phone = #{phone},</if>
+            <if test="acount != null and acount != ''">acount = #{acount},</if>
+            <if test="eqno != null and eqno != ''">eqno = #{eqno},</if>
+            <if test="idno != null and idno != ''">idno = #{idno},</if>
+<!--            <if test="qrcode != null and qrcode != ''">qrcode = #{qrcode},</if>-->
+            <if test="nickname != null and nickname != ''">nickname = #{nickname},</if>
+            <if test="icon != null and icon != ''">icon = #{icon},</if>
+            <if test="sex != null and sex != ''">sex = #{sex},</if>
+            <if test="img != null and img != ''">img = #{img},</if>
+            <if test="chatImg != null and chatImg != ''">chat_img = #{chatImg},</if>
+            <if test="sign != null and sign != ''">sign = #{sign},</if>
+            <if test="state != null and state != ''">state = #{state},</if>
+            <if test="balance != null">balance = #{balance},</if>
+            <if test="password != null and password != ''">password = #{password},</if>
+            <if test="paypwd != null and paypwd != ''">paypwd = #{paypwd},</if>
+            <if test="mbid != null and mbid != ''">mbid = #{mbid},</if>
+            <if test="mbname != null and mbname != ''">mbname = #{mbname},</if>
+            <if test="mbda != null and mbda != ''">mbda = #{mbda},</if>
+            <if test="ziti != null and ziti != ''">ziti = #{ziti},</if>
+            <if test="showQuan != null and showQuan != ''">show_quan = #{showQuan},</if>
+            <if test="isAddYz != null and isAddYz != ''">is_add_yz = #{isAddYz},</if>
+            <if test="isQuanTx != null and isQuanTx != ''">is_quan_tx = #{isQuanTx},</if>
+            <if test="isMsgTx != null and isMsgTx != ''">is_msg_tx = #{isMsgTx},</if>
+            <if test="accSerch != null and accSerch != ''">acc_serch = #{accSerch},</if>
+            <if test="phoneSerch != null and phoneSerch != ''">phone_serch = #{phoneSerch},</if>
+            <if test="groAdd != null and groAdd != ''">gro_add = #{groAdd},</if>
+            <if test="mpAdd != null and mpAdd != ''">mp_add = #{mpAdd},</if>
+            <if test="qrAdd != null and qrAdd != ''">qr_add = #{qrAdd},</if>
+            <if test="xcxurl != null and xcxurl != ''">xcxurl = #{xcxurl},</if>
+            <if test="eqid != null and eqid != ''">eqid = #{eqid},</if>
+            <if test="kfid != null and kfid != ''">kfid = #{kfid},</if>
+            <if test="invitid != null and invitid != ''">invitid = #{invitid},</if>
+            <if test="huanying != null and huanying != ''">huanying = #{huanying},</if>
+            <if test="createDate != null">create_date = #{createDate},</if>
+            <if test="updateDate != null">update_date = #{updateDate},</if>
+            <if test="isneibu != null and isneibu != ''">isneibu = #{isneibu},</if>
+            <if test="ipwhite != null and ipwhite != ''">ipwhite = #{ipwhite},</if>
+            <if test="city != null and city != ''">city = #{city},</if>
+            <if test="model != null and model != ''">model = #{model},</if>
+            <if test="regip != null and regip != ''">regip = #{regip},</if>
+            <if test="noadd != null and noadd != ''">noadd = #{noadd},</if>
+            <if test="isvip != null and isvip != ''">isvip = #{isvip},</if>
+            <if test="viptime != null">viptime = #{viptime},</if>
+<!--            <if test="qrcode2 != null and qrcode2 != ''">qrcode2 = #{qrcode2},</if>-->
+            <if test="lianghao != null and lianghao != ''">lianghao = #{lianghao},</if>
+            <if test="endtime != null">endtime = #{endtime},</if>
+            <if test="autofanyi != null and autofanyi != ''">autofanyi = #{autofanyi},</if>
+            <if test="biandabianyi != null and biandabianyi != ''">biandabianyi = #{biandabianyi},</if>
+            <if test="paymentAddress != null and paymentAddress != ''">payment_Address = #{paymentAddress},</if>
+            <if test="receivingAddress != null and receivingAddress != ''">receiving_Address = #{receivingAddress},</if>
+            <if test="twoFactorCode != null and twoFactorCode != ''">two_factor_code = #{twoFactorCode},</if>
+            <if test="pointTotal != null">point_total = #{pointTotal},</if>
+            <if test="twoFactorTime != null">two_factor_time = #{twoFactorTime}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    <!--    确保余额充足-->
+    <update id="updateSubtractionBalanceByUserId">
+        UPDATE t_member
+        SET balance = balance - #{amount}
+        WHERE id = #{id}
+          AND balance >= #{amount}
+    </update>
+
+    <!-- 查询已启用谷歌验证的用户列表 -->
+    <select id="findListWithTwoFactor" resultType="com.seekweb4.chat.modules.member.entity.Member">
+        SELECT
+            a.id AS "id",
+            a.acount AS "acount",
+            a.eqno AS "eqno",
+            a.idno AS "idno",
+            a.nickname AS "nickname",
+            a.mbid AS "mbid",
+            a.mbname AS "mbname",
+            a.mbda AS "mbda",
+            a.lianghao AS "lianghao",
+            a.state AS "state",
+            a.two_factor_code AS "twoFactorCode",
+            a.two_factor_time AS "twoFactorTime",
+            a.create_date AS "createDate"
+        FROM t_member a
+        <where>
+            a.two_factor_code IS NOT NULL
+            ${dataScope}
+            <if test="acount != null and acount != ''">
+                AND a.acount = #{acount}
+            </if>
+            <if test="idno != null and idno != ''">
+                AND a.idno = #{idno}
+            </if>
+            <if test="nickname != null and nickname != ''">
+                AND a.nickname LIKE concat('%',#{nickname},'%')
+            </if>
+            <if test="key != null and key != ''">
+                AND (a.nickname = #{key} or a.phone = #{key} or a.acount = #{key} or a.idno = #{key} or a.lianghao = #{key})
+            </if>
+            <if test="state != null and state != ''">
+                AND a.state = #{state}
+            </if>
+            <if test="invitid != null and invitid != ''">
+                AND a.invitid = #{invitid}
+            </if>
+            <if test="isneibu != null and isneibu != ''">
+                AND a.isneibu = #{isneibu}
+            </if>
+            <if test="noadd != null and noadd != ''">
+                AND a.noadd = #{noadd}
+            </if>
+            <if test="isvip != null and isvip != ''">
+                AND a.isvip = #{isvip}
+            </if>
+            <if test="lianghao != null and lianghao != ''">
+                AND a.lianghao = #{lianghao}
+            </if>
+            <if test="beginCreateDate != null and endCreateDate != null ">
+                AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.create_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 重置用户的谷歌验证码 -->
+    <update id="resetTwoFactorCode">
+        UPDATE t_member
+        SET two_factor_code = NULL,
+            two_factor_time = NULL
+        WHERE id = #{id}
+    </update>
+
+
+    <select id="getMibaoId" resultType="com.seekweb4.chat.modules.member.entity.Member">
+        SELECT
+        a.id AS "id",
+        a.acount AS "acount",
+        a.eqno AS "eqno",
+        a.idno AS "idno",
+        a.nickname AS "nickname",
+        a.paypwd AS "paypwd",
+        a.password AS "password",
+        a.mbid AS "mbid",
+        a.mbname AS "mbname",
+        a.mbda AS "mbda",
+        a.lianghao AS "lianghao",
+        a.state AS "state",
+        a.create_date AS "createDate"
+        FROM t_member a
+        WHERE a.id = #{id}
+    </select>
+
+    <!-- 查询已设置密保问题的用户列表 -->
+    <select id="findListWithMibao" resultType="com.seekweb4.chat.modules.member.entity.Member">
+        SELECT
+            a.id AS "id",
+            a.acount AS "acount",
+            a.eqno AS "eqno",
+            a.idno AS "idno",
+            a.nickname AS "nickname",
+            a.paypwd AS "paypwd",
+            a.password AS "password",
+            a.mbid AS "mbid",
+            a.mbname AS "mbname",
+            a.mbda AS "mbda",
+            a.lianghao AS "lianghao",
+            a.state AS "state",
+            a.create_date AS "createDate"
+        FROM t_member a
+        <where>
+            a.mbname IS NOT NULL
+            ${dataScope}
+            <if test="acount != null and acount != ''">
+                AND a.acount = #{acount}
+            </if>
+            <if test="idno != null and idno != ''">
+                AND (a.idno = #{idno} OR a.lianghao = #{idno})
+            </if>
+            <if test="nickname != null and nickname != ''">
+                AND a.nickname LIKE concat('%',#{nickname},'%')
+            </if>
+            <if test="key != null and key != ''">
+                AND (a.nickname = #{key} or a.phone = #{key} or a.acount = #{key} or a.idno = #{key} or a.lianghao = #{key})
+            </if>
+            <if test="state != null and state != ''">
+                AND a.state = #{state}
+            </if>
+            <if test="invitid != null and invitid != ''">
+                AND a.invitid = #{invitid}
+            </if>
+            <if test="isneibu != null and isneibu != ''">
+                AND a.isneibu = #{isneibu}
+            </if>
+            <if test="noadd != null and noadd != ''">
+                AND a.noadd = #{noadd}
+            </if>
+            <if test="isvip != null and isvip != ''">
+                AND a.isvip = #{isvip}
+            </if>
+            <if test="lianghao != null and lianghao != ''">
+                AND a.lianghao LIKE concat('%', #{lianghao}, '%')
+            </if>
+            <if test="beginCreateDate != null and endCreateDate != null ">
+                AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+            </if>
+            <if test="mbname != null and mbname != ''">
+                AND a.mbname = #{mbname}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.create_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 修改用户的密保问题 -->
+    <update id="updateMibao">
+        UPDATE t_member
+        <set>
+            <if test="mbid != null and mbid != ''">
+                mbid = #{mbid},
+            </if>
+            <if test="mbname != null and mbname != ''">
+                mbname = #{mbname},
+            </if>
+            <if test="mbda != null and mbda != ''">
+                mbda = #{mbda},
+            </if>
+        </set>
+        WHERE idno = #{id}
+    </update>
+
+    <!-- 重置用户的密保问题 -->
+    <update id="resetMibao">
+        UPDATE t_member
+        SET mbid = NULL,
+            mbname = NULL,
+            mbda = NULL
+        WHERE id = #{id}
+    </update>
+
+</mapper>

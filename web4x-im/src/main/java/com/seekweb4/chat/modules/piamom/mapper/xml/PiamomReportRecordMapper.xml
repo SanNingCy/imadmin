@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.piamom.mapper.PiamomReportRecordMapper">
+
+    <resultMap id="BaseResultMap" type="com.seekweb4.chat.modules.piamom.entity.PiamomReportRecord">
+        <id column="id" property="id"/>
+        <result column="reporter_id" property="reporterId"/>
+        <result column="target_type" property="targetType"/>
+        <result column="target_id" property="targetId"/>
+        <result column="report_config_id" property="reportConfigId"/>
+        <result column="reason" property="reason"/>
+        <result column="image_urls" property="imageUrls"/>
+        <result column="audit_status" property="auditStatus"/>
+        <result column="audit_user_id" property="auditUserId"/>
+        <result column="audit_time" property="auditTime"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="reporter_idno" property="reporterIdno"/>
+        <result column="reporter_nickname" property="reporterNickname"/>
+        <result column="report_type_name" property="reportTypeName"/>
+        <result column="publisher_user_id" property="publisherUserId"/>
+        <result column="publisher_idno" property="publisherIdno"/>
+        <result column="publisher_nickname" property="publisherNickname"/>
+        <result column="post_id" property="postId"/>
+        <result column="post_status" property="postStatus"/>
+        <result column="post_visible_status" property="postVisibleStatus"/>
+        <result column="post_content" property="postContent"/>
+        <result column="post_image_urls" property="postImageUrls"/>
+        <result column="post_video" property="postVideo"/>
+    </resultMap>
+
+    <sql id="adminWhere">
+        <where>
+            <if test="id != null">and r.id = #{id}</if>
+            <if test="reporterId != null and reporterId != ''">and r.reporter_id = #{reporterId}</if>
+            <if test="reporterIdno != null and reporterIdno != ''">and m.idno like concat('%', #{reporterIdno}, '%')</if>
+            <if test="targetType != null and targetType != ''">and r.target_type = #{targetType}</if>
+            <if test="targetId != null">and r.target_id = #{targetId}</if>
+            <if test="auditStatus != null">and r.audit_status = #{auditStatus}</if>
+            <if test="reportConfigId != null">and r.report_config_id = #{reportConfigId}</if>
+        </where>
+    </sql>
+
+    <select id="selectAdminPageList" resultMap="BaseResultMap">
+        select r.id, r.reporter_id, r.target_type, r.target_id, r.report_config_id, r.reason, r.image_urls,
+               r.audit_status, r.audit_user_id, r.audit_time, r.created_at,
+               IFNULL(m.idno, '') AS reporter_idno, IFNULL(m.nickname, '') AS reporter_nickname,
+               IFNULL(c.report_type, '') AS report_type_name,
+               IFNULL(pm.id, '') AS publisher_user_id,
+               IFNULL(pm.idno, '') AS publisher_idno,
+               IFNULL(pm.nickname, '') AS publisher_nickname,
+               CASE WHEN r.target_type = 'square' THEN sp.id
+                    WHEN r.target_type = 'moment' THEN mo.id
+                    ELSE null END AS post_id,
+               CASE WHEN r.target_type = 'square' THEN sp.odic_stake_status
+                    ELSE null END AS post_status,
+               CASE WHEN r.target_type = 'square' THEN sp.status
+                    WHEN r.target_type = 'moment' THEN mo.status
+                    ELSE null END AS post_visible_status,
+               CASE WHEN r.target_type = 'square' THEN sp.content
+                    WHEN r.target_type = 'moment' THEN mo.content
+                    ELSE null END AS post_content,
+               CASE WHEN r.target_type = 'square' THEN sp.image_urls
+                    WHEN r.target_type = 'moment' THEN mo.image_urls
+                    ELSE null END AS post_image_urls,
+               CASE WHEN r.target_type = 'square' THEN sp.video
+                    ELSE null END AS post_video
+        from t_piamom_report_record r
+        left join t_member m on m.id = r.reporter_id
+        left join t_piamom_report_config c on c.id = r.report_config_id
+        left join t_piamom_square_post sp on r.target_type = 'square' and sp.id = r.target_id
+        left join t_piamom_moment mo on r.target_type = 'moment' and mo.id = r.target_id
+        left join t_member pm on pm.id = case
+            when r.target_type = 'square' then sp.user_id
+            when r.target_type = 'moment' then mo.user_id
+            else null end
+        <include refid="adminWhere"/>
+        <choose>
+            <when test="orderBy != null and orderBy != ''">order by ${orderBy}</when>
+            <otherwise>order by r.created_at desc</otherwise>
+        </choose>
+        <if test="pageNo != null and pageSize != null">limit #{pageNo}, #{pageSize}</if>
+    </select>
+
+    <select id="selectAdminCount" resultType="java.lang.Long">
+        select count(1) from t_piamom_report_record r
+        left join t_member m on m.id = r.reporter_id
+        <include refid="adminWhere"/>
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select r.id, r.reporter_id, r.target_type, r.target_id, r.report_config_id, r.reason, r.image_urls,
+               r.audit_status, r.audit_user_id, r.audit_time, r.created_at,
+               IFNULL(m.idno, '') AS reporter_idno, IFNULL(m.nickname, '') AS reporter_nickname,
+               IFNULL(c.report_type, '') AS report_type_name,
+               IFNULL(pm.id, '') AS publisher_user_id,
+               IFNULL(pm.idno, '') AS publisher_idno,
+               IFNULL(pm.nickname, '') AS publisher_nickname,
+               CASE WHEN r.target_type = 'square' THEN sp.id
+                    WHEN r.target_type = 'moment' THEN mo.id
+                    ELSE null END AS post_id,
+               CASE WHEN r.target_type = 'square' THEN sp.odic_stake_status
+                    ELSE null END AS post_status,
+               CASE WHEN r.target_type = 'square' THEN sp.status
+                    WHEN r.target_type = 'moment' THEN mo.status
+                    ELSE null END AS post_visible_status,
+               CASE WHEN r.target_type = 'square' THEN sp.content
+                    WHEN r.target_type = 'moment' THEN mo.content
+                    ELSE null END AS post_content,
+               CASE WHEN r.target_type = 'square' THEN sp.image_urls
+                    WHEN r.target_type = 'moment' THEN mo.image_urls
+                    ELSE null END AS post_image_urls,
+               CASE WHEN r.target_type = 'square' THEN sp.video
+                    ELSE null END AS post_video
+        from t_piamom_report_record r
+        left join t_member m on m.id = r.reporter_id
+        left join t_piamom_report_config c on c.id = r.report_config_id
+        left join t_piamom_square_post sp on r.target_type = 'square' and sp.id = r.target_id
+        left join t_piamom_moment mo on r.target_type = 'moment' and mo.id = r.target_id
+        left join t_member pm on pm.id = case
+            when r.target_type = 'square' then sp.user_id
+            when r.target_type = 'moment' then mo.user_id
+            else null end
+        where r.id = #{id}
+    </select>
+
+    <update id="updateAudit">
+        update t_piamom_report_record
+        set audit_status = #{auditStatus}, audit_user_id = #{auditUserId}, audit_time = #{auditTime}
+        where id = #{id}
+          and audit_status = 0
+    </update>
+</mapper>

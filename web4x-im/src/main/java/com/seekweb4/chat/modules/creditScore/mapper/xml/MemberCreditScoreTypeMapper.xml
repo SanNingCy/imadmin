@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.creditScore.mapper.MemberCreditScoreTypeMapper">
+
+    <resultMap id="BaseResultMap" type="com.seekweb4.chat.modules.creditScore.entity.MemberCreditScoreType">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="type" property="type"/>
+        <result column="subtype" property="subtype"/>
+        <result column="current_score" property="currentScore"/>
+        <result column="user_id" property="userId"/>
+    </resultMap>
+
+    <select id="selectByUserIdTypeSubtype" resultMap="BaseResultMap">
+        SELECT
+            id, create_time, update_time, create_by, update_by, is_deleted,
+            type, subtype, current_score, user_id
+        FROM t_member_credit_score_type
+        WHERE is_deleted = 0
+          AND user_id = #{userId}
+          AND type = #{type}
+          AND subtype = #{subtype}
+        LIMIT 1
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO t_member_credit_score_type(
+            create_time, update_time, create_by, update_by, is_deleted,
+            type, subtype, current_score, user_id
+        ) VALUES (
+            #{createTime}, #{updateTime}, #{createBy}, #{updateBy}, #{isDeleted},
+            #{type}, #{subtype}, #{currentScore}, #{userId}
+        )
+    </insert>
+
+    <update id="updateCurrentScoreByKeys">
+        UPDATE t_member_credit_score_type
+        SET current_score = #{currentScore},
+            update_time = #{updateTime},
+            update_by = #{updateBy}
+        WHERE is_deleted = 0
+          AND user_id = #{userId}
+          AND type = #{type}
+          AND subtype = #{subtype}
+    </update>
+
+    <select id="selectTotalCurrentScoreByUserId" resultType="java.math.BigDecimal">
+        SELECT COALESCE(SUM(current_score), 0)
+        FROM t_member_credit_score_type
+        WHERE is_deleted = 0
+          AND user_id = #{userId}
+    </select>
+
+</mapper>
+

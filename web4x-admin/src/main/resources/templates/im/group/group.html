@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('群组管理')" />
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="group-form">
+                <div class="select-list">
+                    <ul>
+                        <li>群名称：<input type="text" name="name"/></li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js}"></script>
+<script th:inline="javascript">
+    var prefix = ctx + "group/group";
+    $(function () {
+        $.table.init({
+            url: prefix + "/list",
+            modalName: "群组",
+            responseHandler: imPageResponse,
+            ajaxOptions: { beforeSend: imTableBeforeSend },
+            columns: [
+                {field: 'id', title: 'ID'},
+                {field: 'name', title: '群名称'},
+                {field: 'memberCount', title: '成员数'},
+                {field: 'createDate', title: '创建时间'}
+            ]
+        });
+    });
+</script>
+</body>
+</html>

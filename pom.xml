@@ -3,19 +3,19 @@
         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ruoyi</groupId>
-    <artifactId>ruoyi</artifactId>
+    <groupId>com.web4x</groupId>
+    <artifactId>web4x</artifactId>
     <version>4.8.3</version>
 
-    <name>ruoyi</name>
-    <url>http://www.ruoyi.vip</url>
-    <description>若依管理系统</description>
+    <name>web4x</name>
+    <url>http://www.web4x.vip</url>
+    <description>web4x管理系统</description>
     
     <properties>
-        <ruoyi.version>4.8.3</ruoyi.version>
+        <web4x.version>4.8.3</web4x.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>17</java.version>
+        <java.version>21</java.version>
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
         <spring-boot.version>4.0.3</spring-boot.version>
         <shiro.version>2.1.0</shiro.version>
@@ -31,6 +31,9 @@
         <poi.version>4.1.2</poi.version>
         <velocity.version>2.3</velocity.version>
         <springdoc.version>3.0.2</springdoc.version>
+        <mybatis-plus.version>3.5.15</mybatis-plus.version>
+        <!-- 与 chat-ops 同级目录：D:/project/chat-ops -->
+        <chat.ops.resources>${maven.multiModuleProjectDirectory}/../../chat-ops/src/main/resources</chat.ops.resources>
     </properties>
 
     <!-- 依赖声明 -->
@@ -78,6 +81,13 @@
             <!-- Shiro使用Spring框架 -->
             <dependency>
                 <groupId>org.apache.shiro</groupId>
+                <artifactId>shiro-ehcache</artifactId>
+                <classifier>jakarta</classifier>
+                <version>${shiro.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-spring</artifactId>
                 <classifier>jakarta</classifier>
                 <version>${shiro.version}</version>
@@ -88,13 +98,6 @@
                         <artifactId>shiro-web</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-
-            <!-- Shiro使用EhCache缓存框架 -->
-            <dependency>
-                <groupId>org.apache.shiro</groupId>
-                <artifactId>shiro-ehcache</artifactId>
-                <version>${shiro.version}</version>
             </dependency>
 
             <!-- thymeleaf模板引擎和shiro框架的整合 -->
@@ -149,6 +152,12 @@
             <!-- excel工具 -->
             <dependency>
                 <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
                 <version>${poi.version}</version>
             </dependency>
@@ -169,49 +178,63 @@
 
             <!-- 定时任务-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-quartz</artifactId>
-                <version>${ruoyi.version}</version>
+                <groupId>com.web4x</groupId>
+                <artifactId>web4x-quartz</artifactId>
+                <version>${web4x.version}</version>
             </dependency>
 
             <!-- 代码生成-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-generator</artifactId>
-                <version>${ruoyi.version}</version>
+                <groupId>com.web4x</groupId>
+                <artifactId>web4x-generator</artifactId>
+                <version>${web4x.version}</version>
             </dependency>
 
             <!-- 核心模块-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-framework</artifactId>
-                <version>${ruoyi.version}</version>
+                <groupId>com.web4x</groupId>
+                <artifactId>web4x-framework</artifactId>
+                <version>${web4x.version}</version>
             </dependency>
 
             <!-- 系统模块-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-system</artifactId>
-                <version>${ruoyi.version}</version>
+                <groupId>com.web4x</groupId>
+                <artifactId>web4x-system</artifactId>
+                <version>${web4x.version}</version>
             </dependency>
 
             <!-- 通用工具-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-common</artifactId>
-                <version>${ruoyi.version}</version>
+                <groupId>com.web4x</groupId>
+                <artifactId>web4x-common</artifactId>
+                <version>${web4x.version}</version>
+            </dependency>
+
+            <!-- IM 业务 -->
+            <dependency>
+                <groupId>com.web4x</groupId>
+                <artifactId>web4x-im</artifactId>
+                <version>${web4x.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
             </dependency>
 
         </dependencies>
     </dependencyManagement>
 
     <modules>
-        <module>ruoyi-admin</module>
-        <module>ruoyi-framework</module>
-        <module>ruoyi-system</module>
-        <module>ruoyi-quartz</module>
-        <module>ruoyi-generator</module>
-        <module>ruoyi-common</module>
+        <module>web4x-admin</module>
+        <module>web4x-framework</module>
+        <module>web4x-system</module>
+        <module>web4x-quartz</module>
+        <module>web4x-generator</module>
+        <module>web4x-common</module>
+        <module>web4x-im</module>
     </modules>
     <packaging>pom</packaging>
 

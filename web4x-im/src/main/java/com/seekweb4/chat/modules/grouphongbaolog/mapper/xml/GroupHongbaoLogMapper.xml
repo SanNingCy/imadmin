@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.grouphongbaolog.mapper.GroupHongbaoLogMapper">
+
+	<sql id="groupHongbaoLogColumns">
+		a.id AS "id",
+		a.uid AS "u.id",
+		a.bao_id AS "baoId",
+		a.group_id AS "group.id",
+		a.money AS "money",
+		a.del_flag AS "delFlag",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+
+		u.nickname AS "u.nickname",
+		u.icon AS "u.icon",
+		u.idno AS "u.idno",
+		u.sex AS "u.sex",
+
+
+		`group`.name AS "group.name",
+		`group`.idno AS "group.idno"
+	</sql>
+
+	<sql id="groupHongbaoLogJoins">
+
+		LEFT JOIN t_member u ON u.id = a.uid
+		LEFT JOIN t_group `group` ON `group`.id = a.group_id
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.grouphongbaolog.entity.GroupHongbaoLog" >
+		SELECT
+			<include refid="groupHongbaoLogColumns"/>
+		FROM t_group_hongbao_log a
+		<include refid="groupHongbaoLogJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.grouphongbaolog.entity.GroupHongbaoLog" >
+		SELECT
+			<include refid="groupHongbaoLogColumns"/>
+		FROM t_group_hongbao_log a
+		<include refid="groupHongbaoLogJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="u != null and u.id != null and u.id != ''">
+				AND a.uid = #{u.id}
+			</if>
+			<if test="u != null and u.idno != null and u.idno != ''">
+				AND u.idno = #{u.idno}
+			</if>
+			<if test="baoId != null and baoId != ''">
+				AND a.bao_id = #{baoId}
+			</if>
+			<if test="group != null and group.id != null and group.id != ''">
+				AND a.group_id = #{group.id}
+			</if>
+			<if test="group != null and group.idno != null and group.idno != ''">
+				AND `group`.idno LIKE concat('%', #{group.idno}, '%')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.grouphongbaolog.entity.GroupHongbaoLog" >
+		SELECT
+			<include refid="groupHongbaoLogColumns"/>
+		FROM t_group_hongbao_log a
+		<include refid="groupHongbaoLogJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="u != null and u.id != null and u.id != ''">
+				AND a.uid = #{u.id}
+			</if>
+			<if test="u != null and u.idno != null and u.idno != ''">
+				AND u.idno = #{u.idno}
+			</if>
+			<if test="baoId != null and baoId != ''">
+				AND a.bao_id = #{baoId}
+			</if>
+			<if test="group != null and group.id != null and group.id != ''">
+				AND a.group_id = #{group.id}
+			</if>
+			<if test="group != null and group.idno != null and group.idno != ''">
+				AND `group`.idno LIKE concat('%', #{group.idno}, '%')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_group_hongbao_log(
+			id,
+			uid,
+			bao_id,
+			group_id,
+			money,
+			del_flag,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{u.id},
+			#{baoId},
+			#{group.id},
+			#{money},
+			#{delFlag},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_group_hongbao_log SET
+			uid = #{u.id},
+			bao_id = #{baoId},
+			group_id = #{group.id},
+			money = #{money},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_group_hongbao_log
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_group_hongbao_log SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.grouphongbaolog.entity.GroupHongbaoLog">
+		SELECT
+			<include refid="groupHongbaoLogColumns"/>
+		FROM t_group_hongbao_log a
+		<include refid="groupHongbaoLogJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

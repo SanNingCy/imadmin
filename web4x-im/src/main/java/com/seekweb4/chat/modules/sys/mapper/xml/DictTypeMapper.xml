@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.sys.mapper.DictTypeMapper">
+
+	<sql id="dictTypeColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.description AS "description",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<resultMap id="BaseResultMap" type="com.seekweb4.chat.modules.sys.entity.DictType" >
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="type" property="type" jdbcType="VARCHAR" />
+		<collection property="dictValueList" javaType="java.util.ArrayList" ofType="com.seekweb4.chat.modules.sys.entity.DictValue"
+					select="com.seekweb4.chat.modules.sys.mapper.DictValueMapper.getDictValueByType"
+					column="{dict_type_id=id}" />
+		<!-- dict_type_id是定义的变量名, id是主表的字段id/sort 多个参数 column="{dict_type_id=id,xx=xx}",
+        先查出主表的结果, 然后主表记录数是几 就执行几次 collection 的select,
+        javaType写不写都行 mybatis会自行匹配,
+        select的值: 对应xml的namespace + 对应xml中的代码片段的id,
+        column作为select语句的参数传入,如果只传一个参数id可以简写: column="id" -->
+	</resultMap>
+
+	<sql id="dictTypeJoins">
+	</sql>
+
+	<select id="getDict" resultMap="BaseResultMap">
+		select * from sys_dict_type
+		<where>
+
+		</where>
+	</select>
+
+	<select id="get" resultType="DictType" >
+		SELECT
+			<include refid="dictTypeColumns"/>
+		FROM sys_dict_type a
+		<include refid="dictTypeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="DictType" >
+		SELECT
+			<include refid="dictTypeColumns"/>
+		FROM sys_dict_type a
+		<include refid="dictTypeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="type != null and type != ''">
+				AND a.type LIKE concat('%',#{type},'%')
+			</if>
+			<if test="description != null and description != ''">
+				AND a.description LIKE concat('%',#{description},'%')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="DictType" >
+		SELECT
+			<include refid="dictTypeColumns"/>
+		FROM sys_dict_type a
+		<include refid="dictTypeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO sys_dict_type(
+			id,
+			type,
+			description,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag
+		) VALUES (
+			#{id},
+			#{type},
+			#{description},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE sys_dict_type SET
+			type = #{type},
+			description = #{description},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM sys_dict_type
+		WHERE id = #{id}
+	</update>
+
+	<!--物理批量删除-->
+	<delete id="batchDelete">
+		delete from sys_dict_type
+		where id IN
+		<foreach collection="ids" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE sys_dict_type SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="DictType">
+		select * FROM sys_dict_type  where ${propertyName} = #{value}
+	</select>
+
+</mapper>

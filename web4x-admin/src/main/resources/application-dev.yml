@@ -1,0 +1,62 @@
+# IM 环境配置：引用 chat-ops（构建时打入 classpath:chat-ops/，源文件在 ../../chat-ops/src/main/resources）
+spring:
+  config:
+    import:
+      - optional:classpath:chat-ops/application-dev.yml
+  # 若依 Druid 数据源（覆盖/补充 IM 的 Hikari 扁平配置，仅 web4x 需要）
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    druid:
+      master:
+        url: jdbc:mysql://localhost:3306/chat_platform_db?useUnicode=true&characterEncoding=utf-8&useSSL=false&nullCatalogMeansCurrent=true&serverTimezone=Asia/Shanghai
+        username: root
+        password: root
+      slave:
+        enabled: false
+        url:
+        username:
+        password:
+      initialSize: 5
+      minIdle: 5
+      maxActive: 20
+      maxWait: 60000
+      connectTimeout: 30000
+      socketTimeout: 60000
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      maxEvictableIdleTimeMillis: 900000
+      validationQuery: SELECT 1 FROM DUAL
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      webStatFilter:
+        enabled: true
+      statViewServlet:
+        enabled: true
+        allow:
+        url-pattern: /druid/*
+        login-username: web4x
+        login-password: 123456
+      filter:
+        stat:
+          enabled: true
+          log-slow-sql: true
+          slow-sql-millis: 1000
+          merge-sql: true
+        wall:
+          config:
+            multi-statement-allow: true
+
+# 若依 dev 覆盖（后加载，优先于 chat-ops 同名字段）
+mybatis:
+  typeAliasesPackage: com.web4x.**.domain,com.seekweb4.chat.modules
+  mapperLocations: classpath*:mapper/**/*Mapper.xml,classpath*:com/seekweb4/chat/modules/**/*Mapper.xml
+  configLocation: classpath:mybatis/mybatis-config.xml
+
+logging:
+  level:
+    com.web4x: info
+
+captcha:
+  expireTime: 2

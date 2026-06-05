@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.friend.mapper.FriendMapper">
+
+	<sql id="friendColumns">
+		a.id AS "id",
+		u.idno AS "u.id",
+		uid2.idno AS "uid2.id",
+		a.zimu AS "zimu",
+		a.bei AS "bei",
+		a.mdr AS "mdr",
+		a.is_top AS "isTop",
+		a.isfanyi AS "isfanyi",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+
+		u.nickname AS "u.nickname",
+		u.icon AS "u.icon",
+		u.sex AS "u.sex",
+		u.sign AS "u.sign",
+		u.idno AS "u.idno",
+		IFNULL(u.lianghao, '') AS "u.lianghao",
+		IFNULL(u.city, '') AS "u.city",
+
+		uid2.nickname AS "uid2.nickname",
+		uid2.icon AS "uid2.icon",
+		uid2.idno AS "uid2.idno",
+		IFNULL(uid2.lianghao, '') AS "uid2.lianghao",
+		IFNULL(uid2.city, '') AS "uid2.city",
+		uid2.sex AS "uid2.sex"
+	</sql>
+
+	<sql id="friendJoins">
+
+		LEFT JOIN t_member u ON u.id = a.uid
+		LEFT JOIN t_member uid2 ON uid2.id = a.uid2
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.friend.entity.Friend" >
+		SELECT
+			<include refid="friendColumns"/>
+		FROM t_friend a
+		<include refid="friendJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.friend.entity.Friend" >
+		SELECT
+			<include refid="friendColumns"/>
+		FROM t_friend a
+		<include refid="friendJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="u != null and u.id != null and u.id != ''">
+				AND (a.uid = #{u.id} OR u.idno LIKE concat('%',#{u.id},'%'))
+			</if>
+			<if test="uid2 != null and uid2.id != null and uid2.id != ''">
+				AND (a.uid2 = #{uid2.id} OR uid2.idno LIKE concat('%',#{uid2.id},'%'))
+			</if>
+			<if test="u != null and u.idno != null and u.idno != ''">
+				AND u.idno LIKE concat('%',#{u.idno},'%')
+			</if>
+			<if test="uid2 != null and uid2.idno != null and uid2.idno != ''">
+				AND uid2.idno LIKE concat('%',#{uid2.idno},'%')
+			</if>
+			<if test="u != null and u.lianghao != null and u.lianghao != ''">
+				AND u.lianghao LIKE concat('%',#{u.lianghao},'%')
+			</if>
+			<if test="uid2 != null and uid2.lianghao != null and uid2.lianghao != ''">
+				AND uid2.lianghao LIKE concat('%',#{uid2.lianghao},'%')
+			</if>
+			<if test="mdr != null and mdr != ''">
+				AND a.mdr = #{mdr}
+			</if>
+			<if test="isTop != null and isTop != ''">
+				AND a.is_top = #{isTop}
+			</if>
+			<if test="key != null and key != ''">
+				AND (a.bei LIKE concat('%',#{key},'%') or uid2.nickname LIKE concat('%',#{key},'%') or uid2.idno = #{key})
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.zimu
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.friend.entity.Friend" >
+		SELECT
+			<include refid="friendColumns"/>
+		FROM t_friend a
+		<include refid="friendJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_friend(
+			id,
+			uid,
+			uid2,
+			zimu,
+			bei,
+			mdr,
+			is_top,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{u.id},
+			#{uid2.id},
+			#{zimu},
+			#{bei},
+			#{mdr},
+			#{isTop},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_friend SET
+			uid = #{u.id},
+			uid2 = #{uid2.id},
+			zimu = #{zimu},
+			bei = #{bei},
+			mdr = #{mdr},
+			is_top = #{isTop},
+			isfanyi = #{isfanyi},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_friend
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_friend SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.friend.entity.Friend">
+		SELECT
+			<include refid="friendColumns"/>
+		FROM t_friend a
+		<include refid="friendJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

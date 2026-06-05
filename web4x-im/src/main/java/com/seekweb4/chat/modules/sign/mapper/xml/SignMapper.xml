@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.sign.mapper.SignMapper">
+
+	<sql id="signColumns">
+		a.id AS "id",
+		a.day AS "day",
+		a.money AS "money",
+		a.last_sign_date AS "lastSignDate",
+		a.award_money AS "awardMoney",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate"
+	</sql>
+
+	<sql id="signJoins">
+
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.sign.entity.Sign" >
+		SELECT
+			<include refid="signColumns"/>
+		FROM t_sign a
+		<include refid="signJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.sign.entity.Sign" >
+		SELECT
+			<include refid="signColumns"/>
+		FROM t_sign a
+		<include refid="signJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="day != null and day != ''">
+				AND a.day = #{day}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.sign.entity.Sign" >
+		SELECT
+			<include refid="signColumns"/>
+		FROM t_sign a
+		<include refid="signJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_sign(
+			id,
+			day,
+			money,
+			last_sign_date,
+			award_money,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{day},
+			#{money},
+			#{lastSignDate},
+			#{awardMoney},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_sign SET
+			day = #{day},
+			money = #{money},
+			last_sign_date = #{lastSignDate},
+			award_money = #{awardMoney},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_sign
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_sign SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.sign.entity.Sign">
+		SELECT
+			<include refid="signColumns"/>
+		FROM t_sign a
+		<include refid="signJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

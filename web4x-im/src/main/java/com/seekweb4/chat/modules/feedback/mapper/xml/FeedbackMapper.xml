@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.feedback.mapper.FeedbackMapper">
+
+	<sql id="feedbackColumns">
+		a.id AS "id",
+		a.uid AS "member.id",
+		a.phone AS "phone",
+		a.content AS "content",
+		a.images AS "images",
+		a.reply AS "reply",
+		a.reply_date AS "replyDate",
+		a.status AS "status",
+		a.reward_amount AS "rewardAmount",
+		a.is_reward AS "isReward",
+		a.create_date AS "createDate",
+
+		member.phone AS "member.phone",
+		member.nickname AS "member.nickname",
+		member.idno AS "member.idno",
+		member.lianghao AS "member.lianghao"
+	</sql>
+
+	<sql id="feedbackJoins">
+
+		LEFT JOIN t_member member ON member.id = a.uid
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.feedback.entity.Feedback" >
+		SELECT
+			<include refid="feedbackColumns"/>
+		FROM t_feedback a
+		<include refid="feedbackJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.feedback.entity.Feedback" >
+		SELECT
+			<include refid="feedbackColumns"/>
+		FROM t_feedback a
+		<include refid="feedbackJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="member != null and member.id != null and member.id != ''">
+				AND a.uid = #{member.id}
+			</if>
+			<if test="phone != null and phone != ''">
+				AND a.phone = #{phone}
+			</if>
+			<if test="content != null and content != ''">
+				AND a.content LIKE concat('%',#{content},'%')
+			</if>
+			<if test="status != null">
+				AND a.status = #{status}
+			</if>
+			<if test="idno != null and idno != ''">
+				AND member.idno LIKE concat('%', #{idno}, '%')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.feedback.entity.Feedback" >
+		SELECT
+			<include refid="feedbackColumns"/>
+		FROM t_feedback a
+		<include refid="feedbackJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_feedback(
+			id,
+			uid,
+			phone,
+			content,
+			images,
+			create_date
+		) VALUES (
+			#{id},
+			#{member.id},
+			#{phone},
+			#{content},
+			#{images},
+			#{createDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_feedback SET
+			uid = #{member.id},
+			phone = #{phone},
+			content = #{content},
+			images = #{images},
+			reply = #{reply},
+			reply_date = #{replyDate},
+			status = #{status},
+			reward_amount = #{rewardAmount},
+			is_reward = #{isReward}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_feedback
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_feedback SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.feedback.entity.Feedback">
+		SELECT
+			<include refid="feedbackColumns"/>
+		FROM t_feedback a
+		<include refid="feedbackJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

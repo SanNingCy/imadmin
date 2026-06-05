@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.dyomm.mapper.DyCommMapper">
+
+	<sql id="dyCommColumns">
+		a.id AS "id",
+		a.uid AS "u.id",
+		a.dy_id AS "dy.id",
+		a.to AS "to.id",
+		a.title AS "title",
+		a.commid AS "commid",
+		a.likes AS "likes",
+		a.level AS "level",
+		a.del_flag AS "delFlag",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+
+		u.nickname AS "u.nickname",
+		u.idno AS "u.idno",
+		u.lianghao AS "u.lianghao",
+		u.icon AS "u.icon",
+		u.sex AS "u.sex",
+
+		dy.info AS "dy.info",
+
+		`to`.nickname AS "to.nickname",
+		`to`.icon AS "to.icon",
+		`to`.sex AS "to.sex"
+	</sql>
+
+	<sql id="dyCommJoins">
+
+		LEFT JOIN t_member u ON u.id = a.uid
+		LEFT JOIN t_dy dy ON dy.id = a.dy_id
+		LEFT JOIN t_member `to` ON `to`.id = a.to
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.dyomm.entity.DyComm" >
+		SELECT
+			<include refid="dyCommColumns"/>
+		FROM t_dy_comm a
+		<include refid="dyCommJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.dyomm.entity.DyComm" >
+		SELECT
+			<include refid="dyCommColumns"/>
+		FROM t_dy_comm a
+		<include refid="dyCommJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="u != null and u.id != null and u.id != ''">
+				AND a.uid = #{u.id}
+			</if>
+			<if test="idno != null and idno != ''">
+				AND (u.idno = #{idno} OR u.lianghao = #{idno})
+			</if>
+			<if test="(idno == null or idno == '') and u != null and u.idno != null and u.idno != ''">
+				AND (u.idno = #{u.idno} OR u.lianghao = #{u.idno})
+			</if>
+			<if test="u != null and u.lianghao != null and u.lianghao != ''">
+				AND u.lianghao LIKE concat('%', #{u.lianghao}, '%')
+			</if>
+			<if test="dy != null and dy.id != null and dy.id != ''">
+				AND a.dy_id = #{dy.id}
+			</if>
+			<if test="level != null and level != ''">
+				AND a.level = #{level}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.dyomm.entity.DyComm" >
+		SELECT
+			<include refid="dyCommColumns"/>
+		FROM t_dy_comm a
+		<include refid="dyCommJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="u != null and u.id != null and u.id != ''">
+				AND a.uid = #{u.id}
+			</if>
+			<if test="idno != null and idno != ''">
+				AND (u.idno = #{idno} OR u.lianghao = #{idno})
+			</if>
+			<if test="(idno == null or idno == '') and u != null and u.idno != null and u.idno != ''">
+				AND (u.idno = #{u.idno} OR u.lianghao = #{u.idno})
+			</if>
+			<if test="u != null and u.lianghao != null and u.lianghao != ''">
+				AND u.lianghao LIKE concat('%', #{u.lianghao}, '%')
+			</if>
+			<if test="dy != null and dy.id != null and dy.id != ''">
+				AND a.dy_id = #{dy.id}
+			</if>
+			<if test="level != null and level != ''">
+				AND a.level = #{level}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_dy_comm(
+			id,
+			uid,
+			dy_id,
+			`to`,
+			title,
+			commid,
+			likes,
+			`level`,
+			del_flag,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{u.id},
+			#{dy.id},
+			#{to.id},
+			#{title},
+			#{commid},
+			#{likes},
+			#{level},
+			#{delFlag},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_dy_comm SET
+			uid = #{u.id},
+			dy_id = #{dy.id},
+			`to` = #{to.id},
+			title = #{title},
+			commid = #{commid},
+			likes = #{likes},
+			`level` = #{level},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_dy_comm
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_dy_comm SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.dyomm.entity.DyComm">
+		SELECT
+			<include refid="dyCommColumns"/>
+		FROM t_dy_comm a
+		<include refid="dyCommJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

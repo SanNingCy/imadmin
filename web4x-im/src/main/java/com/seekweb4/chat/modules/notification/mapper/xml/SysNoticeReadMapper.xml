@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.notification.mapper.SysNoticeReadMapper">
+	<sql id="cols">
+		a.id AS "id",
+		a.user_id AS "u.id",
+		a.notice_id AS "noticeId",
+		a.notice_type AS "noticeType",
+		a.read_time AS "readTime",
+		a.create_time AS "createDate",
+		a.update_time AS "updateDate",
+		a.event_id AS "eventId"
+	</sql>
+
+	<select id="get" resultType="com.seekweb4.chat.modules.notification.entity.SysNoticeRead">
+		SELECT <include refid="cols"/> FROM sys_notice_read a WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.notification.entity.SysNoticeRead">
+		SELECT <include refid="cols"/> FROM sys_notice_read a
+		<where>
+			${dataScope}
+			<if test="u != null and u.id != null and u.id != ''"> AND a.user_id = #{u.id} </if>
+			<if test="noticeId != null and noticeId != ''"> AND a.notice_id = #{noticeId} </if>
+		</where>
+		ORDER BY a.create_time DESC
+	</select>
+
+	<insert id="insert">
+		INSERT INTO sys_notice_read (
+			id, user_id, notice_id, notice_type, read_time, event_id, create_time, update_time
+		) VALUES (
+			#{id}, #{u.id}, #{noticeId}, #{noticeType}, #{readTime}, #{eventId}, #{createDate}, #{updateDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE sys_notice_read SET
+			user_id=#{u.id}, notice_id=#{noticeId}, notice_type=#{noticeType}, read_time=#{readTime}, event_id=#{eventId}, update_time=#{updateDate}
+		WHERE id=#{id}
+	</update>
+
+	<update id="delete">
+		DELETE FROM sys_notice_read WHERE id=#{id}
+	</update>
+</mapper>

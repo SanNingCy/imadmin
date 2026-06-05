@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.quhao.mapper.QuhaoMapper">
+
+	<sql id="quhaoColumns">
+		a.id AS "id",
+		a.sort AS "sort",
+		a.no AS "no",
+		a.country AS "country",
+		a.ext AS "ext",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate"
+	</sql>
+
+	<sql id="quhaoJoins">
+
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.quhao.entity.Quhao" >
+		SELECT
+			<include refid="quhaoColumns"/>
+		FROM t_quhao a
+		<include refid="quhaoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.quhao.entity.Quhao" >
+		SELECT
+			<include refid="quhaoColumns"/>
+		FROM t_quhao a
+		<include refid="quhaoJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="country != null and country != ''">
+				AND (a.country LIKE concat('%',#{country},'%') or a.no LIKE concat('%',#{country},'%'))
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.sort
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.quhao.entity.Quhao" >
+		SELECT
+			<include refid="quhaoColumns"/>
+		FROM t_quhao a
+		<include refid="quhaoJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_quhao(
+			id,
+			sort,
+			no,
+			country,
+			ext,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{sort},
+			#{no},
+			#{country},
+			#{ext},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_quhao SET
+			sort = #{sort},
+			no = #{no},
+			country = #{country},
+			ext = #{ext},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_quhao
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_quhao SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.quhao.entity.Quhao">
+		SELECT
+			<include refid="quhaoColumns"/>
+		FROM t_quhao a
+		<include refid="quhaoJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

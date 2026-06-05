@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.creditScore.mapper.CreditScoreTypeConfigMapper">
+
+    <resultMap id="BaseResultMap" type="com.seekweb4.chat.modules.creditScore.entity.CreditScoreTypeConfig">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="type" property="type"/>
+        <result column="subtype" property="subtype"/>
+        <result column="max_limit" property="maxLimit"/>
+        <result column="score" property="score"/>
+        <result column="status" property="status"/>
+        <result column="order_num" property="orderNum"/>
+        <result column="constitute_show" property="constituteShow"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, create_time, update_time, create_by, update_by, is_deleted,
+        type, subtype, max_limit, score, status, order_num, constitute_show
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_credit_score_type_config
+        where id = #{id}
+          and is_deleted = 0
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into t_credit_score_type_config(
+            create_time, update_time, create_by, update_by, is_deleted,
+            type, subtype, max_limit, score, status, order_num, constitute_show
+        ) values (
+            #{createTime}, #{updateTime}, #{createBy}, #{updateBy}, #{isDeleted},
+            #{type}, #{subtype}, #{maxLimit}, #{score}, #{status}, #{orderNum}, #{constituteShow}
+        )
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.seekweb4.chat.modules.creditScore.entity.CreditScoreTypeConfig">
+        update t_credit_score_type_config
+        <set>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="subtype != null">subtype = #{subtype},</if>
+            <if test="maxLimit != null">max_limit = #{maxLimit},</if>
+            <if test="score != null">score = #{score},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="orderNum != null">order_num = #{orderNum},</if>
+            <if test="constituteShow != null">constitute_show = #{constituteShow},</if>
+            update_time = #{updateTime}
+        </set>
+        where id = #{id}
+          and is_deleted = 0
+    </update>
+
+    <delete id="deleteByPrimaryKey">
+        delete from t_credit_score_type_config
+        where id = #{id}
+    </delete>
+
+    <select id="selectAdminPageList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_credit_score_type_config
+        <where>
+            is_deleted = 0
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="type != null">
+                and type = #{type}
+            </if>
+            <if test="subtype != null">
+                and subtype = #{subtype}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="constituteShow != null">
+                and constitute_show = #{constituteShow}
+            </if>
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+        <if test="orderBy == null or orderBy == ''">
+            order by order_num desc, update_time desc
+        </if>
+        <if test="pageNo != null and pageSize != null">
+            limit #{pageNo}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="selectAdminCount" resultType="java.lang.Long">
+        select count(1)
+        from t_credit_score_type_config
+        <where>
+            is_deleted = 0
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="type != null">
+                and type = #{type}
+            </if>
+            <if test="subtype != null">
+                and subtype = #{subtype}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="constituteShow != null">
+                and constitute_show = #{constituteShow}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectEnabledByTypeSubtype" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_credit_score_type_config
+        where is_deleted = 0
+          and status = 1
+          and type = #{type}
+          and subtype = #{subtype}
+        limit 1
+    </select>
+
+    <select id="selectAllEnabledAndDisabled" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_credit_score_type_config
+        where is_deleted = 0
+        order by order_num desc, update_time desc, id desc
+    </select>
+
+    <select id="selectAllEnabled" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_credit_score_type_config
+        where is_deleted = 0
+          and status = 1
+        order by order_num desc, update_time desc, id desc
+    </select>
+
+</mapper>
+

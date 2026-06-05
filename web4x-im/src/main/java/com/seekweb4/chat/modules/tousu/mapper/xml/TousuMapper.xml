@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.tousu.mapper.TousuMapper">
+
+	<sql id="tousuColumns">
+		a.id AS "id",
+		a.uid AS "u.id",
+		a.group_id AS "group.id",
+		a.reason AS "reason",
+		a.log AS "log",
+		a.imgs AS "imgs",
+		a.info AS "info",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+
+		u.nickname AS "u.nickname",
+		u.icon AS "u.icon",
+		u.sex AS "u.sex",
+
+		`group`.name AS "group.name",
+		`group`.idno AS "group.idno"
+	</sql>
+
+	<sql id="tousuJoins">
+
+		LEFT JOIN t_member u ON u.id = a.uid
+		LEFT JOIN t_group `group` ON `group`.id = a.group_id
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.tousu.entity.Tousu" >
+		SELECT
+			<include refid="tousuColumns"/>
+		FROM t_tousu a
+		<include refid="tousuJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.tousu.entity.Tousu" >
+		SELECT
+			<include refid="tousuColumns"/>
+		FROM t_tousu a
+		<include refid="tousuJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="u != null and u.id != null and u.id != ''">
+				AND a.uid = #{u.id}
+			</if>
+			<if test="group != null and group.id != null and group.id != ''">
+				AND a.group_id = #{group.id}
+			</if>
+			<if test="beginCreateDate != null and endCreateDate != null ">
+				AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.tousu.entity.Tousu" >
+		SELECT
+			<include refid="tousuColumns"/>
+		FROM t_tousu a
+		<include refid="tousuJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_tousu(
+			id,
+			uid,
+			group_id,
+			reason,
+			log,
+			imgs,
+			info,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{u.id},
+			#{group.id},
+			#{reason},
+			#{log},
+			#{imgs},
+			#{info},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_tousu SET
+			uid = #{u.id},
+			group_id = #{group.id},
+			reason = #{reason},
+			log = #{log},
+			imgs = #{imgs},
+			info = #{info},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_tousu
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_tousu SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.tousu.entity.Tousu">
+		SELECT
+			<include refid="tousuColumns"/>
+		FROM t_tousu a
+		<include refid="tousuJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

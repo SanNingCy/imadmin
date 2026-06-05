@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.tixiantitle.mapper.TixianTitleMapper">
+
+	<sql id="tixianTitleColumns">
+		a.id AS "id",
+		a.sort AS "sort",
+		a.title AS "title",
+		a.info AS "info",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate"
+	</sql>
+
+	<sql id="tixianTitleJoins">
+
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.tixiantitle.entity.TixianTitle" >
+		SELECT
+			<include refid="tixianTitleColumns"/>
+		FROM t_tixian_title a
+		<include refid="tixianTitleJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.tixiantitle.entity.TixianTitle" >
+		SELECT
+			<include refid="tixianTitleColumns"/>
+		FROM t_tixian_title a
+		<include refid="tixianTitleJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.sort
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.tixiantitle.entity.TixianTitle" >
+		SELECT
+			<include refid="tixianTitleColumns"/>
+		FROM t_tixian_title a
+		<include refid="tixianTitleJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_tixian_title(
+			id,
+			sort,
+			title,
+			info,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{sort},
+			#{title},
+			#{info},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_tixian_title SET
+			sort = #{sort},
+			title = #{title},
+			info = #{info},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_tixian_title
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_tixian_title SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.tixiantitle.entity.TixianTitle">
+		SELECT
+			<include refid="tixianTitleColumns"/>
+		FROM t_tixian_title a
+		<include refid="tixianTitleJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

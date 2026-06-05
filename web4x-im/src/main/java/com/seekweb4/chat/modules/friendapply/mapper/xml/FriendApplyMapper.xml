@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.friendapply.mapper.FriendApplyMapper">
+
+	<sql id="friendApplyColumns">
+		a.id AS "id",
+		a.uid AS "u.id",
+		a.uid2 AS "uid2.id",
+		a.sinfo AS "sinfo",
+		a.bei AS "bei",
+		a.info AS "info",
+		a.state AS "state",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+
+		u.nickname AS "u.nickname",
+		u.icon AS "u.icon",
+		u.sex AS "u.sex",
+
+		uid2.nickname AS "uid2.nickname",
+		uid2.icon AS "uid2.icon",
+		uid2.huanying AS "uid2.huanying",
+		uid2.sex AS "uid2.sex"
+	</sql>
+
+	<sql id="friendApplyJoins">
+
+		LEFT JOIN t_member u ON u.id = a.uid
+		LEFT JOIN t_member uid2 ON uid2.id = a.uid2
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.friendapply.entity.FriendApply" >
+		SELECT
+			<include refid="friendApplyColumns"/>
+		FROM t_friend_apply a
+		<include refid="friendApplyJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.friendapply.entity.FriendApply" >
+		SELECT
+			<include refid="friendApplyColumns"/>
+		FROM t_friend_apply a
+		<include refid="friendApplyJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="u != null and u.id != null and u.id != ''">
+				AND a.uid = #{u.id}
+			</if>
+			<if test="uid2 != null and uid2.id != null and uid2.id != ''">
+				AND a.uid2 = #{uid2.id}
+			</if>
+			<if test="state != null and state != ''">
+				AND a.state = #{state}
+			</if>
+			<if test="key != null and key != ''">
+				AND (a.sinfo LIKE concat('%',#{key},'%') or uid2.nickname LIKE concat('%',#{key},'%') or uid2.idno = #{key})
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.friendapply.entity.FriendApply" >
+		SELECT
+			<include refid="friendApplyColumns"/>
+		FROM t_friend_apply a
+		<include refid="friendApplyJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_friend_apply(
+			id,
+			uid,
+			uid2,
+			sinfo,
+			bei,
+			info,
+			state,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{u.id},
+			#{uid2.id},
+			#{sinfo},
+			#{bei},
+			#{info},
+			#{state},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_friend_apply SET
+			uid = #{u.id},
+			uid2 = #{uid2.id},
+			sinfo = #{sinfo},
+			bei = #{bei},
+			info = #{info},
+			state = #{state},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_friend_apply
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_friend_apply SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.friendapply.entity.FriendApply">
+		SELECT
+			<include refid="friendApplyColumns"/>
+		FROM t_friend_apply a
+		<include refid="friendApplyJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

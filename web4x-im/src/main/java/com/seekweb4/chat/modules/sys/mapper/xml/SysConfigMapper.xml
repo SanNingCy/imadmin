@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.sys.mapper.SysConfigMapper">
+
+	<sql id="sysConfigColumns">
+		a.id AS "id",
+		a.smtp AS "smtp",
+		a.port AS "port",
+		a.mailname AS "mailName",
+		a.mailpassword AS "mailPassword",
+		a.accesskeyid AS "accessKeyId",
+		a.accesskeysecret AS "accessKeySecret",
+		a.signature AS "signature",
+		a.templatecode AS "templateCode",
+		a.defaulttheme AS "defaultTheme",
+ 		a.defaultlayout AS "defaultLayout",
+		a.productname AS "productName",
+		a.logo AS "logo",
+		a.multiaccountlogin AS "multiAccountLogin",
+		a.singlelogintype AS "singleLoginType",
+		a.home_url AS "homeUrl"
+	</sql>
+
+	<sql id="sysConfigJoins">
+
+	</sql>
+
+
+	<select id="get" resultType="ImSysConfig" >
+		SELECT
+			<include refid="sysConfigColumns"/>
+		FROM sys_config a
+		<include refid="sysConfigJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="ImSysConfig" >
+		SELECT
+			<include refid="sysConfigColumns"/>
+		FROM sys_config a
+		<include refid="sysConfigJoins"/>
+		<where>
+
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="ImSysConfig" >
+		SELECT
+			<include refid="sysConfigColumns"/>
+		FROM sys_config a
+		<include refid="sysConfigJoins"/>
+		<where>
+
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO sys_config(
+			id,
+			smtp,
+			port,
+			mailname,
+			mailpassword,
+			accesskeyid,
+			accesskeysecret,
+			signature,
+			templatecode,
+			defaulttheme,
+		    defaultlayout,
+			productname,
+			logo,
+			multiaccountlogin,
+			singlelogintype,
+			home_url
+		) VALUES (
+			#{id},
+			#{smtp},
+			#{port},
+			#{mailName},
+			#{mailPassword},
+			#{accessKeyId},
+			#{accessKeySecret},
+			#{signature},
+			#{templateCode},
+			#{defaultTheme},
+		    #{defaultLayout},
+			#{productName},
+			#{logo},
+			#{multiAccountLogin},
+			#{singleLoginType},
+			#{homeUrl}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE sys_config SET
+			smtp = #{smtp},
+			port = #{port},
+			mailname = #{mailName},
+			mailpassword = #{mailPassword},
+			accesskeyid = #{accessKeyId},
+			accesskeysecret = #{accessKeySecret},
+			signature = #{signature},
+			templatecode = #{templateCode},
+			defaulttheme = #{defaultTheme},
+		    defaultlayout = #{defaultLayout},
+			productname = #{productName},
+			logo = #{logo},
+			multiaccountlogin = #{multiAccountLogin},
+			singlelogintype = #{singleLoginType},
+			home_url = #{homeUrl}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM sys_config
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE sys_config SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="ImSysConfig">
+		select * FROM sys_config  where ${propertyName} = #{value}
+	</select>
+
+</mapper>

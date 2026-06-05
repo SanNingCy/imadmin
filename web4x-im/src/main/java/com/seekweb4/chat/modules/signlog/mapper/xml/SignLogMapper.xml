@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.signlog.mapper.SignLogMapper">
+
+	<sql id="signLogColumns">
+		a.id AS "id",
+		a.uid AS "u.id",
+		a.is_sign AS "isSign",
+		a.money AS "money",
+		a.date AS "date",
+		a.day AS "day",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+
+		u.nickname AS "u.nickname",
+		u.idno AS "u.idno",
+		u.icon AS "u.icon",
+		u.sex AS "u.sex"
+	</sql>
+
+	<sql id="signLogJoins">
+
+		LEFT JOIN t_member u ON u.id = a.uid
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.signlog.entity.SignLog" >
+		SELECT
+			<include refid="signLogColumns"/>
+		FROM t_sign_log a
+		<include refid="signLogJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.signlog.entity.SignLog" >
+		SELECT
+			<include refid="signLogColumns"/>
+		FROM t_sign_log a
+		<include refid="signLogJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="u != null and u.id != null and u.id != ''">
+				AND a.uid = #{u.id}
+			</if>
+			<if test="u != null and u.idno != null and u.idno != ''">
+				AND (u.idno = #{u.idno} OR u.lianghao = #{u.idno})
+			</if>
+<!--			<if test="isSign != null and isSign != ''">-->
+<!--				AND a.is_sign = #{isSign}-->
+<!--			</if>-->
+			<if test="date != null and date != ''">
+				AND a.date = #{date}
+			</if>
+			AND a.is_sign = "1"
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.signlog.entity.SignLog" >
+		SELECT
+			<include refid="signLogColumns"/>
+		FROM t_sign_log a
+		<include refid="signLogJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="u != null and u.id != null and u.id != ''">
+				AND a.uid = #{u.id}
+			</if>
+			<if test="u != null and u.idno != null and u.idno != ''">
+				AND (u.idno = #{u.idno} OR u.lianghao = #{u.idno})
+			</if>
+			<if test="date != null and date != ''">
+				AND a.date = #{date}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_sign_log(
+			id,
+			uid,
+			is_sign,
+			money,
+			date,
+			day,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{u.id},
+			#{isSign},
+			#{money},
+			#{date},
+			#{day},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_sign_log SET
+			uid = #{u.id},
+			is_sign = #{isSign},
+			money = #{money},
+			date = #{date},
+			day = #{day},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_sign_log
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_sign_log SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="SignLog">
+		SELECT
+			<include refid="signLogColumns"/>
+		FROM t_sign_log a
+		<include refid="signLogJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

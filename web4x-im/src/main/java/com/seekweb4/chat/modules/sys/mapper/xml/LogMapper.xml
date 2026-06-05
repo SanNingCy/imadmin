@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.sys.mapper.LogMapper">
+
+	<select id="findList" resultType="Log">
+		SELECT
+			a.*,
+			u.id AS "createBy.id",
+			u.name AS "createBy.name",
+			c.name AS "createBy.company.name",
+			o.name AS "createBy.office.name"
+		FROM sys_log a
+		left JOIN sys_user u ON u.id = a.create_by
+		left JOIN sys_office c ON c.id = u.company_id
+		left JOIN sys_office o ON o.id = u.office_id
+		WHERE a.create_date BETWEEN #{beginDate} AND #{endDate}
+		<if test="title != null and title != ''">
+			AND a.title LIKE CONCAT('%', #{title}, '%')
+		</if>
+		<if test="createBy != null and createBy.name != null and createBy.name != ''">
+			AND u.name = #{createBy.name}
+		</if>
+		<if test="requestUri != null and requestUri != ''">
+			AND a.request_uri LIKE CONCAT('%', #{requestUri}, '%')
+		</if>
+		<if test="type != null and type != ''">
+			AND a.type = #{type}
+		</if>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="get" resultType="Log">
+		SELECT
+			*
+		FROM sys_log
+		WHERE id = #{id}
+	</select>
+
+	<delete id="delete">
+		DELETE FROM sys_log
+		WHERE id = #{id}
+	</delete>
+
+	<!--物理批量删除-->
+	<delete id="batchDelete">
+		delete from sys_log
+		where id IN
+		<foreach collection="ids" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<delete id="empty">
+		DELETE FROM sys_log
+	</delete>
+
+	<insert id="insert">
+		INSERT INTO sys_log(
+			id,
+			type,
+			title,
+			create_by,
+			create_date,
+			remote_addr,
+			user_agent,
+			request_uri,
+			method,
+			params,
+			exception
+		) VALUES (
+			#{id},
+			#{type},
+			#{title},
+			#{createBy.id},
+			#{createDate},
+			#{remoteAddr},
+			#{userAgent},
+			#{requestUri},
+			#{method},
+			#{params},
+			#{exception}
+		)
+	</insert>
+
+</mapper>

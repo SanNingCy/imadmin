@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.withdrawaladdress.mapper.WithdrawalAddressMapper">
+
+    <resultMap id="WithdrawalAddressResultMap"
+               type="com.seekweb4.chat.modules.withdrawaladdress.entity.WithdrawalAddress">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="user_id" property="userId"/>
+        <result column="to_address" property="toAddress"/>
+        <result column="remark" property="remark"/>
+        <result column="is_default" property="isDefault"/>
+        <result column="type" property="type"/>
+        <result column="address_type" property="addressType"/>
+        <result column="flag" property="flag"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,
+        create_time,
+        update_time,
+        user_id,
+        to_address,
+        remark,
+        is_default,
+        type,
+        address_type,
+        flag
+    </sql>
+
+    <select id="get" resultMap="WithdrawalAddressResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_withdrawal_address
+        WHERE id = #{id}
+    </select>
+
+    <select id="findList" resultMap="WithdrawalAddressResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_withdrawal_address
+        <where>
+            <if test="userId != null and userId != ''">
+                AND user_id = #{userId}
+            </if>
+            <if test="addressType != null">
+                AND address_type = #{addressType}
+            </if>
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+            <if test="flag != null">
+                AND flag = #{flag}
+            </if>
+        </where>
+        ORDER BY is_default DESC, id DESC
+    </select>
+
+    <select id="findByUser" resultMap="WithdrawalAddressResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_withdrawal_address
+        WHERE user_id = #{userId}
+          AND flag = 1
+          AND type = 1
+        <if test="addressType != null">
+            AND address_type = #{addressType}
+        </if>
+        ORDER BY is_default DESC, id DESC
+    </select>
+
+    <insert id="insert" parameterType="com.seekweb4.chat.modules.withdrawaladdress.entity.WithdrawalAddress"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_withdrawal_address (
+            create_time,
+            update_time,
+            user_id,
+            to_address,
+            remark,
+            is_default,
+            type,
+            address_type,
+            flag
+        ) VALUES (
+            NOW(),
+            NOW(),
+            #{userId},
+            #{toAddress},
+            #{remark},
+            #{isDefault},
+            #{type},
+            #{addressType},
+            #{flag}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.seekweb4.chat.modules.withdrawaladdress.entity.WithdrawalAddress">
+        UPDATE t_withdrawal_address
+        <set>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="toAddress != null">
+                to_address = #{toAddress},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            <if test="isDefault != null">
+                is_default = #{isDefault},
+            </if>
+            <if test="type != null">
+                type = #{type},
+            </if>
+            <if test="addressType != null">
+                address_type = #{addressType},
+            </if>
+            <if test="flag != null">
+                flag = #{flag},
+            </if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="softDelete">
+        UPDATE t_withdrawal_address
+        SET flag = 0,
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="clearDefaultForUser">
+        UPDATE t_withdrawal_address
+        SET is_default = 0,
+            update_time = NOW()
+        WHERE user_id = #{userId}
+          AND flag = 1
+        <if test="addressType != null">
+            AND address_type = #{addressType}
+        </if>
+    </update>
+
+    <update id="setDefault">
+        UPDATE t_withdrawal_address
+        SET is_default = 1,
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>
+

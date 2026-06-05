@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.customer.mapper.CustomerMapper">
+
+	<sql id="customerColumns">
+		a.id AS "id",
+		a.login_type AS "loginType",
+		a.has_invit AS "hasInvit",
+		a.show_fx AS "showFx",
+		a.show_xcx AS "showXcx",
+		a.open_bj AS "openBj",
+		a.open_ch AS "openCh",
+		a.open_mibao AS "openMibao",
+		a.sname AS "sname",
+		a.sno AS "sno",
+		a.skm AS "skm",
+		a.hongbao AS "hongbao",
+		a.zhuanzhang AS "zhuanzhang",
+		a.tx1 AS "tx1",
+		a.tx2 AS "tx2",
+		a.tx3 AS "tx3",
+		a.cz AS "cz",
+		a.czimg AS "czimg",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+		a.openhb AS "openhb",
+		a.openzz AS "openzz",
+		a.tonghua AS "tonghua",
+		a.sendadd AS "sendadd",
+		a.showkf AS "showkf",
+		a.kfurl AS "kfurl",
+		a.namemgc AS "namemgc",
+		a.showonline AS "showonline",
+		a.showyidu AS "showyidu",
+		a.showsign AS "showsign",
+		a.showqianbao AS "showqianbao",
+		a.mintixian AS "mintixian",
+		a.showmsgtime AS "showmsgtime",
+		a.topsyan AS "topsyan",
+		a.openneibu AS "openneibu",
+		a.signtype AS "signtype",
+		a.ipwhite AS "ipwhite",
+		a.changeeq AS "changeeq",
+		a.eqcount AS "eqcount",
+		a.ipcount AS "ipcount",
+		a.filetype AS "filetype",
+		a.regimgtype AS "regimgtype",
+		a.regimg AS "regimg",
+		a.regvideo AS "regvideo",
+		a.reginfo AS "reginfo",
+		a.aikey AS "aikey",
+		a.robname AS "robname",
+		a.newadd AS "newadd",
+		a.maxadd AS "maxadd",
+		a.line AS "line",
+		a.serchmin AS "serchmin",
+		a.serchnum AS "serchnum",
+		a.mgc AS "mgc"
+	</sql>
+
+	<sql id="customerJoins">
+
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.customer.entity.Customer" >
+		SELECT
+			<include refid="customerColumns"/>
+		FROM t_customer a
+		<include refid="customerJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.customer.entity.Customer" >
+		SELECT
+			<include refid="customerColumns"/>
+		FROM t_customer a
+		<include refid="customerJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.customer.entity.Customer" >
+		SELECT
+			<include refid="customerColumns"/>
+		FROM t_customer a
+		<include refid="customerJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_customer(
+			id,
+			login_type,
+			has_invit,
+			show_fx,
+			show_xcx,
+			open_bj,
+			open_ch,
+			open_mibao,
+			sname,
+			sno,
+			skm,
+			hongbao,
+			zhuanzhang,
+			tx1,
+			tx2,
+			tx3,
+			cz,
+			czimg,
+			create_date,
+			update_date,
+			openhb,
+			openzz,
+			tonghua,
+			sendadd,
+			showkf,
+			kfurl,
+			namemgc,
+			showonline,
+			showyidu,
+			showsign,
+			showqianbao,
+			mintixian,
+			showmsgtime,
+			ipwhite,
+			topsyan
+		) VALUES (
+			#{id},
+			#{loginType},
+			#{hasInvit},
+			#{showFx},
+			#{showXcx},
+			#{openBj},
+			#{openCh},
+			#{openMibao},
+			#{sname},
+			#{sno},
+			#{skm},
+			#{hongbao},
+			#{zhuanzhang},
+			#{tx1},
+			#{tx2},
+			#{tx3},
+			#{cz},
+			#{czimg},
+			#{createDate},
+			#{updateDate},
+			#{openhb},
+			#{openzz},
+			#{tonghua},
+			#{sendadd},
+			#{showkf},
+			#{kfurl},
+			#{namemgc},
+			#{showonline},
+			#{showyidu},
+			#{showsign},
+			#{showqianbao},
+			#{mintixian},
+			#{showmsgtime},
+			#{ipwhite},
+			#{topsyan}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_customer
+		<set>
+			<if test="loginType != null">login_type = #{loginType},</if>
+			<if test="hasInvit != null">has_invit = #{hasInvit},</if>
+			<if test="showFx != null">show_fx = #{showFx},</if>
+			<if test="showXcx != null">show_xcx = #{showXcx},</if>
+			<if test="openBj != null">open_bj = #{openBj},</if>
+			<if test="openCh != null">open_ch = #{openCh},</if>
+			<if test="openMibao != null">open_mibao = #{openMibao},</if>
+			<if test="sname != null">sname = #{sname},</if>
+			<if test="sno != null">sno = #{sno},</if>
+			<if test="skm != null">skm = #{skm},</if>
+			<if test="hongbao != null">hongbao = #{hongbao},</if>
+			<if test="zhuanzhang != null">zhuanzhang = #{zhuanzhang},</if>
+			<if test="tx1 != null">tx1 = #{tx1},</if>
+			<if test="tx2 != null">tx2 = #{tx2},</if>
+			<if test="tx3 != null">tx3 = #{tx3},</if>
+			<if test="cz != null">cz = #{cz},</if>
+			<if test="czimg != null">czimg = #{czimg},</if>
+			<if test="updateDate != null">update_date = #{updateDate},</if>
+			<if test="openhb != null">openhb = #{openhb},</if>
+			<if test="openzz != null">openzz = #{openzz},</if>
+			<if test="tonghua != null">tonghua = #{tonghua},</if>
+			<if test="sendadd != null">sendadd = #{sendadd},</if>
+			<if test="showkf != null">showkf = #{showkf},</if>
+			<if test="kfurl != null">kfurl = #{kfurl},</if>
+			<if test="namemgc != null">namemgc = #{namemgc},</if>
+			<if test="showonline != null">showonline = #{showonline},</if>
+			<if test="showyidu != null">showyidu = #{showyidu},</if>
+			<if test="showsign != null">showsign = #{showsign},</if>
+			<if test="showqianbao != null">showqianbao = #{showqianbao},</if>
+			<if test="mintixian != null">mintixian = #{mintixian},</if>
+			<if test="showmsgtime != null">showmsgtime = #{showmsgtime},</if>
+			<if test="topsyan != null">topsyan = #{topsyan},</if>
+			<if test="openneibu != null">openneibu = #{openneibu},</if>
+			<if test="ipwhite != null">ipwhite = #{ipwhite},</if>
+			<if test="signtype != null">signtype = #{signtype},</if>
+			<if test="changeeq != null">changeeq = #{changeeq},</if>
+			<if test="eqcount != null">eqcount = #{eqcount},</if>
+			<if test="ipcount != null">ipcount = #{ipcount},</if>
+			<if test="filetype != null">filetype = #{filetype},</if>
+			<if test="regimgtype != null">regimgtype = #{regimgtype},</if>
+			<if test="regimg != null">regimg = #{regimg},</if>
+			<if test="regvideo != null">regvideo = #{regvideo},</if>
+			<if test="reginfo != null">reginfo = #{reginfo},</if>
+			<if test="aikey != null">aikey = #{aikey},</if>
+			<if test="robname != null">robname = #{robname},</if>
+			<if test="newadd != null">newadd = #{newadd},</if>
+			<if test="maxadd != null">maxadd = #{maxadd},</if>
+			<if test="serchmin != null">serchmin = #{serchmin},</if>
+			<if test="serchnum != null">serchnum = #{serchnum},</if>
+			<if test="line != null">line = #{line},</if>
+			<if test="mgc != null">mgc = #{mgc},</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+<!--	<update id="update">-->
+<!--		UPDATE t_customer SET-->
+<!--			login_type = #{loginType},-->
+<!--			has_invit = #{hasInvit},-->
+<!--			show_fx = #{showFx},-->
+<!--			show_xcx = #{showXcx},-->
+<!--			open_bj = #{openBj},-->
+<!--			open_ch = #{openCh},-->
+<!--			open_mibao = #{openMibao},-->
+<!--			sname = #{sname},-->
+<!--			sno = #{sno},-->
+<!--			skm = #{skm},-->
+<!--			hongbao = #{hongbao},-->
+<!--			zhuanzhang = #{zhuanzhang},-->
+<!--			tx1 = #{tx1},-->
+<!--			tx2 = #{tx2},-->
+<!--			tx3 = #{tx3},-->
+<!--			cz = #{cz},-->
+<!--			czimg = #{czimg},-->
+<!--			update_date = #{updateDate},-->
+<!--			openhb = #{openhb},-->
+<!--			openzz = #{openzz},-->
+<!--			tonghua = #{tonghua},-->
+<!--			sendadd = #{sendadd},-->
+<!--			showkf = #{showkf},-->
+<!--			kfurl = #{kfurl},-->
+<!--			namemgc = #{namemgc},-->
+<!--			showonline = #{showonline},-->
+<!--			showyidu = #{showyidu},-->
+<!--			showsign = #{showsign},-->
+<!--			showqianbao = #{showqianbao},-->
+<!--			mintixian = #{mintixian},-->
+<!--			showmsgtime = #{showmsgtime},-->
+<!--			topsyan = #{topsyan},-->
+<!--			openneibu = #{openneibu},-->
+<!--			ipwhite = #{ipwhite},-->
+<!--			signtype = #{signtype},-->
+<!--			changeeq = #{changeeq},-->
+<!--			eqcount = #{eqcount},-->
+<!--			ipcount = #{ipcount},-->
+<!--			filetype = #{filetype},-->
+<!--			regimgtype = #{regimgtype},-->
+<!--			regimg = #{regimg},-->
+<!--			regvideo = #{regvideo},-->
+<!--			reginfo = #{reginfo},-->
+<!--			aikey = #{aikey},-->
+<!--			robname = #{robname},-->
+<!--			newadd = #{newadd},-->
+<!--			maxadd = #{maxadd},-->
+<!--			serchmin = #{serchmin},-->
+<!--			serchnum = #{serchnum},-->
+<!--			line = #{line},-->
+<!--			mgc = #{mgc}-->
+<!--		WHERE id = #{id}-->
+<!--	</update>-->
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_customer
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_customer SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.customer.entity.Customer">
+		SELECT
+			<include refid="customerColumns"/>
+		FROM t_customer a
+		<include refid="customerJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

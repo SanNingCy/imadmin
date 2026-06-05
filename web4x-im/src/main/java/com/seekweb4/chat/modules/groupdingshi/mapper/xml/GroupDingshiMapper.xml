@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.groupdingshi.mapper.GroupDingshiMapper">
+
+	<sql id="groupDingshiColumns">
+		a.id AS "id",
+		a.group_id AS "group.id",
+		a.title AS "title",
+		a.imgs AS "imgs",
+		a.video AS "video",
+		a.pdf AS "pdf",
+		a.type AS "type",
+		a.time AS "time",
+		a.txType AS "txtype",
+		a.name AS "name",
+		a.size AS "size",
+		a.miao AS "miao",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+
+		`group`.name AS "group.name",
+		`group`.idno AS "group.idno"
+	</sql>
+
+	<sql id="groupDingshiJoins">
+
+		LEFT JOIN t_group `group` ON `group`.id = a.group_id
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.groupdingshi.entity.GroupDingshi" >
+		SELECT
+			<include refid="groupDingshiColumns"/>
+		FROM t_group_dingshi a
+		<include refid="groupDingshiJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.groupdingshi.entity.GroupDingshi" >
+		SELECT
+			<include refid="groupDingshiColumns"/>
+		FROM t_group_dingshi a
+		<include refid="groupDingshiJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="group != null and group.id != null and group.id != ''">
+				AND a.group_id = #{group.id}
+			</if>
+			<if test="group != null and group.idno != null and group.idno != ''">
+				AND `group`.idno LIKE concat('%', #{group.idno}, '%')
+			</if>
+			<if test="title != null and title != ''">
+				AND a.title LIKE concat('%',#{title},'%')
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="txtype != null and txtype != ''">
+				AND a.txType = #{txtype}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.groupdingshi.entity.GroupDingshi" >
+		SELECT
+			<include refid="groupDingshiColumns"/>
+		FROM t_group_dingshi a
+		<include refid="groupDingshiJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="group != null and group.id != null and group.id != ''">
+				AND a.group_id = #{group.id}
+			</if>
+			<if test="group != null and group.idno != null and group.idno != ''">
+				AND `group`.idno LIKE concat('%', #{group.idno}, '%')
+			</if>
+			<if test="title != null and title != ''">
+				AND a.title LIKE concat('%',#{title},'%')
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="txtype != null and txtype != ''">
+				AND a.txType = #{txtype}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_group_dingshi(
+			id,
+			group_id,
+			title,
+			imgs,
+			video,
+			pdf,
+			`type`,
+			`time`,
+			txType,
+			`name`,
+			`size`,
+			miao,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{group.id},
+			#{title},
+			#{imgs},
+			#{video},
+			#{pdf},
+			#{type},
+			#{time},
+			#{txtype},
+			#{name},
+			#{size},
+			#{miao},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_group_dingshi SET
+			group_id = #{group.id},
+			title = #{title},
+			imgs = #{imgs},
+			video = #{video},
+			pdf = #{pdf},
+			`type` = #{type},
+			`time` = #{time},
+			txType = #{txtype},
+			`name` = #{name},
+			`size` = #{size},
+			miao = #{miao},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_group_dingshi
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_group_dingshi SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.groupdingshi.entity.GroupDingshi">
+		SELECT
+			<include refid="groupDingshiColumns"/>
+		FROM t_group_dingshi a
+		<include refid="groupDingshiJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

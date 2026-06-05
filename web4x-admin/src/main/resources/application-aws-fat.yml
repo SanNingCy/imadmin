@@ -1,0 +1,5 @@
+# IM 环境配置：引用 chat-ops（勿在此重复 IM 配置项）
+spring:
+  config:
+    import:
+      - optional:classpath:chat-ops/application-aws-fat.yml

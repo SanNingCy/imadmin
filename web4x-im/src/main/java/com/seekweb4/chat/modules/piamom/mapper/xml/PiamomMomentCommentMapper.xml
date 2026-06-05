@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.piamom.mapper.PiamomMomentCommentMapper">
+
+    <resultMap id="BaseResultMap" type="com.seekweb4.chat.modules.piamom.entity.PiamomMomentComment">
+        <id column="id" property="id"/>
+        <result column="moment_id" property="momentId"/>
+        <result column="user_id" property="userId"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="content" property="content"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="user_idno" property="userIdno"/>
+        <result column="user_nickname" property="userNickname"/>
+    </resultMap>
+
+    <sql id="adminWhere">
+        <where>
+            <if test="id != null">and a.id = #{id}</if>
+            <if test="momentId != null">and a.moment_id = #{momentId}</if>
+            <if test="userId != null and userId != ''">and a.user_id = #{userId}</if>
+            <if test="userIdno != null and userIdno != ''">and m.idno like concat('%', #{userIdno}, '%')</if>
+            <if test="content != null and content != ''">and a.content like concat('%', #{content}, '%')</if>
+        </where>
+    </sql>
+
+    <select id="selectAdminPageList" resultMap="BaseResultMap">
+        select a.id, a.moment_id, a.user_id, a.parent_id, a.content, a.created_at,
+               IFNULL(m.idno, '') AS user_idno, IFNULL(m.nickname, '') AS user_nickname
+        from t_piamom_moment_comment a
+        left join t_member m on m.id = a.user_id
+        <include refid="adminWhere"/>
+        <choose>
+            <when test="orderBy != null and orderBy != ''">order by ${orderBy}</when>
+            <otherwise>order by a.created_at desc</otherwise>
+        </choose>
+        <if test="pageNo != null and pageSize != null">limit #{pageNo}, #{pageSize}</if>
+    </select>
+
+    <select id="selectAdminCount" resultType="java.lang.Long">
+        select count(1) from t_piamom_moment_comment a
+        left join t_member m on m.id = a.user_id
+        <include refid="adminWhere"/>
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select a.id, a.moment_id, a.user_id, a.parent_id, a.content, a.created_at,
+               IFNULL(m.idno, '') AS user_idno, IFNULL(m.nickname, '') AS user_nickname
+        from t_piamom_moment_comment a
+        left join t_member m on m.id = a.user_id
+        where a.id = #{id}
+    </select>
+
+    <delete id="deleteByPrimaryKey">delete from t_piamom_moment_comment where id = #{id}</delete>
+</mapper>

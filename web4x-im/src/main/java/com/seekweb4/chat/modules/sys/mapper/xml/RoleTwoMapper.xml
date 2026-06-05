@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.sys.mapper.RoleMapper">
+
+    <resultMap id="roleResult" type="Role">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="enname" column="enname" />
+        <result property="remarks" column="remarks" />
+        <result property="useable" column="useable" />
+        <result property="sysData" column="sysData" />
+        <collection property="menuList" ofType="Menu">
+            <id property="id" column="menuList.id" />
+        </collection>
+        <collection property="dataRuleList" ofType="DataRule">
+            <id property="id" column="dataRuleList.id" />
+        </collection>
+    </resultMap>
+
+    <sql id="roleColumns">
+        a.id,
+    	a.name,
+    	a.enname,
+		a.remarks,
+		a.create_by AS "createBy.id",
+		a.create_date,
+		a.update_by AS "updateBy.id",
+		a.update_date,
+		a.del_flag,
+    	a.useable AS useable,
+    	a.is_sys AS sysData
+    </sql>
+
+    <select id="get" resultMap="roleResult">
+        SELECT
+        <include refid="roleColumns"/>,
+        rm.menu_id AS "menuList.id",
+        rd.datarule_id AS "dataRuleList.id"
+        FROM sys_role a
+        LEFT JOIN sys_role_menu_two rm ON rm.role_id = a.id
+        LEFT JOIN sys_role_datarule rd ON rd.role_id = a.id
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="getByName" resultType="Role">
+        SELECT
+        <include refid="roleColumns"/>
+        FROM sys_role a
+        WHERE a.name = #{name} AND a.del_flag = #{DEL_FLAG_NORMAL}
+    </select>
+
+    <select id="getByEnname" resultType="Role">
+        SELECT
+        <include refid="roleColumns"/>
+        FROM sys_role a
+        WHERE a.enname = #{enname} AND a.del_flag = #{DEL_FLAG_NORMAL}
+    </select>
+    <!-- 查询角色的所有无下属菜单ID -->
+    <select id="queryAllNotChildrenMenuId" resultType="String">
+        SELECT
+            distinct rm.menu_id
+        FROM
+            sys_role a
+                LEFT JOIN sys_role_menu_two rm ON a.id = rm.role_id
+        WHERE a.id = #{id}
+          AND (SELECT count(*) FROM sys_menu_two WHERE parent_id=menu_id ) = 0
+    </select>
+    <select id="findList" resultMap="roleResult">
+        SELECT <!-- DISTINCT -->
+        <include refid="roleColumns"/>
+        FROM sys_role a
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+        <if test="name != null and name != ''">
+            AND a.name like CONCAT('%', #{name}, '%')
+        </if>
+        <if test="enname != null and enname != ''">
+            AND a.enname like CONCAT('%', #{enname}, '%')
+        </if>
+        <!-- 数据范围过滤 -->
+        ${dataScope}
+        ORDER BY a.name desc
+    </select>
+
+    <select id="findAllList" resultType="Role">
+        SELECT
+        <include refid="roleColumns"/>
+        FROM sys_role a
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+        ORDER BY a.name
+    </select>
+
+    <insert id="insert">
+        INSERT INTO sys_role(
+            id,
+            name,
+            enname,
+            create_by,
+            create_date,
+            update_by,
+            update_date,
+            remarks,
+            del_flag,
+            is_sys,
+            useable
+        ) VALUES (
+                     #{id},
+                     #{name},
+                     #{enname},
+                     #{createBy.id},
+                     #{createDate},
+                     #{updateBy.id},
+                     #{updateDate},
+                     #{remarks},
+                     #{delFlag},
+                     #{sysData},
+                     #{useable}
+                 )
+    </insert>
+
+    <update id="update">
+        UPDATE sys_role SET
+                            name = #{name},
+                            enname = #{enname},
+                            update_by = #{updateBy.id},
+                            update_date = #{updateDate},
+                            remarks = #{remarks},
+                            is_sys = #{sysData},
+                            useable = #{useable}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteRoleMenu">
+        DELETE FROM sys_role_menu_two WHERE role_id = #{id}
+    </delete>
+
+    <insert id="insertRoleMenu">
+        INSERT INTO sys_role_menu_two(role_id, menu_id)
+        <foreach collection="menuList" item="menu" separator=" union all ">
+            SELECT #{id}, #{menu.id}
+        </foreach>
+    </insert>
+
+    <delete id="deleteRoleDataRule">
+        DELETE FROM sys_role_datarule WHERE role_id = #{id}
+    </delete>
+
+    <insert id="insertRoleDataRule">
+        INSERT INTO sys_role_datarule(role_id, datarule_id)
+        <foreach collection="dataRuleList" item="dataRule" separator=" union all ">
+            SELECT #{id}, #{dataRule.id}
+        </foreach>
+    </insert>
+
+
+    <update id="delete">
+        DELETE FROM sys_role
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteByLogic">
+        UPDATE sys_role SET
+            del_flag = #{DEL_FLAG_DELETE}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

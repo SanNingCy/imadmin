@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.coll.mapper.CollMapper">
+
+	<sql id="collColumns">
+		a.id AS "id",
+		a.uid AS "uid",
+		a.uid2 AS "uid2.id",
+		a.info AS "info",
+		a.type AS "type",
+		a.miao AS "miao",
+		a.lon AS "lon",
+		a.lat AS "lat",
+		a.msgid AS "msgid",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+
+
+		uid2.nickname AS "uid2.nickname",
+		uid2.icon AS "uid2.icon",
+		uid2.sex AS "uid2.sex"
+	</sql>
+
+	<sql id="collJoins">
+
+		LEFT JOIN t_member uid2 ON uid2.id = a.uid2
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.coll.entity.Coll" >
+		SELECT
+			<include refid="collColumns"/>
+		FROM t_coll a
+		<include refid="collJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.coll.entity.Coll" >
+		SELECT
+			<include refid="collColumns"/>
+		FROM t_coll a
+		<include refid="collJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="uid != null and uid != ''">
+				AND a.uid = #{uid}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.coll.entity.Coll" >
+		SELECT
+			<include refid="collColumns"/>
+		FROM t_coll a
+		<include refid="collJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_coll(
+			id,
+			uid,
+			uid2,
+			info,
+			type,
+			miao,
+			lon,
+			lat,
+			msgid,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{uid},
+			#{uid2.id},
+			#{info},
+			#{type},
+			#{miao},
+			#{lon},
+			#{lat},
+			#{msgid},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_coll SET
+			uid = #{uid},
+			uid2 = #{uid2.id},
+			info = #{info},
+			type = #{type},
+			miao = #{miao},
+			lon = #{lon},
+			lat = #{lat},
+			msgid = #{msgid},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_coll
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_coll SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.coll.entity.Coll">
+		SELECT
+			<include refid="collColumns"/>
+		FROM t_coll a
+		<include refid="collJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.vipcode.mapper.VipCodeMapper">
+
+	<sql id="vipCodeColumns">
+		a.id AS "id",
+		a.code AS "code",
+		a.day AS "day",
+		a.isdui AS "isdui",
+		a.uid AS "u.id",
+		a.dui_time AS "duiTime",
+		a.sync_status AS "syncStatus",
+		a.type AS "type",
+		a.type_name AS "typeName",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+		u.idno AS "idno",
+		u.idno AS "u.idno",
+		u.nickname AS "u.nickname"
+	</sql>
+
+	<sql id="vipCodeJoins">
+
+		LEFT JOIN t_member u ON u.id = a.uid
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.vipcode.entity.VipCode" >
+		SELECT
+			<include refid="vipCodeColumns"/>
+		FROM t_vip_code a
+		<include refid="vipCodeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.vipcode.entity.VipCode" >
+		SELECT
+			<include refid="vipCodeColumns"/>
+		FROM t_vip_code a
+		<include refid="vipCodeJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="code != null and code != ''">
+				AND a.code = #{code}
+			</if>
+			<if test="isdui != null and isdui != ''">
+				AND a.isdui = #{isdui}
+			</if>
+			<if test="u != null and u.id != null and u.id != ''">
+				AND a.uid = #{u.id}
+			</if>
+			<if test="idno != null and idno != ''">
+				AND u.idno = #{idno}
+			</if>
+			<if test="u != null and u.idno != null and u.idno != ''">
+				AND u.idno = #{u.idno}
+			</if>
+			<if test="syncStatus != null and syncStatus != ''">
+				AND a.sync_status = #{syncStatus}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="typeName != null and typeName != ''">
+				AND a.type_name = #{typeName}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.vipcode.entity.VipCode" >
+		SELECT
+			<include refid="vipCodeColumns"/>
+		FROM t_vip_code a
+		<include refid="vipCodeJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 查询未同步且已填写类型的会员码（限制返回条数，用于无参同步） -->
+	<select id="findUnsyncedWithTypeLimit" resultType="com.seekweb4.chat.modules.vipcode.entity.VipCode">
+		SELECT
+			<include refid="vipCodeColumns"/>
+		FROM t_vip_code a
+		<include refid="vipCodeJoins"/>
+		WHERE a.sync_status = '0'
+		  AND a.type IS NOT NULL
+		  AND a.type != ''
+		ORDER BY a.create_date DESC
+		LIMIT #{limit}
+	</select>
+
+	<!-- 批量插入会员码（用于批量生成，提升性能） -->
+	<insert id="insertBatch">
+		INSERT INTO t_vip_code(
+			id,
+			code,
+			day,
+			isdui,
+			uid,
+			dui_time,
+			sync_status,
+			type,
+			type_name,
+			create_date,
+			update_date
+		) VALUES
+		<foreach collection="list" item="item" separator=",">
+			(
+				#{item.id},
+				#{item.code},
+				#{item.day},
+				#{item.isdui},
+				#{item.u.id},
+				#{item.duiTime},
+				#{item.syncStatus},
+				#{item.type},
+				#{item.typeName},
+				#{item.createDate},
+				#{item.updateDate}
+			)
+		</foreach>
+	</insert>
+
+	<insert id="insert">
+		INSERT INTO t_vip_code(
+			id,
+			code,
+			day,
+			isdui,
+			uid,
+			dui_time,
+			sync_status,
+			type,
+			type_name,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{code},
+			#{day},
+			#{isdui},
+			#{u.id},
+			#{duiTime},
+			#{syncStatus},
+			#{type},
+			#{typeName},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+<!--	<update id="update">-->
+<!--		UPDATE t_vip_code SET-->
+<!--			code = #{code},-->
+<!--			day = #{day},-->
+<!--			isdui = #{isdui},-->
+<!--			uid = #{u.id},-->
+<!--			dui_time = #{duiTime},-->
+<!--			sync_status = #{syncStatus},-->
+<!--			type = #{type},-->
+<!--			type_name = #{typeName},-->
+<!--			update_date = #{updateDate}-->
+<!--		WHERE id = #{id}-->
+<!--	</update>-->
+
+	<update id="update">
+		UPDATE t_vip_code
+		<set>
+			<!-- 每个字段加if判断：仅当参数非空时，才加入更新语句 -->
+			<if test="code != null and code != ''">
+				code = #{code},
+			</if>
+			<if test="day != null">
+				day = #{day},
+			</if>
+			<if test="isdui != null">
+				isdui = #{isdui},
+			</if>
+			<if test="u != null and u.id != null">
+				uid = #{u.id},
+			</if>
+			<if test="duiTime != null">
+				dui_time = #{duiTime},
+			</if>
+			<if test="syncStatus != null">
+				sync_status = #{syncStatus},
+			</if>
+			<if test="type != null and type != ''">
+				type = #{type},
+			</if>
+			<if test="typeName != null and typeName != ''">
+				type_name = #{typeName},
+			</if>
+			<if test="updateDate != null">
+				update_date = #{updateDate},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_vip_code
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_vip_code SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.vipcode.entity.VipCode">
+		SELECT
+			<include refid="vipCodeColumns"/>
+		FROM t_vip_code a
+		<include refid="vipCodeJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+	<!-- 按兑换码列表批量更新同步状态 -->
+	<update id="updateSyncStatusByCodes">
+		UPDATE t_vip_code SET sync_status = #{syncStatus}, update_date = NOW()
+		WHERE code IN
+		<foreach collection="codes" item="code" open="(" separator="," close=")">
+			#{code}
+		</foreach>
+	</update>
+
+</mapper>

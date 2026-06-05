@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.dy.mapper.DyMapper">
+
+	<sql id="dyColumns">
+		a.id AS "id",
+		a.uid AS "u.id",
+		a.info AS "info",
+		a.imgs AS "imgs",
+		a.vimg AS "vimg",
+		a.video AS "video",
+		a.type AS "type",
+		a.address AS "address",
+		a.lon AS "lon",
+		a.lat AS "lat",
+		a.del_flag AS "delFlag",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+
+		u.nickname AS "u.nickname",
+		u.idno AS "u.idno",
+		u.lianghao AS "u.lianghao",
+		u.icon AS "u.icon",
+		u.sex AS "u.sex"
+	</sql>
+
+	<sql id="dyJoins">
+
+		LEFT JOIN t_member u ON u.id = a.uid
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.dy.entity.Dy" >
+		SELECT
+			<include refid="dyColumns"/>
+		FROM t_dy a
+		<include refid="dyJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.dy.entity.Dy" >
+		SELECT
+			<include refid="dyColumns"/>
+		FROM t_dy a
+		<include refid="dyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="u != null and u.id != null and u.id != ''">
+				AND a.uid = #{u.id}
+			</if>
+			<if test="u != null and u.idno != null and u.idno != ''">
+				AND (u.idno = #{u.idno} OR u.lianghao = #{u.idno})
+			</if>
+			<if test="u != null and u.lianghao != null and u.lianghao != ''">
+				AND u.lianghao LIKE concat('%', #{u.lianghao}, '%')
+			</if>
+			<if test="info != null and info != ''">
+				AND a.info LIKE concat('%',#{info},'%')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.dy.entity.Dy" >
+		SELECT
+			<include refid="dyColumns"/>
+		FROM t_dy a
+		<include refid="dyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="u != null and u.id != null and u.id != ''">
+				AND a.uid = #{u.id}
+			</if>
+			<if test="u != null and u.idno != null and u.idno != ''">
+				AND (u.idno = #{u.idno} OR u.lianghao = #{u.idno})
+			</if>
+			<if test="u != null and u.lianghao != null and u.lianghao != ''">
+				AND u.lianghao LIKE concat('%', #{u.lianghao}, '%')
+			</if>
+			<if test="info != null and info != ''">
+				AND a.info LIKE concat('%',#{info},'%')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_dy(
+			id,
+			uid,
+			info,
+			imgs,
+			vimg,
+			video,
+			type,
+			address,
+			lon,
+			lat,
+			del_flag,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{u.id},
+			#{info},
+			#{imgs},
+			#{vimg},
+			#{video},
+			#{type},
+			#{address},
+			#{lon},
+			#{lat},
+			#{delFlag},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_dy SET
+			uid = #{u.id},
+			info = #{info},
+			imgs = #{imgs},
+			vimg = #{vimg},
+			video = #{video},
+			type = #{type},
+			address = #{address},
+			lon = #{lon},
+			lat = #{lat},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_dy
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_dy SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.dy.entity.Dy">
+		SELECT
+			<include refid="dyColumns"/>
+		FROM t_dy a
+		<include refid="dyJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

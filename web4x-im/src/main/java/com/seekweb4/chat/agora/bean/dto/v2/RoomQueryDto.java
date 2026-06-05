@@ -1,0 +1,20 @@
+package com.seekweb4.chat.agora.bean.dto.v2;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+import java.util.Map;
+
+@Data
+@JsonInclude(value = JsonInclude.Include.NON_NULL)
+@Accessors(chain = true)
+public class RoomQueryDto {
+    private String appId;
+    private String sceneId;
+    // Room id
+    private String roomId;
+    private Map<String, Object> payload;
+    private Long updateTime;
+    private Long createTime;
+}

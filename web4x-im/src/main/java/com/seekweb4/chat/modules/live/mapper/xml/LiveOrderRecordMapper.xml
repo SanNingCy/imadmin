@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.live.mapper.LiveOrderRecordMapper">
+
+    <resultMap id="BaseResultMap" type="com.seekweb4.chat.modules.live.entity.LiveOrderRecord">
+        <id column="id" property="id"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="user_id" property="userId"/>
+        <result column="user_idno" property="userIdno"/>
+        <result column="duration_id" property="durationId"/>
+        <result column="duration_value" property="durationValue"/>
+        <result column="tier_id" property="tierId"/>
+        <result column="tier_value" property="tierValue"/>
+        <result column="total_amount" property="totalAmount"/>
+        <result column="group_id_no" property="groupIdNo"/>
+        <result column="tidno_group" property="tidnoGroup"/>
+        <result column="live_status" property="liveStatus"/>
+        <result column="begin_time" property="beginTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="channel_name" property="channelName"/>
+        <result column="channel_id" property="channelId"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, order_no, user_id, duration_id, duration_value, tier_id, tier_value, total_amount, group_id_no, live_status,
+        begin_time, end_time, channel_name, channel_id, remark, create_time, update_time, create_by, update_by, is_deleted
+    </sql>
+
+    <select id="selectAdminPageList" resultMap="BaseResultMap">
+        select
+        o.id, o.order_no, o.user_id, o.duration_id, o.duration_value, o.tier_id, o.tier_value, o.total_amount,
+        o.group_id_no, o.live_status, o.begin_time, o.end_time, o.channel_name, o.channel_id, o.remark,
+        o.create_time, o.update_time, o.create_by, o.update_by, o.is_deleted,
+        IFNULL(m.idno, '') AS user_idno,
+        IFNULL(
+            (select gx.idno from t_group gx
+             where o.group_id_no is not null and trim(o.group_id_no) != ''
+               and (gx.id = trim(o.group_id_no) or gx.idno = trim(o.group_id_no))
+             limit 1),
+            ''
+        ) AS tidno_group
+        from t_live_order_record o
+        left join t_member m on m.id = o.user_id
+        left join t_group g on g.id = o.group_id_no
+        <where>
+            o.is_deleted = 0
+            <if test="id != null">
+                and o.id = #{id}
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                and o.order_no = #{orderNo}
+            </if>
+            <if test="userId != null and userId != ''">
+                and o.user_id = #{userId}
+            </if>
+            <if test="userIdno != null and userIdno != ''">
+                and m.idno like concat('%', #{userIdno}, '%')
+            </if>
+            <if test="durationId != null">
+                and o.duration_id = #{durationId}
+            </if>
+            <if test="tierId != null">
+                and o.tier_id = #{tierId}
+            </if>
+            <if test="groupIdNo != null and groupIdNo != ''">
+                and o.group_id_no = #{groupIdNo}
+            </if>
+            <if test="groupIdno != null and groupIdno != ''">
+                and exists (select 1 from t_group gx where gx.idno like concat('%', #{groupIdno}, '%')
+                    and o.group_id_no is not null and trim(o.group_id_no) != ''
+                    and (gx.id = trim(o.group_id_no) or gx.idno = trim(o.group_id_no)))
+            </if>
+            <if test="tidnoGroup != null and tidnoGroup != ''">
+                and g.idno like concat('%', #{tidnoGroup}, '%')
+            </if>
+            <if test="liveStatus != null and liveStatus != ''">
+                and o.live_status = #{liveStatus}
+            </if>
+            <if test="beginTimeStart != null">
+                and o.begin_time &gt;= #{beginTimeStart}
+            </if>
+            <if test="beginTimeEnd != null">
+                and o.begin_time &lt;= #{beginTimeEnd}
+            </if>
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+        <if test="orderBy == null or orderBy == ''">
+            order by o.create_time desc
+        </if>
+        <if test="pageNo != null and pageSize != null">
+            limit #{pageNo}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="selectAdminCount" resultType="java.lang.Long">
+        select count(1)
+        from t_live_order_record o
+        left join t_member m on m.id = o.user_id
+        <where>
+            o.is_deleted = 0
+            <if test="id != null">
+                and o.id = #{id}
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                and o.order_no = #{orderNo}
+            </if>
+            <if test="userId != null and userId != ''">
+                and o.user_id = #{userId}
+            </if>
+            <if test="userIdno != null and userIdno != ''">
+                and m.idno like concat('%', #{userIdno}, '%')
+            </if>
+            <if test="durationId != null">
+                and o.duration_id = #{durationId}
+            </if>
+            <if test="tierId != null">
+                and o.tier_id = #{tierId}
+            </if>
+            <if test="groupIdNo != null and groupIdNo != ''">
+                and o.group_id_no = #{groupIdNo}
+            </if>
+            <if test="groupIdno != null and groupIdno != ''">
+                and exists (select 1 from t_group gx where gx.idno like concat('%', #{groupIdno}, '%')
+                    and o.group_id_no is not null and trim(o.group_id_no) != ''
+                    and (gx.id = trim(o.group_id_no) or gx.idno = trim(o.group_id_no)))
+            </if>
+            <if test="liveStatus != null and liveStatus != ''">
+                and o.live_status = #{liveStatus}
+            </if>
+            <if test="beginTimeStart != null">
+                and o.begin_time &gt;= #{beginTimeStart}
+            </if>
+            <if test="beginTimeEnd != null">
+                and o.begin_time &lt;= #{beginTimeEnd}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select
+        o.id, o.order_no, o.user_id, o.duration_id, o.duration_value, o.tier_id, o.tier_value, o.total_amount,
+        o.group_id_no, o.live_status, o.begin_time, o.end_time, o.channel_name, o.channel_id, o.remark,
+        o.create_time, o.update_time, o.create_by, o.update_by, o.is_deleted,
+        IFNULL(m.idno, '') AS user_idno,
+        IFNULL(
+            (select gx.idno from t_group gx
+             where o.group_id_no is not null and trim(o.group_id_no) != ''
+               and (gx.id = trim(o.group_id_no) or gx.idno = trim(o.group_id_no))
+             limit 1),
+            ''
+        ) AS tidno_group
+        from t_live_order_record o
+        left join t_member m on m.id = o.user_id
+        where o.id = #{id} and o.is_deleted = 0
+    </select>
+
+    <select id="selectByOrderNo" resultMap="BaseResultMap">
+        select
+        o.id, o.order_no, o.user_id, o.duration_id, o.duration_value, o.tier_id, o.tier_value, o.total_amount,
+        o.group_id_no, o.live_status, o.begin_time, o.end_time, o.channel_name, o.channel_id, o.remark,
+        o.create_time, o.update_time, o.create_by, o.update_by, o.is_deleted,
+        IFNULL(m.idno, '') AS user_idno,
+        IFNULL(
+            (select gx.idno from t_group gx
+             where o.group_id_no is not null and trim(o.group_id_no) != ''
+               and (gx.id = trim(o.group_id_no) or gx.idno = trim(o.group_id_no))
+             limit 1),
+            ''
+        ) AS tidno_group
+        from t_live_order_record o
+        left join t_member m on m.id = o.user_id
+        where o.order_no = #{orderNo} and o.is_deleted = 0
+        limit 1
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.seekweb4.chat.modules.live.entity.LiveOrderRecord">
+        update t_live_order_record
+        <set>
+            <if test="orderNo != null">
+                order_no = #{orderNo},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="durationId != null">
+                duration_id = #{durationId},
+            </if>
+            <if test="durationValue != null">
+                duration_value = #{durationValue},
+            </if>
+            <if test="tierId != null">
+                tier_id = #{tierId},
+            </if>
+            <if test="tierValue != null">
+                tier_value = #{tierValue},
+            </if>
+            <if test="totalAmount != null">
+                total_amount = #{totalAmount},
+            </if>
+            <if test="groupIdNo != null">
+                group_id_no = #{groupIdNo},
+            </if>
+            <if test="liveStatus != null">
+                live_status = #{liveStatus},
+            </if>
+            <if test="beginTime != null">
+                begin_time = #{beginTime},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime},
+            </if>
+            <if test="channelName != null">
+                channel_name = #{channelName},
+            </if>
+            <if test="channelId != null">
+                channel_id = #{channelId},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted},
+            </if>
+            update_time = now()
+        </set>
+        where id = #{id}
+    </update>
+
+    <insert id="insert" parameterType="com.seekweb4.chat.modules.live.entity.LiveOrderRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into t_live_order_record (
+            order_no, user_id, duration_id, duration_value, tier_id, tier_value, total_amount, group_id_no, live_status,
+            begin_time, end_time, channel_name, channel_id, remark, create_time, update_time, create_by, update_by, is_deleted
+        ) values (
+            #{orderNo}, #{userId}, #{durationId}, #{durationValue}, #{tierId}, #{tierValue}, #{totalAmount}, #{groupIdNo}, #{liveStatus},
+            #{beginTime}, #{endTime}, #{channelName}, #{channelId}, #{remark}, now(), now(), #{createBy}, #{updateBy}, #{isDeleted}
+        )
+    </insert>
+
+</mapper>
+

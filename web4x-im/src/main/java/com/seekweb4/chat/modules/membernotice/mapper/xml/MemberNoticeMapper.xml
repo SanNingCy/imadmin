@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.membernotice.mapper.MemberNoticeMapper">
+
+	<sql id="memberNoticeColumns">
+		a.id AS "id",
+		a.uid AS "u.id",
+		a.info AS "info",
+		a.isdu AS "isdu",
+		a.nid AS "nid",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+
+		u.idno AS "u.idno",
+		u.nickname AS "u.nickname"
+	</sql>
+
+	<sql id="memberNoticeJoins">
+
+		LEFT JOIN t_member u ON u.id = a.uid
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.membernotice.entity.MemberNotice" >
+		SELECT
+			<include refid="memberNoticeColumns"/>
+		FROM t_member_notice a
+		<include refid="memberNoticeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.membernotice.entity.MemberNotice" >
+		SELECT
+			<include refid="memberNoticeColumns"/>
+		FROM t_member_notice a
+		<include refid="memberNoticeJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="u != null and u.id != null and u.id != ''">
+				AND a.uid = #{u.id}
+			</if>
+			<if test="isdu != null and isdu != ''">
+				AND a.isdu = #{isdu}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.membernotice.entity.MemberNotice" >
+		SELECT
+			<include refid="memberNoticeColumns"/>
+		FROM t_member_notice a
+		<include refid="memberNoticeJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_member_notice(
+			id,
+			uid,
+			info,
+			isdu,
+			nid,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{u.id},
+			#{info},
+			#{isdu},
+			#{nid},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_member_notice SET
+			uid = #{u.id},
+			info = #{info},
+			isdu = #{isdu},
+			nid = #{nid},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_member_notice
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_member_notice SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="MemberNotice">
+		SELECT
+			<include refid="memberNoticeColumns"/>
+		FROM t_member_notice a
+		<include refid="memberNoticeJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>

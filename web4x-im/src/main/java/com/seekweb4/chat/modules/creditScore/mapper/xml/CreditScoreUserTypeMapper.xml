@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.creditScore.mapper.CreditScoreUserTypeMapper">
+
+    <resultMap id="UserTypeResultMap" type="com.seekweb4.chat.modules.creditScore.vo.CreditScoreUserTypeVo">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="idno" property="idno"/>
+        <result column="lianghao" property="lianghao"/>
+        <result column="type" property="type"/>
+        <result column="subtype" property="subtype"/>
+        <result column="current_score" property="currentScore"/>
+        <result column="total_credit_score" property="totalCreditScore"/>
+        <result column="base_score" property="baseScore"/>
+        <result column="max_limit" property="maxLimit"/>
+        <result column="status" property="status"/>
+        <result column="order_num" property="orderNum"/>
+        <result column="constitute_show" property="constituteShow"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="UserType_Columns">
+        t.id,
+        t.user_id,
+        m.idno,
+        m.lianghao,
+        t.type,
+        t.subtype,
+        t.current_score,
+        cfg.score AS base_score,
+        cfg.max_limit,
+        cfg.status,
+        cfg.order_num,
+        cfg.constitute_show,
+        t.update_time,
+        (
+            SELECT d.credit_score
+            FROM t_member_details d
+            WHERE d.user_id = t.user_id
+              AND d.is_deleted = 0
+            ORDER BY d.id DESC
+            LIMIT 1
+        ) AS total_credit_score
+    </sql>
+
+    <select id="selectPageList" resultMap="UserTypeResultMap">
+        SELECT
+            <include refid="UserType_Columns"/>
+        FROM t_member_credit_score_type t
+        LEFT JOIN t_member m ON m.id = t.user_id
+        LEFT JOIN t_credit_score_type_config cfg
+            ON cfg.type = t.type AND cfg.subtype = t.subtype AND cfg.is_deleted = 0
+        <where>
+            t.is_deleted = 0
+            <if test="userId != null and userId != ''">
+                AND t.user_id = #{userId}
+            </if>
+            <if test="idno != null and idno != ''">
+                AND m.idno LIKE CONCAT('%', #{idno}, '%')
+            </if>
+            <if test="lianghao != null and lianghao != ''">
+                AND m.lianghao LIKE CONCAT('%', #{lianghao}, '%')
+            </if>
+            <if test="type != null">
+                AND t.type = #{type}
+            </if>
+            <if test="subtype != null">
+                AND t.subtype = #{subtype}
+            </if>
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            ORDER BY ${orderBy}
+        </if>
+        <if test="orderBy == null or orderBy == ''">
+            ORDER BY t.update_time DESC, t.id DESC
+        </if>
+        <if test="pageNo != null and pageSize != null">
+            LIMIT #{pageNo}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="selectCount" resultType="java.lang.Long">
+        SELECT COUNT(1)
+        FROM t_member_credit_score_type t
+        LEFT JOIN t_member m ON m.id = t.user_id
+        WHERE t.is_deleted = 0
+        <if test="userId != null and userId != ''">
+            AND t.user_id = #{userId}
+        </if>
+        <if test="idno != null and idno != ''">
+            AND m.idno LIKE CONCAT('%', #{idno}, '%')
+        </if>
+        <if test="lianghao != null and lianghao != ''">
+            AND m.lianghao LIKE CONCAT('%', #{lianghao}, '%')
+        </if>
+        <if test="type != null">
+            AND t.type = #{type}
+        </if>
+        <if test="subtype != null">
+            AND t.subtype = #{subtype}
+        </if>
+    </select>
+
+    <select id="selectDetailById" resultMap="UserTypeResultMap">
+        SELECT
+            <include refid="UserType_Columns"/>
+        FROM t_member_credit_score_type t
+        LEFT JOIN t_member m ON m.id = t.user_id
+        LEFT JOIN t_credit_score_type_config cfg
+            ON cfg.type = t.type AND cfg.subtype = t.subtype AND cfg.is_deleted = 0
+        WHERE t.is_deleted = 0
+          AND t.id = #{id}
+        LIMIT 1
+    </select>
+
+</mapper>
+

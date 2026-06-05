@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.WithdrawApply.mapper.WithdrawApplyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.seekweb4.chat.modules.WithdrawApply.entity.WithdrawApply">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="transaction_number" property="transactionNumber"/>
+        <result column="coinId" property="coinId"/>
+        <result column="actual_amount" property="actualAmount"/>
+        <result column="amount" property="amount"/>
+        <result column="rate_amount" property="rateAmount"/>
+        <result column="withdrawal_id" property="withdrawalId"/>
+        <result column="status" property="status"/>
+        <result column="receiving_address" property="receivingAddress"/>
+        <result column="withdrawal_hash" property="withdrawalHash"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        , user_id, transaction_number, coinId, actual_amount, amount,
+        rate_amount, withdrawal_id, status, receiving_address,remark,withdrawal_hash,
+        create_time, update_time, create_by, update_by, is_deleted
+    </sql>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into t_withdraw_apply(id, user_id, transaction_number, coinId, actual_amount, amount,
+                                     rate_amount, withdrawal_id, status, receiving_address,
+                                     create_time, update_time, create_by, update_by)
+        values (#{id}, #{userId}, #{transactionNumber}, #{coinId}, #{actualAmount}, #{amount},
+                #{rateAmount}, #{withdrawalId}, #{status}, #{receivingAddress},
+                #{createTime}, #{updateTime}, #{createBy}, #{updateBy})
+    </insert>
+    <select id="selectByWithdrawalId"
+            resultType="com.seekweb4.chat.modules.WithdrawApply.entity.WithdrawApply" >
+        select
+        <include refid="Base_Column_List"/>
+        from t_withdraw_apply
+        where withdrawal_id = #{withdrawalId} and is_deleted=0 limit 1
+    </select>
+    <select id="selectByTransactionNumber" resultType="com.seekweb4.chat.modules.WithdrawApply.entity.WithdrawApply">
+        select
+        <include refid="Base_Column_List"/>
+        from t_withdraw_apply
+        where transaction_number = #{transactionNumber} and is_deleted=0 limit 1
+    </select>
+
+    <!-- 根据主键选择性更新 -->
+    <update id="updateByPrimaryKeySelective" parameterType="com.seekweb4.chat.modules.WithdrawApply.entity.WithdrawApply">
+        update t_withdraw_apply
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=VARCHAR},
+            </if>
+            <if test="transactionNumber != null">
+                transaction_number = #{transactionNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="coinId != null">
+                coinId = #{coinId,jdbcType=INTEGER},
+            </if>
+            <if test="actualAmount != null">
+                actual_amount = #{actualAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="amount != null">
+                amount = #{amount,jdbcType=DECIMAL},
+            </if>
+            <if test="rateAmount != null">
+                rate_amount = #{rateAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="withdrawalId != null">
+                withdrawal_id = #{withdrawalId,jdbcType=BIGINT},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="receivingAddress != null">
+                receiving_address = #{receivingAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="withdrawalHash != null">
+                withdrawal_hash = #{withdrawalHash,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=VARCHAR},
+            </if>
+            update_time = now()
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+        and is_deleted = 0
+    </update>
+
+    <!-- 更新提现状态 -->
+    <update id="updateStatus">
+        update t_withdraw_apply
+        set
+            status = #{status,jdbcType=INTEGER},
+            update_by = #{updateBy,jdbcType=VARCHAR},
+            update_time = now()
+        where id = #{id,jdbcType=BIGINT}
+          and is_deleted = 0
+    </update>
+
+    <!-- 更新提现状态和外部提现ID -->
+    <update id="updateStatusAndWithdrawalId">
+        update t_withdraw_apply
+        set
+            status = #{status,jdbcType=INTEGER},
+            withdrawal_id = #{withdrawalId,jdbcType=BIGINT},
+            update_by = #{updateBy,jdbcType=VARCHAR},
+            update_time = now()
+        where id = #{id,jdbcType=BIGINT}
+          and is_deleted = 0
+    </update>
+
+    <!-- 后台管理 - 分页查询提现申请 -->
+    <select id="selectAdminPageList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_withdraw_apply
+        <where>
+            is_deleted = 0
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="transactionNumber != null and transactionNumber != ''">
+                and transaction_number like concat('%', #{transactionNumber}, '%')
+            </if>
+            <if test="coinId != null">
+                and coinId = #{coinId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="amountMin != null">
+                and amount >= #{amountMin}
+            </if>
+            <if test="receivingAddress != null and receivingAddress != ''">
+                and receiving_address like concat('%', #{receivingAddress}, '%')
+            </if>
+            <if test="createTimeStart != null">
+                and create_time >= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and create_time &lt;= #{createTimeEnd}
+            </if>
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+        <if test="orderBy == null or orderBy == ''">
+            order by create_time desc
+        </if>
+        <if test="pageNo != null and pageSize != null">
+            limit #{pageNo}, #{pageSize}
+        </if>
+    </select>
+
+    <!-- 后台管理 - 统计提现申请总数 -->
+    <select id="selectAdminCount" resultType="java.lang.Long">
+        select count(1)
+        from t_withdraw_apply
+        <where>
+            is_deleted = 0
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="transactionNumber != null and transactionNumber != ''">
+                and transaction_number like concat('%', #{transactionNumber}, '%')
+            </if>
+            <if test="coinId != null">
+                and coinId = #{coinId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="amountMin != null">
+                and amount >= #{amountMin}
+            </if>
+            <if test="receivingAddress != null and receivingAddress != ''">
+                and receiving_address like concat('%', #{receivingAddress}, '%')
+            </if>
+            <if test="createTimeStart != null">
+                and create_time >= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and create_time &lt;= #{createTimeEnd}
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据状态查询提现申请列表 -->
+    <select id="selectListByStatus" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_withdraw_apply
+        where is_deleted = 0
+        and status = #{status}
+        order by create_time asc
+    </select>
+
+    <!-- 后台管理 - 统计提现金额 -->
+    <select id="selectAdminTotalAmount" resultType="java.math.BigDecimal">
+        select ifnull(sum(amount), 0)
+        from t_withdraw_apply
+        <where>
+            is_deleted = 0
+            and status in (1, 2)
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="transactionNumber != null and transactionNumber != ''">
+                and transaction_number like concat('%', #{transactionNumber}, '%')
+            </if>
+            <if test="coinId != null">
+                and coinId = #{coinId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="receivingAddress != null and receivingAddress != ''">
+                and receiving_address like concat('%', #{receivingAddress}, '%')
+            </if>
+            <if test="createTimeStart != null">
+                and create_time >= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and create_time &lt;= #{createTimeEnd}
+            </if>
+        </where>
+    </select>
+
+    <!-- 后台管理 - 统计手续费 -->
+    <select id="selectAdminTotalFeeAmount" resultType="java.math.BigDecimal">
+        select ifnull(sum(rate_amount), 0)
+        from t_withdraw_apply
+        <where>
+            is_deleted = 0
+            and status in (1, 2)
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="transactionNumber != null and transactionNumber != ''">
+                and transaction_number like concat('%', #{transactionNumber}, '%')
+            </if>
+            <if test="coinId != null">
+                and coinId = #{coinId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="receivingAddress != null and receivingAddress != ''">
+                and receiving_address like concat('%', #{receivingAddress}, '%')
+            </if>
+            <if test="createTimeStart != null">
+                and create_time >= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and create_time &lt;= #{createTimeEnd}
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据主键查询 -->
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_withdraw_apply
+        where id = #{id} and is_deleted = 0
+    </select>
+    <select id="getWithdrawPage" resultType="com.seekweb4.chat.modules.WithdrawApply.entity.WithdrawApply">
+        select   <include refid="Base_Column_List"/>
+        from t_withdraw_apply
+        where is_deleted = 0
+        and user_id=#{userId}
+        order by create_time desc
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="getWithdrawPageCount" resultType="java.lang.Long">
+        select count(1)
+        from t_withdraw_apply
+        where is_deleted = 0
+        and user_id= #{userId}
+        order by create_time desc
+    </select>
+
+    <!-- 查询待同步的提现记录总数 -->
+    <select id="countPendingWithdrawals" resultType="java.lang.Integer">
+        select count(1)
+        from t_withdraw_apply
+        where is_deleted = 0
+        and status in
+        <foreach collection="statusList" item="status" open="(" separator="," close=")">
+            #{status}
+        </foreach>
+    </select>
+
+    <!-- 分页查询待同步的提现记录 -->
+    <select id="selectPendingWithdrawals" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_withdraw_apply
+        where is_deleted = 0
+        and status in
+        <foreach collection="statusList" item="status" open="(" separator="," close=")">
+            #{status}
+        </foreach>
+        order by create_time asc
+        limit #{offset}, #{limit}
+    </select>
+
+
+
+
+</mapper>

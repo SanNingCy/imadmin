@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.sys.mapper.SensitiveWordMapper">
+
+    <sql id="sensitiveWordColumns">
+        a.id AS "id",
+        a.word AS "word",
+        a.create_date AS "createDate",
+        a.update_date AS "updateDate"
+    </sql>
+
+    <sql id="sensitiveWordJoins">
+    </sql>
+
+    <select id="get" resultType="com.seekweb4.chat.modules.sys.entity.SensitiveWord">
+        SELECT
+        <include refid="sensitiveWordColumns"/>
+        FROM t_sensitive_word a
+        <include refid="sensitiveWordJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="com.seekweb4.chat.modules.sys.entity.SensitiveWord">
+        SELECT
+        <include refid="sensitiveWordColumns"/>
+        FROM t_sensitive_word a
+        <include refid="sensitiveWordJoins"/>
+        <where>
+            <if test="word != null and word != ''">
+                AND a.word LIKE concat('%',#{word},'%')
+            </if>
+            ${dataScope}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.create_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="com.seekweb4.chat.modules.sys.entity.SensitiveWord">
+        SELECT
+        <include refid="sensitiveWordColumns"/>
+        FROM t_sensitive_word a
+        <include refid="sensitiveWordJoins"/>
+        <where>
+            <if test="word != null and word != ''">
+                AND a.word LIKE concat('%',#{word},'%')
+            </if>
+            ${dataScope}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.create_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO t_sensitive_word (
+            id,
+            word,
+            create_date,
+            update_date
+        ) VALUES (
+            #{id},
+            #{word},
+            #{createDate},
+            #{updateDate}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE t_sensitive_word SET
+            word = #{word},
+            update_date = #{updateDate}
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete">
+        DELETE FROM t_sensitive_word
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteByLogic">
+        UPDATE t_sensitive_word SET
+            del_flag = #{DEL_FLAG_DELETE}
+        WHERE id = #{id}
+    </update>
+
+    <select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.sys.entity.SensitiveWord">
+        SELECT
+        <include refid="sensitiveWordColumns"/>
+        FROM t_sensitive_word a
+        <include refid="sensitiveWordJoins"/>
+        WHERE a.${propertyName} = #{value}
+    </select>
+
+</mapper>

@@ -1,0 +1,36 @@
+package com.seekweb4.chat.modules.changenamelog.entity;
+
+import com.seekweb4.chat.modules.member.entity.Member;
+
+import com.seekweb4.chat.core.persistence.DataEntity;
+import com.seekweb4.chat.common.utils.excel.annotation.ExcelField;
+import lombok.Data;
+
+/**
+ * 修改昵称记录Entity
+ * @author lixinapp
+ * @version 2024-11-15
+ */
+@Data
+public class ChangeNameLog extends DataEntity<ChangeNameLog> {
+	
+	private static final long serialVersionUID = 1L;
+	@ExcelField(title="用户", fieldType=Member.class, value="u.phone", align=2, sort=1)
+	private Member u;		// 用户
+	@ExcelField(title="旧昵称", align=2, sort=2)
+	private String oldName;		// 旧昵称
+	@ExcelField(title="新名字", align=2, sort=3)
+	private String newName;		// 新名字
+	@ExcelField(title="ip地址", align=2, sort=4)
+	private String ip;		// ip地址
+	@ExcelField(title="城市", align=2, sort=5)
+	private String ipcity;		// 城市
+	
+	public ChangeNameLog() {
+		super();
+	}
+	
+	public ChangeNameLog(String id){
+		super(id);
+	}
+}

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.creditScore.mapper.CreditScoreAvatarDisplayConfigMapper">
+
+    <resultMap id="BaseResultMap" type="com.seekweb4.chat.modules.creditScore.entity.CreditScoreAvatarDisplayConfig">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="new_user_days" property="newUserDays"/>
+        <result column="new_user_days_v2" property="newUserDaysV2"/>
+        <result column="new_in_group_days" property="newInGroupDays"/>
+        <result column="badge_bg_new_user" property="badgeBgNewUser"/>
+        <result column="badge_bg_regular" property="badgeBgRegular"/>
+        <result column="is_lianghao" property="isLianghao"/>
+        <result column="is_vip" property="isVip"/>
+        <result column="new_user_join_days" property="newUserJoinDays"/>
+        <result column="friend_apply_count" property="friendApplyCount"/>
+        <result column="new_user_create_group_days" property="newUserCreateGroupDays"/>
+        <result column="new_user_create_group_member_count" property="newUserCreateGroupMemberCount"/>
+        <result column="create_group_count" property="createGroupCount"/>
+        <result column="login_second_verify_min_pass" property="loginSecondVerifyMinPass"/>
+        <result column="scan_login_check_im_code" property="scanLoginCheckImCode"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, create_time, update_time, create_by, update_by, is_deleted,
+        new_user_days, new_user_days_v2, new_in_group_days, badge_bg_new_user, badge_bg_regular,
+        is_lianghao, is_vip, new_user_join_days, friend_apply_count,
+        new_user_create_group_days, new_user_create_group_member_count, create_group_count,
+        login_second_verify_min_pass, scan_login_check_im_code
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_credit_score_avatar_display_config
+        where id = #{id}
+          and is_deleted = 0
+    </select>
+
+    <select id="selectCurrent" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_credit_score_avatar_display_config
+        where is_deleted = 0
+        order by id desc
+        limit 1
+    </select>
+
+    <!-- 带库 DEFAULT 的列：Java 为 null 时省略，由库写入默认值（与 NOT NULL DEFAULT 一致） -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into t_credit_score_avatar_display_config(
+            create_time, update_time, create_by, update_by, is_deleted,
+            new_user_days, new_user_days_v2, new_in_group_days, badge_bg_new_user, badge_bg_regular,
+            is_lianghao, is_vip
+            <if test="newUserJoinDays != null">, new_user_join_days</if>
+            <if test="friendApplyCount != null">, friend_apply_count</if>
+            <if test="newUserCreateGroupDays != null">, new_user_create_group_days</if>
+            <if test="newUserCreateGroupMemberCount != null">, new_user_create_group_member_count</if>
+            <if test="createGroupCount != null">, create_group_count</if>
+            <if test="loginSecondVerifyMinPass != null">, login_second_verify_min_pass</if>
+            <if test="scanLoginCheckImCode != null">, scan_login_check_im_code</if>
+        ) values (
+            #{createTime}, #{updateTime}, #{createBy}, #{updateBy}, #{isDeleted},
+            #{newUserDays}, #{newUserDaysV2}, #{newInGroupDays}, #{badgeBgNewUser}, #{badgeBgRegular},
+            #{isLianghao}, #{isVip}
+            <if test="newUserJoinDays != null">, #{newUserJoinDays}</if>
+            <if test="friendApplyCount != null">, #{friendApplyCount}</if>
+            <if test="newUserCreateGroupDays != null">, #{newUserCreateGroupDays}</if>
+            <if test="newUserCreateGroupMemberCount != null">, #{newUserCreateGroupMemberCount}</if>
+            <if test="createGroupCount != null">, #{createGroupCount}</if>
+            <if test="loginSecondVerifyMinPass != null">, #{loginSecondVerifyMinPass}</if>
+            <if test="scanLoginCheckImCode != null">, #{scanLoginCheckImCode}</if>
+        )
+    </insert>
+
+    <update id="updateByPrimaryKeySelective"
+            parameterType="com.seekweb4.chat.modules.creditScore.entity.CreditScoreAvatarDisplayConfig">
+        update t_credit_score_avatar_display_config
+        <set>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+            <if test="newUserDays != null">new_user_days = #{newUserDays},</if>
+            <if test="newUserDaysV2 != null">new_user_days_v2 = #{newUserDaysV2},</if>
+            <if test="newInGroupDays != null">new_in_group_days = #{newInGroupDays},</if>
+            <if test="badgeBgNewUser != null">badge_bg_new_user = #{badgeBgNewUser},</if>
+            <if test="badgeBgRegular != null">badge_bg_regular = #{badgeBgRegular},</if>
+            <if test="isLianghao != null">is_lianghao = #{isLianghao},</if>
+            <if test="isVip != null">is_vip = #{isVip},</if>
+            <if test="newUserJoinDays != null">new_user_join_days = #{newUserJoinDays},</if>
+            <if test="friendApplyCount != null">friend_apply_count = #{friendApplyCount},</if>
+            <if test="newUserCreateGroupDays != null">new_user_create_group_days = #{newUserCreateGroupDays},</if>
+            <if test="newUserCreateGroupMemberCount != null">new_user_create_group_member_count = #{newUserCreateGroupMemberCount},</if>
+            <if test="createGroupCount != null">create_group_count = #{createGroupCount},</if>
+            <if test="loginSecondVerifyMinPass != null">login_second_verify_min_pass = #{loginSecondVerifyMinPass},</if>
+            <if test="scanLoginCheckImCode != null">scan_login_check_im_code = #{scanLoginCheckImCode},</if>
+            update_time = #{updateTime}
+        </set>
+        where id = #{id}
+          and is_deleted = 0
+    </update>
+
+    <delete id="deleteByPrimaryKey">
+        delete from t_credit_score_avatar_display_config
+        where id = #{id}
+    </delete>
+
+    <select id="selectAdminPageList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_credit_score_avatar_display_config
+        <where>
+            is_deleted = 0
+            <if test="id != null">
+                and id = #{id}
+            </if>
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+        <if test="orderBy == null or orderBy == ''">
+            order by update_time desc, id desc
+        </if>
+        <if test="pageNo != null and pageSize != null">
+            limit #{pageNo}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="selectAdminCount" resultType="java.lang.Long">
+        select count(1)
+        from t_credit_score_avatar_display_config
+        <where>
+            is_deleted = 0
+            <if test="id != null">
+                and id = #{id}
+            </if>
+        </where>
+    </select>
+
+</mapper>

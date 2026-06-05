@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.group.mapper.GroupMapper">
+
+	<sql id="groupColumns">
+		a.id AS "id",
+		a.uid AS "u.id",
+		a.icon AS "icon",
+		a.name AS "name",
+		a.idno AS "idno",
+		a.qrcode AS "qrcode",
+		a.gonggao AS "gonggao",
+		a.open_qyyq AS "openQyyq",
+		a.open_qyyz AS "openQyyz",
+		a.open_qzhb AS "openQzhb",
+		a.open_qzts AS "openQzts",
+		a.open_qygl AS "openQygl",
+		a.open_qysl AS "openQysl",
+		a.open_qykj AS "openQykj",
+		a.jiange AS "jiange",
+		a.mgc AS "mgc",
+		a.open_gmc AS "openGmc",
+		a.all_jy AS "allJy",
+		a.gtype AS "gtype",
+		a.aikey AS "aikey",
+		a.openpic AS "openpic",
+		a.del_flag AS "delFlag",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+
+		u.nickname AS "u.nickname",
+		u.icon AS "u.icon",
+		u.sex AS "u.sex"
+	</sql>
+
+	<sql id="groupJoins">
+
+		LEFT JOIN t_member u ON u.id = a.uid
+	</sql>
+
+
+	<select id="get" resultType="com.seekweb4.chat.modules.group.entity.Group" >
+		SELECT
+			<include refid="groupColumns"/>
+		FROM t_group a
+		<include refid="groupJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="com.seekweb4.chat.modules.group.entity.Group" >
+		SELECT
+			<include refid="groupColumns"/>
+		FROM t_group a
+		<include refid="groupJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="u != null and u.id != null and u.id != '' and u.id.length() &lt; 50">
+				AND a.uid = #{u.id}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE concat('%',#{name},'%')
+			</if>
+			<if test="idno != null and idno != ''">
+				AND a.idno = #{idno}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="com.seekweb4.chat.modules.group.entity.Group" >
+		SELECT
+			<include refid="groupColumns"/>
+		FROM t_group a
+		<include refid="groupJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_group(
+			id,
+			uid,
+			icon,
+			`name`,
+			idno,
+			qrcode,
+			gonggao,
+			open_qyyq,
+			open_qyyz,
+			open_qzhb,
+			open_qzts,
+			open_qygl,
+			open_qysl,
+			open_qykj,
+			jiange,
+			mgc,
+			open_gmc,
+			all_jy,
+			del_flag,
+			create_date,
+			update_date
+		) VALUES (
+			#{id},
+			#{u.id},
+			#{icon},
+			#{name},
+			#{idno},
+			#{qrcode},
+			#{gonggao},
+			#{openQyyq},
+			#{openQyyz},
+			#{openQzhb},
+			#{openQzts},
+			#{openQygl},
+			#{openQysl},
+			#{openQykj},
+			#{jiange},
+			#{mgc},
+			#{openGmc},
+			#{allJy},
+			#{delFlag},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+
+<!--	<update id="update">-->
+<!--		UPDATE t_group SET-->
+<!--			uid = #{u.id},-->
+<!--			icon = #{icon},-->
+<!--			`name` = #{name},-->
+<!--			idno = #{idno},-->
+<!--			qrcode = #{qrcode},-->
+<!--			gonggao = #{gonggao},-->
+<!--			open_qyyq = #{openQyyq},-->
+<!--			open_qyyz = #{openQyyz},-->
+<!--			open_qzhb = #{openQzhb},-->
+<!--			open_qzts = #{openQzts},-->
+<!--			open_qygl = #{openQygl},-->
+<!--			open_qysl = #{openQysl},-->
+<!--			open_qykj = #{openQykj},-->
+<!--			jiange = #{jiange},-->
+<!--			mgc = #{mgc},-->
+<!--			open_gmc = #{openGmc},-->
+<!--			all_jy = #{allJy},-->
+<!--			gtype = #{gtype},-->
+<!--			aikey = #{aikey},-->
+<!--			openpic = #{openpic},-->
+<!--			update_date = #{updateDate}-->
+<!--		WHERE id = #{id}-->
+<!--	</update>-->
+	<update id="update">
+		UPDATE t_group
+		<set>
+			<if test="u.id != null">uid = #{u.id},</if>
+			<if test="icon != null">icon = #{icon},</if>
+			<if test="name != null">`name` = #{name},</if>
+			<if test="idno != null">idno = #{idno},</if>
+			<if test="qrcode != null">qrcode = #{qrcode},</if>
+			<if test="gonggao != null">gonggao = #{gonggao},</if>
+			<if test="openQyyq != null">open_qyyq = #{openQyyq},</if>
+			<if test="openQyyz != null">open_qyyz = #{openQyyz},</if>
+			<if test="openQzhb != null">open_qzhb = #{openQzhb},</if>
+			<if test="openQzts != null">open_qzts = #{openQzts},</if>
+			<if test="openQygl != null">open_qygl = #{openQygl},</if>
+			<if test="openQysl != null">open_qysl = #{openQysl},</if>
+			<if test="openQykj != null">open_qykj = #{openQykj},</if>
+			<if test="jiange != null">jiange = #{jiange},</if>
+			<if test="mgc != null">mgc = #{mgc},</if>
+			<if test="openGmc != null">open_gmc = #{openGmc},</if>
+			<if test="allJy != null">all_jy = #{allJy},</if>
+			<if test="gtype != null">gtype = #{gtype},</if>
+			<if test="aikey != null">aikey = #{aikey},</if>
+			<if test="openpic != null">openpic = #{openpic},</if>
+			<if test="updateDate != null">update_date = #{updateDate},</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM t_group
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE t_group SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="com.seekweb4.chat.modules.group.entity.Group">
+		SELECT
+			<include refid="groupColumns"/>
+		FROM t_group a
+		<include refid="groupJoins"/>
+		WHERE a.${propertyName} = #{value}
+	</select>
+
+</mapper>
