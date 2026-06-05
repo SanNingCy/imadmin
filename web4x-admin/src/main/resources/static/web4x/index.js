@@ -2,6 +2,20 @@
  * 首页方法封装处理
  * Copyright (c) 2019 web4x
  */
+
+/** 按 href 精确匹配菜单，避免 /withdraw 误展开 /asset/fund/withdraw 等父级 */
+function findMenuByUrl(dataUrl) {
+    if (!dataUrl) {
+        return $();
+    }
+    var decoded = decodeURI(dataUrl);
+    var $exact = $('a.menuItem[href="' + decoded + '"]');
+    if ($exact.length) {
+        return $exact;
+    }
+    return $('a[href="' + decoded + '"]');
+}
+
 var isMobile = false;
 var sidebarHeight = isMobile ? '100%' : '96%';
 
@@ -81,8 +95,8 @@ function openToCurrentTab(obj) {
 
 function syncMenuTab(dataId) {
     if (isLinkage) {
-        var $dataObj = $('a[href$="' + decodeURI(dataId) + '"]');
-        if ($dataObj.attr("class") != null && !$dataObj.hasClass("noactive")) {
+        var $dataObj = findMenuByUrl(dataId);
+        if ($dataObj.length && $dataObj.attr("class") != null && !$dataObj.hasClass("noactive")) {
             $('.tab-pane li').removeClass("active");
             $('.nav ul').removeClass("in");
             $dataObj.parents("ul").addClass("in")
@@ -274,7 +288,10 @@ $(function() {
         isRefresh = $(this).data("refresh"),
         flag = true;
 
-        var $dataObj = $('a[href$="' + decodeURI(dataUrl) + '"]');
+        var $dataObj = findMenuByUrl(dataUrl);
+        if (!$dataObj.length) {
+            $dataObj = $(this);
+        }
         if (!$dataObj.hasClass("noactive")) {
             $('.tab-pane li').removeClass("active");
             $('.nav ul').removeClass("in");
@@ -578,7 +595,7 @@ $(function() {
     window.onhashchange = function() {
         var hash = location.hash;
         var url = hash.substring(1, hash.length);
-        $('a[href$="' + url + '"]').click();
+        findMenuByUrl(url).first().click();
     };
 
     // 右键菜单实现

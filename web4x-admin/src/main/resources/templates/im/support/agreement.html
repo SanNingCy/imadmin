@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('平台协议管理')" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="agreement-form">
+                <div class="select-list">
+                    <ul>
+                        <li>标题：<input type="text" name="title"/></li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-primary single disabled" onclick="imAgreementEditSelected()" shiro:hasPermission="ops:support:agreement:edit">
+                <i class="fa fa-edit"></i> 修改
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<div id="agreement-modal" style="display:none;">
+    <form id="agreement-modal-form" class="form-horizontal" style="padding:15px 20px;">
+        <input type="hidden" id="agreement-id"/>
+        <div class="form-group">
+            <label class="col-sm-3 control-label"><span class="text-danger">*</span> 标题：</label>
+            <div class="col-sm-8"><input type="text" class="form-control" id="agreement-title"/></div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">内容：</label>
+            <div class="col-sm-8"><textarea class="form-control" id="agreement-content" rows="10"></textarea></div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">更新时间：</label>
+            <div class="col-sm-8"><input type="text" class="form-control agreement-datetime" id="agreement-updateDate" placeholder="yyyy-MM-dd HH:mm:ss"/></div>
+        </div>
+    </form>
+</div>
+
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: datetimepicker-js" />
+<script th:src="@{/web4x/js/im-table.js?v=20260605j}"></script>
+<script th:src="@{/web4x/js/im-agreement.js?v=20260605j}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imAgreementInitTable(
+            [[${@permission.isPermitted('ops:support:agreement:view')}]],
+            [[${@permission.isPermitted('ops:support:agreement:edit')}]]
+        );
+    });
+</script>
+</body>
+</html>

@@ -177,8 +177,12 @@ function imInitTable(options) {
         }
         var path = settings.url;
         if (path.indexOf('/member/') > -1 || path.indexOf('/upgrade/') > -1
-            || path.indexOf('/notif/') > -1 || path.indexOf('/group/') > -1
-            || path.indexOf('/friend/') > -1 || path.indexOf('/chatlog/') > -1) {
+            || path.indexOf('/notif/') > -1 || path.indexOf('/agreement/') > -1
+            || path.indexOf('/faq/') > -1 || path.indexOf('/feedback/') > -1
+            || path.indexOf('/reason/') > -1 || path.indexOf('/customer/') > -1
+            || path.indexOf('/buttonConfig/') > -1 || path.indexOf('/admin/asset/') > -1
+            || path.indexOf('/group/') > -1 || path.indexOf('/friend/') > -1
+            || path.indexOf('/chatlog/') > -1) {
             imTableBeforeSend(xhr);
         }
     });
