@@ -23,7 +23,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select distinct r.role_id, r.role_name, r.role_key, r.role_sort, r.data_scope,
             r.status, r.del_flag, r.create_time, r.remark 
         from sys_role_ry r
-	        left join sys_user_ry_role_ry ur on ur.role_id = r.role_id
+	        left join sys_user_role_ry ur on ur.role_id = r.role_id
 	        left join sys_user_ry u on u.user_id = ur.user_id
 	        left join sys_dept d on u.dept_id = d.dept_id
     </sql>

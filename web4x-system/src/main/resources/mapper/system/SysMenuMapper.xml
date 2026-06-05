@@ -32,8 +32,8 @@
 	<select id="selectMenusByUserId" parameterType="Long" resultMap="SysMenuResult">
 		select distinct m.menu_id, m.parent_id, m.menu_name, m.url, m.visible, m.is_refresh, ifnull(m.perms,'') as perms, m.target, m.menu_type, m.icon, m.order_num, m.create_time
 		from sys_menu_ry m
-			 left join sys_role_ry_menu_ry rm on m.menu_id = rm.menu_id
-			 left join sys_user_ry_role_ry ur on rm.role_id = ur.role_id
+			 left join sys_role_menu_ry rm on m.menu_id = rm.menu_id
+			 left join sys_user_role_ry ur on rm.role_id = ur.role_id
 			 LEFT JOIN sys_role_ry ro on ur.role_id = ro.role_id
 		where ur.user_id = #{userId} and m.menu_type in ('M', 'C') and m.visible = 0  AND ro.status = 0
 		order by m.parent_id, m.order_num
@@ -54,8 +54,8 @@
 	<select id="selectMenuAllByUserId" parameterType="Long" resultMap="SysMenuResult">
 		select distinct m.menu_id, m.parent_id, m.menu_name, m.url, m.visible, m.is_refresh, ifnull(m.perms,'') as perms, m.target, m.menu_type, m.icon, m.order_num, m.create_time
 		from sys_menu_ry m
-			 left join sys_role_ry_menu_ry rm on m.menu_id = rm.menu_id
-			 left join sys_user_ry_role_ry ur on rm.role_id = ur.role_id
+			 left join sys_role_menu_ry rm on m.menu_id = rm.menu_id
+			 left join sys_user_role_ry ur on rm.role_id = ur.role_id
 			 LEFT JOIN sys_role_ry ro on ur.role_id = ro.role_id
 		where ur.user_id = #{userId}
 		order by m.parent_id, m.order_num
@@ -64,8 +64,8 @@
 	<select id="selectPermsByUserId" parameterType="Long" resultType="String">
 		select distinct m.perms
 		from sys_menu_ry m
-			 left join sys_role_ry_menu_ry rm on m.menu_id = rm.menu_id
-			 left join sys_user_ry_role_ry ur on rm.role_id = ur.role_id
+			 left join sys_role_menu_ry rm on m.menu_id = rm.menu_id
+			 left join sys_user_role_ry ur on rm.role_id = ur.role_id
 			 left join sys_role_ry r on r.role_id = ur.role_id
 		where m.visible = '0' and r.status = '0' and ur.user_id = #{userId}
 	</select>
@@ -73,14 +73,14 @@
 	<select id="selectPermsByRoleId" parameterType="Long" resultType="String">
 		select distinct m.perms
 		from sys_menu_ry m
-			 left join sys_role_ry_menu_ry rm on m.menu_id = rm.menu_id
+			 left join sys_role_menu_ry rm on m.menu_id = rm.menu_id
 		where m.visible = '0' and rm.role_id = #{roleId}
 	</select>
 
 	<select id="selectMenuTree" parameterType="Long" resultType="String">
 		select concat(m.menu_id, ifnull(m.perms,'')) as perms
 		from sys_menu_ry m
-			left join sys_role_ry_menu_ry rm on m.menu_id = rm.menu_id
+			left join sys_role_menu_ry rm on m.menu_id = rm.menu_id
 		where rm.role_id = #{roleId}
 		order by m.parent_id, m.order_num
 	</select>
@@ -101,8 +101,8 @@
 	<select id="selectMenuListByUserId" parameterType="SysMenu" resultMap="SysMenuResult">
 		select distinct m.menu_id, m.parent_id, m.menu_name, m.url, m.visible, m.is_refresh, ifnull(m.perms,'') as perms, m.target, m.menu_type, m.icon, m.order_num, m.create_time
 		from sys_menu_ry m
-		left join sys_role_ry_menu_ry rm on m.menu_id = rm.menu_id
-		left join sys_user_ry_role_ry ur on rm.role_id = ur.role_id
+		left join sys_role_menu_ry rm on m.menu_id = rm.menu_id
+		left join sys_user_role_ry ur on rm.role_id = ur.role_id
 		LEFT JOIN sys_role_ry ro on ur.role_id = ro.role_id
 		where ur.user_id = #{params.userId}
 		<if test="menuName != null and menuName != ''">
