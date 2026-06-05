@@ -13,8 +13,10 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         <setting name="defaultExecutorType"      value="SIMPLE" />
 		<!-- 指定 MyBatis 所用日志的具体实现 -->
         <setting name="logImpl"                  value="SLF4J"  />
-        <!-- 使用驼峰命名法转换字段 -->
+		<!-- 使用驼峰命名法转换字段 -->
 		<!-- <setting name="mapUnderscoreToCamelCase" value="true"/> -->
 	</settings>
+
+	<!-- IM 分页插件由 MyBatisConfig.setPlugins 显式注册，避免与 MyBatis-Plus 共存时 xml 插件未加载 -->
 	
 </configuration>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('基础平台配置')" />
+    <style>
+        #base-modal .form-group { margin-bottom: 8px; }
+        .base-table-wrap { overflow-x: auto; }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="base-form">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped base-table-wrap">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<div id="base-modal" style="display:none;">
+    <form id="base-modal-form" class="form-horizontal" style="padding:15px 20px;max-height:70vh;overflow-y:auto;">
+        <input type="hidden" id="base-id"/>
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="col-sm-5 control-label">登录方式：</label>
+                    <div class="col-sm-7">
+                        <select class="form-control" id="base-loginType">
+                            <option value="">请选择</option>
+                            <option value="1">设备号登录</option>
+                            <option value="2">用户名密码登录</option>
+                            <option value="3">手机号密码登录</option>
+                            <option value="4">手机号、用户名密码登录</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-5 control-label">密保问题：</label>
+                    <div class="col-sm-7"><select class="form-control base-yesno" id="base-openMibao"></select></div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-5 control-label">红包功能：</label>
+                    <div class="col-sm-7"><select class="form-control base-yesno" id="base-openhb"></select></div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-5 control-label">转账功能：</label>
+                    <div class="col-sm-7"><select class="form-control base-yesno" id="base-openzz"></select></div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-5 control-label">语音通话：</label>
+                    <div class="col-sm-7"><select class="form-control base-yesno" id="base-tonghua"></select></div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-5 control-label">昵称敏感词：</label>
+                    <div class="col-sm-7"><input type="text" class="form-control" id="base-namemgc"/></div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="col-sm-5 control-label">签到红包：</label>
+                    <div class="col-sm-7"><select class="form-control base-yesno" id="base-showsign"></select></div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-5 control-label">我的钱包：</label>
+                    <div class="col-sm-7"><select class="form-control base-yesno" id="base-showqianbao"></select></div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-5 control-label">设备注册数：</label>
+                    <div class="col-sm-7"><input type="number" class="form-control" id="base-eqcount" min="0"/></div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-5 control-label">智能客服key：</label>
+                    <div class="col-sm-7"><input type="text" class="form-control" id="base-aikey"/></div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-5 control-label">文件类型：</label>
+                    <div class="col-sm-7"><input type="text" class="form-control" id="base-filetype" placeholder="多种用|隔开"/></div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-5 control-label">签到方式：</label>
+                    <div class="col-sm-7">
+                        <select class="form-control" id="base-signtype">
+                            <option value="">请选择</option>
+                            <option value="1">随机发放</option>
+                            <option value="2">连签发放</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="col-sm-5 control-label">是否上线：</label>
+                    <div class="col-sm-7"><select class="form-control base-yesno" id="base-line"></select></div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-5 control-label">最多可加人：</label>
+                    <div class="col-sm-7"><input type="number" class="form-control" id="base-maxadd" min="0"/></div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-5 control-label">添加时间：</label>
+                    <div class="col-sm-7"><input type="text" class="form-control" id="base-createDate" readonly/></div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-5 control-label">更新时间：</label>
+                    <div class="col-sm-7"><input type="text" class="form-control" id="base-updateDate" readonly/></div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js?v=20260605k}"></script>
+<script th:src="@{/web4x/js/im-base.js?v=20260605k}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imBaseInitTable(
+            [[${@permission.isPermitted('ops:system:base:view')}]],
+            [[${@permission.isPermitted('ops:system:base:edit')}]]
+        );
+    });
+</script>
+</body>
+</html>

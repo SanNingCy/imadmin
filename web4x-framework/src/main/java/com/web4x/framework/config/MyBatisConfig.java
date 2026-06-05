@@ -7,12 +7,16 @@ import java.util.HashSet;
 import java.util.List;
 import javax.sql.DataSource;
 import org.apache.ibatis.io.VFS;
+import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.boot.autoconfigure.SpringBootVFS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
@@ -32,6 +36,11 @@ import com.web4x.common.utils.StringUtils;
 @Configuration
 public class MyBatisConfig
 {
+    private static final Logger log = LoggerFactory.getLogger(MyBatisConfig.class);
+
+    private static final String IM_PAGINATION_INTERCEPTOR =
+            "com.seekweb4.chat.core.persistence.interceptor.PaginationInterceptor";
+
     @Autowired
     private Environment env;
 
@@ -114,6 +123,7 @@ public class MyBatisConfig
     }
 
     @Bean
+    @Primary
     public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception
     {
         String typeAliasesPackage = resolveTypeAliasesPackage();
@@ -127,7 +137,56 @@ public class MyBatisConfig
         sessionFactory.setTypeAliasesPackage(typeAliasesPackage);
         sessionFactory.setMapperLocations(resolveMapperLocations(StringUtils.split(mapperLocations, ",")));
         sessionFactory.setConfigLocation(new DefaultResourceLoader().getResource(configLocation));
-        return sessionFactory.getObject();
+        Interceptor imPaginationInterceptor = resolveImPaginationInterceptor();
+        if (imPaginationInterceptor != null)
+        {
+            sessionFactory.setPlugins(new Interceptor[] { imPaginationInterceptor });
+        }
+        SqlSessionFactory factory = sessionFactory.getObject();
+        ensureImPaginationInterceptor(factory.getConfiguration());
+        logImInterceptors(factory.getConfiguration());
+        return factory;
+    }
+
+    private Interceptor resolveImPaginationInterceptor()
+    {
+        try
+        {
+            Class<?> clazz = Class.forName(IM_PAGINATION_INTERCEPTOR);
+            return (Interceptor) clazz.getDeclaredConstructor().newInstance();
+        }
+        catch (ReflectiveOperationException ex)
+        {
+            return null;
+        }
+    }
+
+    private void ensureImPaginationInterceptor(org.apache.ibatis.session.Configuration configuration)
+    {
+        boolean hasPagination = configuration.getInterceptors().stream()
+                .anyMatch(interceptor -> IM_PAGINATION_INTERCEPTOR.equals(interceptor.getClass().getName()));
+        if (!hasPagination)
+        {
+            Interceptor interceptor = resolveImPaginationInterceptor();
+            if (interceptor != null)
+            {
+                configuration.addInterceptor(interceptor);
+                log.info("Registered IM PaginationInterceptor on SqlSessionFactory configuration");
+            }
+        }
+    }
+
+    private void logImInterceptors(org.apache.ibatis.session.Configuration configuration)
+    {
+        if (configuration.getInterceptors().isEmpty())
+        {
+            log.warn("SqlSessionFactory has no MyBatis interceptors; IM list pagination will not work");
+            return;
+        }
+        for (Interceptor interceptor : configuration.getInterceptors())
+        {
+            log.info("SqlSessionFactory interceptor: {}", interceptor.getClass().getName());
+        }
     }
 
     /**

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('提现配置')" />
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="withdraw-form">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            状态：
+                            <select name="status">
+                                <option value="">所有</option>
+                                <option value="1">已启用</option>
+                                <option value="0">已关闭</option>
+                            </select>
+                        </li>
+                        <li>最低提现金额：<input type="number" name="minAmount" min="0" step="0.01"/></li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="imWithdrawOpenModal('add')" shiro:hasPermission="ops:system:withdraw:add">
+                <i class="fa fa-plus"></i> 新建
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<div id="withdraw-modal" style="display:none;">
+    <form id="withdraw-modal-form" class="form-horizontal" style="padding:15px 20px;">
+        <input type="hidden" id="withdraw-id"/>
+        <div class="form-group">
+            <label class="col-sm-4 control-label"><span class="text-danger">*</span> 最低提现金额：</label>
+            <div class="col-sm-7"><input type="number" class="form-control" id="withdraw-minAmount" min="0" step="0.01"/></div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label"><span class="text-danger">*</span> 最高提现金额：</label>
+            <div class="col-sm-7"><input type="number" class="form-control" id="withdraw-maxAmount" min="0" step="0.01"/></div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label"><span class="text-danger">*</span> 状态：</label>
+            <div class="col-sm-7">
+                <select class="form-control" id="withdraw-status">
+                    <option value="1">已启用</option>
+                    <option value="0">已关闭</option>
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js?v=20260605k}"></script>
+<script th:src="@{/web4x/js/im-withdraw.js?v=20260605k}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imWithdrawInitTable(
+            [[${@permission.isPermitted('ops:system:withdraw:view')}]],
+            [[${@permission.isPermitted('ops:system:withdraw:edit')}]],
+            [[${@permission.isPermitted('ops:system:withdraw:delete')}]]
+        );
+    });
+</script>
+</body>
+</html>

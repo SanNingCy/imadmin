@@ -6,6 +6,7 @@ import com.seekweb4.chat.core.persistence.Page;
 import com.seekweb4.chat.core.persistence.dialect.Dialect;
 import com.seekweb4.chat.core.persistence.dialect.db.*;
 import com.seekweb4.chat.core.persistence.dialect.db.MySQLDialect;
+import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -24,8 +25,12 @@ import java.util.Properties;
  * 数据库分页插件，只拦截查询语句.
  * @version 2016-8-28
  */
-@Intercepts({@Signature(type = Executor.class, method = "query",
-        args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class})})
+@Intercepts({
+        @Signature(type = Executor.class, method = "query",
+                args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}),
+        @Signature(type = Executor.class, method = "query",
+                args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class})
+})
 public class PaginationInterceptor extends BaseInterceptor {
 
     private static final long serialVersionUID = 1L;
@@ -67,53 +72,42 @@ public class PaginationInterceptor extends BaseInterceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
+        Object[] args = invocation.getArgs();
+        MappedStatement mappedStatement = (MappedStatement) args[0];
+        Object parameter = args[1];
+        BoundSql boundSql = args.length == 6 ? (BoundSql) args[5] : mappedStatement.getBoundSql(parameter);
+        Object parameterObject = boundSql.getParameterObject();
 
-        final MappedStatement mappedStatement = (MappedStatement) invocation.getArgs()[0];
-        
-//        //拦截需要分页的SQL
-////        if (mappedStatement.getId().matches(_SQL_PATTERN)) {
-//        if (StringUtils.indexOfIgnoreCase(mappedStatement.getId(), _SQL_PATTERN) != -1) {
-            Object parameter = invocation.getArgs()[1];
-            BoundSql boundSql = mappedStatement.getBoundSql(parameter);
-            Object parameterObject = boundSql.getParameterObject();
+        Page<Object> page = null;
+        if (parameterObject != null) {
+            page = convertParameter(parameterObject, page);
+        }
 
-            //获取分页参数对象
-            Page<Object> page = null;
-            if (parameterObject != null) {
-                page = convertParameter(parameterObject, page);
+        if (page != null && page.getPageSize() != -1) {
+            if (StringUtils.isBlank(boundSql.getSql())) {
+                return null;
             }
+            String originalSql = boundSql.getSql().trim();
+            Dialect dialect = getDialect();
+            page.setCount(SQLHelper.getCount(originalSql, null, mappedStatement, parameterObject, boundSql, log, dialect));
+            String pageSql = SQLHelper.generatePageSql(originalSql, page, dialect);
 
-            //如果设置了分页对象，则进行分页
-            if (page != null && page.getPageSize() != -1) {
-
-            	if (StringUtils.isBlank(boundSql.getSql())){
-                    return null;
-                }
-                String originalSql = boundSql.getSql().trim();
-
-            	Dialect dialect = getDialect();
-
-                //得到总记录数
-                page.setCount(SQLHelper.getCount(originalSql, null, mappedStatement, parameterObject, boundSql, log, dialect));
-                //分页查询 本地化对象 修改数据库注意修改实现
-                String pageSql = SQLHelper.generatePageSql(originalSql, page, dialect);
-
-//                if (log.isDebugEnabled()) {
-//                    log.debug("PAGE SQL:" + StringUtils.replace(pageSql, "\n", ""));
-//                }
-                invocation.getArgs()[2] = new RowBounds(RowBounds.NO_ROW_OFFSET, RowBounds.NO_ROW_LIMIT);
-                BoundSql newBoundSql = new BoundSql(mappedStatement.getConfiguration(), pageSql, boundSql.getParameterMappings(), boundSql.getParameterObject());
-                //解决MyBatis 分页foreach 参数失效 start
-                if (Reflections.getFieldValue(boundSql, "metaParameters") != null) {
-                    MetaObject mo = (MetaObject) Reflections.getFieldValue(boundSql, "metaParameters");
-                    Reflections.setFieldValue(newBoundSql, "metaParameters", mo);
-                }
-                //解决MyBatis 分页foreach 参数失效 end
-                MappedStatement newMs = copyFromMappedStatement(mappedStatement, new BoundSqlSqlSource(newBoundSql));
-
-                invocation.getArgs()[0] = newMs;
+            RowBounds rowBounds = new RowBounds(RowBounds.NO_ROW_OFFSET, RowBounds.NO_ROW_LIMIT);
+            args[2] = rowBounds;
+            BoundSql newBoundSql = new BoundSql(mappedStatement.getConfiguration(), pageSql,
+                    boundSql.getParameterMappings(), boundSql.getParameterObject());
+            if (Reflections.getFieldValue(boundSql, "metaParameters") != null) {
+                MetaObject mo = (MetaObject) Reflections.getFieldValue(boundSql, "metaParameters");
+                Reflections.setFieldValue(newBoundSql, "metaParameters", mo);
             }
-//        }
+            MappedStatement newMs = copyFromMappedStatement(mappedStatement, new BoundSqlSqlSource(newBoundSql));
+            args[0] = newMs;
+            if (args.length == 6) {
+                args[5] = newBoundSql;
+                Executor executor = (Executor) invocation.getTarget();
+                args[4] = executor.createCacheKey(newMs, parameter, rowBounds, newBoundSql);
+            }
+        }
         return invocation.proceed();
     }
 

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('投诉原因配置')" />
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="reason-form">
+                <div class="select-list">
+                    <ul>
+                        <li>原因：<input type="text" name="title"/></li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="imReasonOpenModal('add')" shiro:hasPermission="ops:support:complaint-reasons:add">
+                <i class="fa fa-plus"></i> 新建
+            </a>
+            <a class="btn btn-primary single disabled" onclick="imReasonEditSelected()" shiro:hasPermission="ops:support:complaint-reasons:edit">
+                <i class="fa fa-edit"></i> 修改
+            </a>
+            <a class="btn btn-danger multiple disabled" onclick="imReasonRemoveSelected()" shiro:hasPermission="ops:support:complaint-reasons:delete">
+                <i class="fa fa-remove"></i> 删除
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<div id="reason-modal" style="display:none;">
+    <form id="reason-modal-form" class="form-horizontal" style="padding:15px 20px;">
+        <input type="hidden" id="reason-id"/>
+        <div class="form-group">
+            <label class="col-sm-3 control-label"><span class="text-danger">*</span> 原因：</label>
+            <div class="col-sm-8"><input type="text" class="form-control" id="reason-title"/></div>
+        </div>
+    </form>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js?v=20260605j}"></script>
+<script th:src="@{/web4x/js/im-reason.js?v=20260605j}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imReasonInitTable(
+            [[${@permission.isPermitted('ops:support:complaint-reasons:view')}]],
+            [[${@permission.isPermitted('ops:support:complaint-reasons:edit')}]],
+            [[${@permission.isPermitted('ops:support:complaint-reasons:delete')}]]
+        );
+    });
+</script>
+</body>
+</html>
