@@ -147,8 +147,8 @@ config:
     aws: #亚马逊S3
       baseDir: file
       region: us-west-1
-      accessKey: AKIAXQ2N3G6SQUVUX45O
-      secretKey: 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
+#      accessKey: AKIAXQ2N3G6SQUVUX45O
+#      secretKey: 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
       endpoint: https://s3.us-west-1.amazonaws.com
       bucketName: us-web4x6
       accessUrl: https://d2ixzsnmawz3gt.cloudfront.net
