@@ -45,7 +45,7 @@
         <include refid="adminWhere"/>
         <choose>
             <when test="orderBy != null and orderBy != ''">order by ${orderBy}</when>
-            <otherwise>order by a.is_top desc, a.top_time desc, a.created_at desc</otherwise>
+            <otherwise>order by a.created_at desc, a.id desc</otherwise>
         </choose>
         <if test="pageNo != null and pageSize != null">limit #{pageNo}, #{pageSize}</if>
     </select>
@@ -80,5 +80,23 @@
             top_time = null,
             updated_at = now()
         where id = #{id}
+    </update>
+
+    <update id="syncLikeCount">
+        update t_piamom_moment m
+        set m.like_count = (
+            select count(1) from t_piamom_moment_like l where l.moment_id = #{id}
+        ),
+            m.updated_at = now()
+        where m.id = #{id}
+    </update>
+
+    <update id="syncCommentCount">
+        update t_piamom_moment m
+        set m.comment_count = (
+            select count(1) from t_piamom_moment_comment c where c.moment_id = #{id}
+        ),
+            m.updated_at = now()
+        where m.id = #{id}
     </update>
 </mapper>

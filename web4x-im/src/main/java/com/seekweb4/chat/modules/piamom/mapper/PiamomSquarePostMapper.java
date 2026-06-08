@@ -32,4 +32,10 @@ public interface PiamomSquarePostMapper extends BaseMapper<PiamomSquarePost> {
 
     /** 举报成立等场景：下架隐藏并取消置顶 */
     int hideByPrimaryKey(@Param("id") Long id);
+
+    /** 按点赞表实际条数重算 like_count */
+    int syncLikeCount(@Param("id") Long id);
+
+    /** 按评论表实际条数重算 comment_count */
+    int syncCommentCount(@Param("id") Long id);
 }

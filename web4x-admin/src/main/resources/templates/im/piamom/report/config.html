@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('举报类型配置')" />
+    <style>
+        .piamom-table-wrap { overflow-x: auto; }
+        #report-config-modal .form-group { margin-bottom: 10px; }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="imPiamomReportConfigOpenModal('add')" shiro:hasPermission="piamom:report:config:add">
+                <i class="fa fa-plus"></i> 新建
+            </a>
+            <a class="btn btn-primary" onclick="$('#bootstrap-table').bootstrapTable('refresh')">
+                <i class="fa fa-refresh"></i> 刷新
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped piamom-table-wrap">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<div id="report-config-modal" style="display:none;padding:15px 20px;">
+    <form id="report-config-modal-form">
+        <input type="hidden" id="report-config-id"/>
+        <div class="form-group">
+            <label>举报类型名称 <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="report-config-reportType"/>
+        </div>
+        <div class="form-group">
+            <label>类型说明</label>
+            <textarea class="form-control" id="report-config-description" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+            <label>状态 <span class="text-danger">*</span></label>
+            <select class="form-control" id="report-config-status">
+                <option value="1">启用</option>
+                <option value="0">停用</option>
+            </select>
+        </div>
+    </form>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js?v=20260605r}"></script>
+<script th:src="@{/web4x/js/im-piamom-common.js?v=20260605r}"></script>
+<script th:src="@{/web4x/js/im-piamom-report-config.js?v=20260605r}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imPiamomReportConfigInitTable(
+            [[${@permission.isPermitted('piamom:report:config:view')}]],
+            [[${@permission.isPermitted('piamom:report:config:edit')}]],
+            [[${@permission.isPermitted('piamom:report:config:delete')}]]
+        );
+    });
+</script>
+</body>
+</html>

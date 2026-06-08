@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('用户主页统计')" />
+    <style>
+        .piamom-table-wrap { overflow-x: auto; }
+        .piamom-drawer-tabs { margin-bottom: 10px; }
+        .piamom-drawer-tabs .tab-pane { padding-top: 10px; }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="piamom-profile-stat-form">
+                <div class="select-list">
+                    <ul>
+                        <li>用户ID：<input type="text" name="userId"/></li>
+                        <li>IDNO：<input type="text" name="userIdno"/></li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped piamom-table-wrap">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<div id="piamom-profile-stat-drawer" style="display:none;padding:10px 15px;">
+    <h4 id="piamom-profile-stat-drawer-title" style="margin-top:0;"></h4>
+    <ul class="nav nav-tabs piamom-drawer-tabs">
+        <li class="active"><a data-toggle="tab" href="#pps-tab-following" onclick="imPiamomProfileStatSwitchTab('following')">关注列表</a></li>
+        <li><a data-toggle="tab" href="#pps-tab-follower" onclick="imPiamomProfileStatSwitchTab('follower')">粉丝列表</a></li>
+        <li><a data-toggle="tab" href="#pps-tab-blacklist" onclick="imPiamomProfileStatSwitchTab('blacklist')">黑名单</a></li>
+        <li><a data-toggle="tab" href="#pps-tab-like" onclick="imPiamomProfileStatSwitchTab('like')">获赞记录</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="pps-tab-following" class="tab-pane active">
+            <div class="select-table table-striped">
+                <table id="pps-following-table"></table>
+            </div>
+        </div>
+        <div id="pps-tab-follower" class="tab-pane">
+            <div class="select-table table-striped">
+                <table id="pps-follower-table"></table>
+            </div>
+        </div>
+        <div id="pps-tab-blacklist" class="tab-pane">
+            <div class="select-table table-striped">
+                <table id="pps-blacklist-table"></table>
+            </div>
+        </div>
+        <div id="pps-tab-like" class="tab-pane">
+            <div class="select-table table-striped">
+                <table id="pps-like-table"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js?v=20260605p}"></script>
+<script th:src="@{/web4x/js/im-piamom-common.js?v=20260605p}"></script>
+<script th:src="@{/web4x/js/im-piamom-profile-stat.js?v=20260605p}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imPiamomProfileStatInitTable(
+            [[${@permission.isPermitted('piamom:profile:stat:view')}]],
+            [[${@permission.isPermitted('piamom:profile:stat:delete')}]]
+        );
+    });
+</script>
+</body>
+</html>

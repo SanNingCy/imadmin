@@ -226,7 +226,8 @@ function imInitTable(options) {
             || path.indexOf('/rechagelog/') > -1
             || path.indexOf('/redPacketTransaction/') > -1
             || path.indexOf('/grouphongbaolog/') > -1
-            || path.indexOf('/signset/') > -1) {
+            || path.indexOf('/signset/') > -1
+            || path.indexOf('/admin/piamom/') > -1) {
             imTableBeforeSend(xhr);
         }
     });

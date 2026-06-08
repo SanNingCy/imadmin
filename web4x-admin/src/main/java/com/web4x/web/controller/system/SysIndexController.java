@@ -6,6 +6,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.web4x.common.config.Web4xConfig;
+import com.web4x.common.condition.ImShiroConditionSupport;
 import com.web4x.common.constant.ShiroConstants;
 import com.web4x.common.core.controller.BaseController;
 import com.web4x.common.core.domain.AjaxResult;
@@ -49,6 +51,9 @@ public class SysIndexController extends BaseController
     @Autowired(required = false)
     private ImSysUserPrincipalBridge imUserBridge;
 
+    @Autowired
+    private Environment environment;
+
     @GetMapping("/index")
     public String index(ModelMap mmap, HttpServletRequest request)
     {
@@ -69,9 +74,9 @@ public class SysIndexController extends BaseController
         mmap.put("mainClass", contentMainClass(footer, tagsView));
         mmap.put("copyrightYear", Web4xConfig.getCopyrightYear());
         mmap.put("demoEnabled", Web4xConfig.isDemoEnabled());
-        boolean imIntegrated = imUserBridge != null;
-        mmap.put("isDefaultModifyPwd", imIntegrated ? false : initPasswordIsModify(user.getPwdUpdateDate()));
-        mmap.put("isPasswordExpired", imIntegrated ? false : passwordIsExpiration(user.getPwdUpdateDate()));
+        boolean skipPwdPrompt = shouldSkipPasswordPrompt();
+        mmap.put("isDefaultModifyPwd", skipPwdPrompt ? false : initPasswordIsModify(user.getPwdUpdateDate()));
+        mmap.put("isPasswordExpired", skipPwdPrompt ? false : passwordIsExpiration(user.getPwdUpdateDate()));
         mmap.put("isMobile", ServletUtils.checkAgentIsMobile(ServletUtils.getRequest().getHeader("User-Agent")));
 
         // 菜单导航显示风格
@@ -179,6 +184,18 @@ public class SysIndexController extends BaseController
     {
         Integer initPasswordModify = Convert.toInt(configService.selectConfigByKey("sys.account.initPasswordModify"));
         return initPasswordModify != null && initPasswordModify == 1 && pwdUpdateDate == null;
+    }
+
+    /**
+     * web4x-admin 集成 IM 时，若依账号仅用于后台登录鉴权，不弹初始/过期改密提示。
+     */
+    private boolean shouldSkipPasswordPrompt()
+    {
+        if (imUserBridge != null)
+        {
+            return true;
+        }
+        return ImShiroConditionSupport.resolveProperty(environment, ImShiroConditionSupport.PROPERTY) != null;
     }
 
     // 检查密码是否过期

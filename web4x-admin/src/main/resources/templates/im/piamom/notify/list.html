@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('互动消息')" />
+    <style>
+        .piamom-table-wrap { overflow-x: auto; }
+        .piamom-detail-table td:first-child { width: 140px; font-weight: 600; background: #f9f9f9; }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="piamom-notify-list-form">
+                <div class="select-list">
+                    <ul>
+                        <li>接收人IDNO：<input type="text" name="receiverIdno"/></li>
+                        <li>触发人IDNO：<input type="text" name="fromUserIdno"/></li>
+                        <li>
+                            消息类型：
+                            <select name="msgType">
+                                <option value="">全部</option>
+                                <option value="moment_like">朋友圈点赞</option>
+                                <option value="moment_comment">朋友圈评论</option>
+                                <option value="square_like">广场点赞</option>
+                                <option value="square_comment">广场评论</option>
+                                <option value="report_takedown_reporter">举报下架(举报人)</option>
+                                <option value="report_takedown_publisher">举报下架(发帖人)</option>
+                            </select>
+                        </li>
+                        <li>
+                            对象类型：
+                            <select name="targetType">
+                                <option value="">全部</option>
+                                <option value="moment">朋友圈</option>
+                                <option value="square">广场</option>
+                                <option value="report">举报</option>
+                            </select>
+                        </li>
+                        <li>
+                            已读：
+                            <select name="isRead">
+                                <option value="">全部</option>
+                                <option value="0">未读</option>
+                                <option value="1">已读</option>
+                            </select>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped piamom-table-wrap">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<div id="piamom-notify-detail-modal" style="display:none;padding:15px 20px;">
+    <table class="table table-bordered piamom-detail-table">
+        <tbody>
+        <tr><td>ID</td><td id="pnd-id"></td></tr>
+        <tr><td>接收人</td><td id="pnd-receiver"></td></tr>
+        <tr><td>触发人</td><td id="pnd-fromUser"></td></tr>
+        <tr><td>消息类型</td><td id="pnd-msgType"></td></tr>
+        <tr><td>对象</td><td id="pnd-target"></td></tr>
+        <tr><td id="pnd-refId-label">关联ID</td><td id="pnd-refId"></td></tr>
+        <tr><td>已读</td><td id="pnd-isRead"></td></tr>
+        <tr><td>内容</td><td id="pnd-content"></td></tr>
+        <tr><td>时间</td><td id="pnd-createdAt"></td></tr>
+        </tbody>
+    </table>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js?v=20260605n}"></script>
+<script th:src="@{/web4x/js/im-piamom-common.js?v=20260605n}"></script>
+<script th:src="@{/web4x/js/im-piamom-notify-list.js?v=20260605n}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imPiamomNotifyListInitTable([[${@permission.isPermitted('piamom:notify:list:view')}]]);
+    });
+</script>
+</body>
+</html>

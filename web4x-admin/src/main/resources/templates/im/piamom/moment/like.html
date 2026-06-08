@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('朋友圈点赞列表')" />
+    <style>.piamom-table-wrap { overflow-x: auto; }</style>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="piamom-moment-like-form">
+                <div class="select-list">
+                    <ul>
+                        <li>记录ID：<input type="text" name="id"/></li>
+                        <li>动态ID：<input type="text" name="momentId"/></li>
+                        <li>IDNO：<input type="text" name="userIdno"/></li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped piamom-table-wrap">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js?v=20260605p}"></script>
+<script th:src="@{/web4x/js/im-piamom-common.js?v=20260605p}"></script>
+<script th:src="@{/web4x/js/im-piamom-moment-like.js?v=20260605p}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imPiamomMomentLikeInitTable([[${@permission.isPermitted('piamom:moment:like:delete')}]]);
+    });
+</script>
+</body>
+</html>

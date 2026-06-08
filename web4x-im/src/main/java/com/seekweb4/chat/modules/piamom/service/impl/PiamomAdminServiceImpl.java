@@ -100,7 +100,16 @@ public class PiamomAdminServiceImpl implements PiamomAdminService {
     @Override
     @Transactional(readOnly = false)
     public boolean momentCommentDelete(Long id) {
-        return momentCommentMapper.deleteByPrimaryKey(id) > 0;
+        PiamomMomentComment comment = momentCommentMapper.selectByPrimaryKey(id);
+        if (comment == null) {
+            return false;
+        }
+        Long momentId = comment.getMomentId();
+        int rows = momentCommentMapper.deleteByPrimaryKey(id);
+        if (rows > 0 && momentId != null) {
+            momentMapper.syncCommentCount(momentId);
+        }
+        return rows > 0;
     }
 
     @Override
@@ -116,7 +125,16 @@ public class PiamomAdminServiceImpl implements PiamomAdminService {
     @Override
     @Transactional(readOnly = false)
     public boolean momentLikeDelete(Long id) {
-        return momentLikeMapper.deleteByPrimaryKey(id) > 0;
+        PiamomMomentLike like = momentLikeMapper.selectByPrimaryKey(id);
+        if (like == null) {
+            return false;
+        }
+        Long momentId = like.getMomentId();
+        int rows = momentLikeMapper.deleteByPrimaryKey(id);
+        if (rows > 0 && momentId != null) {
+            momentMapper.syncLikeCount(momentId);
+        }
+        return rows > 0;
     }
 
     @Override
@@ -172,7 +190,16 @@ public class PiamomAdminServiceImpl implements PiamomAdminService {
     @Override
     @Transactional(readOnly = false)
     public boolean squareCommentDelete(Long id) {
-        return squareCommentMapper.deleteByPrimaryKey(id) > 0;
+        PiamomSquareComment comment = squareCommentMapper.selectByPrimaryKey(id);
+        if (comment == null) {
+            return false;
+        }
+        Long squareId = comment.getSquareId();
+        int rows = squareCommentMapper.deleteByPrimaryKey(id);
+        if (rows > 0 && squareId != null) {
+            squarePostMapper.syncCommentCount(squareId);
+        }
+        return rows > 0;
     }
 
     @Override
@@ -188,7 +215,16 @@ public class PiamomAdminServiceImpl implements PiamomAdminService {
     @Override
     @Transactional(readOnly = false)
     public boolean squareLikeDelete(Long id) {
-        return squareLikeMapper.deleteByPrimaryKey(id) > 0;
+        PiamomSquareLike like = squareLikeMapper.selectByPrimaryKey(id);
+        if (like == null) {
+            return false;
+        }
+        Long squareId = like.getSquareId();
+        int rows = squareLikeMapper.deleteByPrimaryKey(id);
+        if (rows > 0 && squareId != null) {
+            squarePostMapper.syncLikeCount(squareId);
+        }
+        return rows > 0;
     }
 
     @Override
