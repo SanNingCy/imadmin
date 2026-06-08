@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('用户注销申请')" />
+    <style>
+        .cancel-apply-table-wrap { overflow-x: auto; }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="cancel-apply-form">
+                <div class="select-list">
+                    <ul>
+                        <li>设备号：<input type="text" name="eqid"/></li>
+                        <li>账号名：<input type="text" name="acc"/></li>
+                        <li>id号：<input type="text" name="idno"/></li>
+                        <li>
+                            审核状态：
+                            <select name="state">
+                                <option value="">全部</option>
+                                <option value="1">待审核</option>
+                                <option value="2">已通过</option>
+                                <option value="3">已驳回</option>
+                            </select>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped cancel-apply-table-wrap">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<div id="cancel-apply-reject-modal" style="display:none;padding:15px 20px;">
+    <form id="cancel-apply-reject-form" class="form-horizontal">
+        <input type="hidden" id="cancel-apply-reject-id"/>
+        <div class="form-group">
+            <label class="col-sm-3 control-label"><span class="text-danger">*</span> 驳回原因：</label>
+            <div class="col-sm-8">
+                <textarea class="form-control" id="cancel-apply-reject-reason" rows="4" placeholder="请输入驳回原因"></textarea>
+            </div>
+        </div>
+    </form>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js?v=20260605n}"></script>
+<script th:src="@{/web4x/js/im-user-cancel-apply.js?v=20260605n}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imCancelApplyInitTable(
+            [[${@permission.isPermitted('social:user:cancel-apply:approved')}]],
+            [[${@permission.isPermitted('social:user:cancel-apply:reject')}]]
+        );
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('表情包管理')" />
+    <style>
+        .emoji-img { width: 50px; height: 50px; object-fit: cover; margin-right: 6px; border-radius: 4px; }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="emojis-form">
+                <div class="select-list">
+                    <ul>
+                        <li>用户ID：<input type="text" name="uid"/></li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js?v=20260605c}"></script>
+<script th:src="@{/web4x/js/im-content-emojis.js?v=20260605c}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imContentEmojisInitTable();
+    });
+</script>
+</body>
+</html>

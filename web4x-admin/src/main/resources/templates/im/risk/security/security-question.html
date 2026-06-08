@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('用户密保问题')" />
+    <style>
+        .sq-table-wrap { overflow-x: auto; }
+        .sq-table-wrap td.sq-ellipsis,
+        .sq-table-wrap th.sq-ellipsis {
+            max-width: 140px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="security-question-form">
+                <div class="select-list">
+                    <ul>
+                        <li>用户ID号：<input type="text" name="idno"/></li>
+                        <li>靓号：<input type="text" name="lianghao"/></li>
+                        <li>问题：<input type="text" name="title" placeholder="密保问题"/></li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped sq-table-wrap">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<div id="security-question-modal" style="display:none;">
+    <form id="security-question-modal-form" class="form-horizontal" style="padding:15px 20px;">
+        <input type="hidden" id="sq-member-id"/>
+        <input type="hidden" id="sq-idno"/>
+        <div class="form-group">
+            <label class="col-sm-3 control-label"><span class="text-danger">*</span> 问题：</label>
+            <div class="col-sm-8"><input type="text" class="form-control" id="sq-mbname"/></div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label"><span class="text-danger">*</span> 答案：</label>
+            <div class="col-sm-8"><input type="text" class="form-control" id="sq-mbda"/></div>
+        </div>
+    </form>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js?v=20260605k}"></script>
+<script th:src="@{/web4x/js/im-risk-security-question.js?v=20260605k}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imRiskSecurityQuestionInitTable(
+            [[${@permission.isPermitted('risk:security:security-question:view')}]],
+            [[${@permission.isPermitted('risk:security:security-question:edit')}]],
+            [[${@permission.isPermitted('risk:security:security-question:reset')}]]
+        );
+    });
+</script>
+</body>
+</html>

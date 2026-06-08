@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('信用分明细记录')" />
+    <style>
+        .credit-log-table-wrap { overflow-x: auto; }
+        .credit-log-summary {
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border: 1px solid #e7eaec;
+            border-radius: 4px;
+            display: none;
+        }
+        .credit-log-summary .summary-item { margin-right: 24px; display: inline-block; }
+        #credit-log-detail-modal .table th { width: 140px; background: #f5f5f5; }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="credit-log-form">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            类型：
+                            <select name="type" id="credit-log-type"></select>
+                        </li>
+                        <li>idno：<input type="text" name="idno"/></li>
+                        <li>靓号：<input type="text" name="lianghao"/></li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="imCreditLogResetSearch()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-sm-12">
+            <div id="credit-log-summary" class="credit-log-summary">
+                <span class="summary-item">idno：<strong id="credit-log-summary-idno">-</strong></span>
+                <span class="summary-item">靓号：<strong id="credit-log-summary-lianghao">-</strong></span>
+                <span class="summary-item">总信用分：<strong id="credit-log-summary-total">-</strong></span>
+            </div>
+        </div>
+
+        <div class="col-sm-12 select-table table-striped credit-log-table-wrap">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<div id="credit-log-detail-modal" style="display:none;padding:15px 20px;">
+    <table class="table table-bordered">
+        <tbody>
+        <tr><th>类型</th><td id="cld-type"></td></tr>
+        <tr><th>子类型</th><td id="cld-subtype"></td></tr>
+        <tr><th>idno</th><td id="cld-idno"></td></tr>
+        <tr><th>靓号</th><td id="cld-lianghao"></td></tr>
+        <tr><th>总信用分</th><td id="cld-totalCreditScore"></td></tr>
+        <tr><th>变动分数</th><td id="cld-score"></td></tr>
+        <tr><th>描述</th><td id="cld-logDesc"></td></tr>
+        <tr><th>VIP加成率(%)</th><td id="cld-vipBonusRate"></td></tr>
+        <tr><th>靓号加成率(%)</th><td id="cld-lianghaoBonusRate"></td></tr>
+        <tr><th>基础分</th><td id="cld-baseScore"></td></tr>
+        <tr><th>备注</th><td id="cld-remark"></td></tr>
+        <tr><th>用户ID</th><td id="cld-userId"></td></tr>
+        <tr><th>创建时间</th><td id="cld-createTime"></td></tr>
+        </tbody>
+    </table>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js?v=20260605r}"></script>
+<script th:src="@{/web4x/js/im-credit-common.js?v=20260605r}"></script>
+<script th:src="@{/web4x/js/im-credit-log.js?v=20260605r}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imCreditLogInitTable([[${@permission.isPermitted('social:credit:detailed-records:view')}]]);
+    });
+</script>
+</body>
+</html>

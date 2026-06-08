@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('账户变更日志')" />
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="account-change-form">
+                <div class="select-list">
+                    <ul>
+                        <li>用户id号：<input type="text" name="uidno"/></li>
+                        <li>
+                            修改类型：
+                            <select name="changeType">
+                                <option value="">全部</option>
+                                <option value="nickname">修改昵称</option>
+                                <option value="password">修改密码</option>
+                                <option value="phone">修改手机号</option>
+                                <option value="paypwd">修改支付密码</option>
+                            </select>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js?v=20260605s}"></script>
+<script th:src="@{/web4x/js/im-security-account-change-logs.js?v=20260605s}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imSecurityAccountChangeInitTable();
+    });
+</script>
+</body>
+</html>

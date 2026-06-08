@@ -28,6 +28,21 @@ function imBaseSignType(val) {
     return map[String(val)] || "-";
 }
 
+function imBaseEscapeHtml(text) {
+    return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+}
+
+function imBaseFormatEllipsis(val) {
+    if (val == null || val === "") return "-";
+    var text = String(val);
+    var safe = imBaseEscapeHtml(text);
+    return '<span class="base-ellipsis-inner" title="' + safe + '">' + safe + "</span>";
+}
+
 function imBaseResolveEntity(res, key) {
     if (!res) return {};
     if (res[key]) return res[key];
@@ -219,18 +234,18 @@ function imBaseInitTable(canView, canEdit) {
         responseHandler: imPageResponse,
         modalName: "基础配置",
         columns: [
-            { field: "loginType", title: "登录方式", sortable: true, formatter: function (v) { return imBaseLoginType(v); } },
+            { field: "loginType", title: "登录方式", sortable: true, width: 140, class: "base-ellipsis", formatter: function (v) { return imBaseFormatEllipsis(imBaseLoginType(v)); } },
             { field: "openMibao", title: "密保问题", sortable: true, formatter: imBaseYesNo },
             { field: "openhb", title: "红包功能", sortable: true, formatter: imBaseYesNo },
             { field: "openzz", title: "转账功能", sortable: true, formatter: imBaseYesNo },
             { field: "tonghua", title: "语音通话", sortable: true, formatter: imBaseYesNo },
-            { field: "namemgc", title: "昵称敏感词", sortable: true },
+            { field: "namemgc", title: "昵称敏感词", sortable: true, width: 160, class: "base-ellipsis", formatter: imBaseFormatEllipsis },
             { field: "showsign", title: "签到红包", sortable: true, formatter: imBaseYesNo },
             { field: "showqianbao", title: "我的钱包", sortable: true, formatter: imBaseYesNo },
             { field: "eqcount", title: "设备注册数", sortable: true },
-            { field: "aikey", title: "智能客服key", sortable: true },
-            { field: "filetype", title: "文件类型", sortable: true },
-            { field: "signtype", title: "签到方式", sortable: true, formatter: imBaseSignType },
+            { field: "aikey", title: "智能客服key", sortable: true, width: 160, class: "base-ellipsis", formatter: imBaseFormatEllipsis },
+            { field: "filetype", title: "文件类型", sortable: true, width: 160, class: "base-ellipsis", formatter: imBaseFormatEllipsis },
+            { field: "signtype", title: "签到方式", sortable: true, width: 120, class: "base-ellipsis", formatter: function (v) { return imBaseFormatEllipsis(imBaseSignType(v)); } },
             { field: "line", title: "是否上线", sortable: true, formatter: imBaseYesNo },
             { field: "maxadd", title: "最多可加人", sortable: true },
             { field: "createDate", title: "添加时间", sortable: true },

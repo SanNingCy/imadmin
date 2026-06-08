@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('用户信用分管理')" />
+    <style>
+        .credit-mgmt-table-wrap { overflow-x: auto; }
+        .credit-type-tag { margin-bottom: 4px; }
+        .credit-type-tag .label { margin-right: 4px; }
+        #credit-mgmt-detail-modal .table th { width: 120px; background: #f5f5f5; }
+        #credit-mgmt-detail-types-wrap { margin-top: 12px; }
+        #credit-mgmt-score-modal .form-group { margin-bottom: 12px; }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="credit-mgmt-form">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            类型：
+                            <select name="type" id="credit-mgmt-type"></select>
+                        </li>
+                        <li>idno：<input type="text" name="idno"/></li>
+                        <li>靓号：<input type="text" name="lianghao"/></li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-sm-12 select-table table-striped credit-mgmt-table-wrap">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<div id="credit-mgmt-detail-modal" style="display:none;padding:15px 20px;max-height:70vh;overflow-y:auto;">
+    <table class="table table-bordered">
+        <tbody>
+        <tr><th>idno</th><td id="cmd-idno"></td></tr>
+        <tr><th>靓号</th><td id="cmd-lianghao"></td></tr>
+        <tr><th>总信用分</th><td id="cmd-totalCreditScore"></td></tr>
+        <tr><th>信用分状态</th><td id="cmd-creditStatus"></td></tr>
+        <tr><th>用户ID</th><td id="cmd-userId"></td></tr>
+        </tbody>
+    </table>
+    <div id="credit-mgmt-detail-types-wrap">
+        <h5>类型累计分</h5>
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>类型</th>
+                <th>子类型</th>
+                <th>当前分</th>
+                <th>基础分</th>
+                <th>上限</th>
+                <th>状态</th>
+                <th>构成展示</th>
+                <th>更新时间</th>
+            </tr>
+            </thead>
+            <tbody id="credit-mgmt-detail-types-body"></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="credit-mgmt-score-modal" style="display:none;padding:15px 20px;">
+    <form id="credit-mgmt-score-form" class="form-horizontal">
+        <input type="hidden" id="credit-mgmt-score-userId"/>
+        <input type="hidden" id="credit-mgmt-score-mode"/>
+        <div class="form-group">
+            <label class="col-sm-3 control-label"><span class="text-danger">*</span> 类型：</label>
+            <div class="col-sm-8">
+                <select class="form-control" id="credit-mgmt-score-type"></select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label"><span class="text-danger">*</span> 分数：</label>
+            <div class="col-sm-8">
+                <input type="number" class="form-control" id="credit-mgmt-score-value" min="0" step="0.01"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">描述：</label>
+            <div class="col-sm-8">
+                <textarea class="form-control" id="credit-mgmt-score-desc" rows="3" maxlength="500" placeholder="type=5(平台贡献)时必填"></textarea>
+            </div>
+        </div>
+    </form>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js?v=20260605t}"></script>
+<script th:src="@{/web4x/js/im-credit-common.js?v=20260605t}"></script>
+<script th:src="@{/web4x/js/im-credit-management.js?v=20260605t}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imCreditMgmtInitTable(
+            [[${@permission.isPermitted('social:credit:management:view')}]],
+            [[${@permission.isPermitted('social:credit:management:edit')}]]
+        );
+    });
+</script>
+</body>
+</html>

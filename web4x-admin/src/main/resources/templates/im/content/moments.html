@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('朋友圈动态管理')" />
+    <style>
+        .moment-media-img { width: 50px; height: 50px; object-fit: cover; margin: 2px; border-radius: 4px; cursor: pointer; }
+        .moment-table-wrap { overflow-x: auto; }
+        .moment-table-wrap td.moment-ellipsis,
+        .moment-table-wrap th.moment-ellipsis {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="moments-form">
+                <div class="select-list">
+                    <ul>
+                        <li>用户IDNO：<input type="text" name="idno"/></li>
+                        <li>靓号：<input type="text" name="lianghao"/></li>
+                        <li>内容：<input type="text" name="info"/></li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped moment-table-wrap">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<div id="moment-video-modal" style="display:none;padding:10px;">
+    <video id="moment-video-player" controls autoplay style="width:100%;max-height:480px;"></video>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js?v=20260605c}"></script>
+<script th:src="@{/web4x/js/im-content-moments.js?v=20260605c}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imContentMomentsInitTable(
+            [[${@permission.isPermitted('social:content:moments:view')}]],
+            [[${@permission.isPermitted('social:content:moments:delete')}]]
+        );
+    });
+</script>
+</body>
+</html>

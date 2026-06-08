@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+<head>
+
+    <th:block th:include="include :: header('用户列表')" />
+
+    <style>
+
+        .user-list-table-wrap { overflow-x: auto; }
+
+        .user-list-img { width: 40px; height: 40px; object-fit: cover; margin-right: 4px; border-radius: 4px; }
+
+        .user-list-copy { cursor: pointer; color: #1ab394; }
+
+        /* 长文本列：限制宽度 + 省略号，避免设备号等撑破表格 */
+        .user-list-table-wrap td.user-list-ellipsis,
+        .user-list-table-wrap th.user-list-ellipsis {
+            max-width: 160px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .user-list-table-wrap td.user-list-ellipsis .user-list-ellipsis-inner {
+            display: inline-block;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: bottom;
+        }
+
+        .ul-image-upload { display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+        .ul-image-preview {
+            position: relative;
+            width: 104px;
+            height: 104px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            overflow: hidden;
+            display: none;
+        }
+        .ul-image-preview.has-image { display: block; }
+        .ul-image-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .ul-image-preview .ul-image-remove {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 18px;
+            height: 18px;
+            line-height: 16px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.45);
+            color: #fff;
+            border-radius: 50%;
+            font-size: 12px;
+        }
+        .ul-image-add {
+            width: 104px;
+            height: 104px;
+            margin: 0;
+            border: 1px dashed #d9d9d9;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 28px;
+            color: #999;
+            background: #fafafa;
+        }
+        .ul-image-add.disabled { cursor: not-allowed; opacity: 0.6; }
+        .ul-image-add input { display: none; }
+
+    </style>
+
+</head>
+
+<body class="gray-bg">
+
+<div class="container-div">
+
+    <div class="row">
+
+        <div class="col-sm-12 search-collapse">
+
+            <form id="user-list-form">
+
+                <div class="select-list">
+
+                    <ul>
+
+                        <li>地区：<input type="text" name="city"/></li>
+
+                        <li>设备号：<input type="text" name="eqno"/></li>
+
+                        <li>idno：<input type="text" name="idno"/></li>
+
+                        <li>账户名：<input type="text" name="acount"/></li>
+
+                        <li>昵称：<input type="text" name="nickname"/></li>
+
+                        <li>靓号：<input type="text" name="lianghao"/></li>
+
+                        <li>
+
+                            是否会员：
+
+                            <select name="isvip">
+
+                                <option value="">全部</option>
+
+                                <option value="1">是</option>
+
+                                <option value="0">否</option>
+
+                            </select>
+
+                        </li>
+
+                        <li>
+
+                            状态：
+
+                            <select name="state">
+
+                                <option value="">全部</option>
+
+                                <option value="0">正常</option>
+
+                                <option value="1">永久封禁</option>
+
+                            </select>
+
+                        </li>
+
+                        <li>
+
+                            是否内部号：
+
+                            <select name="isneibu">
+
+                                <option value="">全部</option>
+
+                                <option value="1">是</option>
+
+                                <option value="0">否</option>
+
+                            </select>
+
+                        </li>
+
+                        <li>注册开始：<input type="text" name="beginCreateDate" placeholder="YYYY-MM-DD HH:mm:ss"/></li>
+
+                        <li>注册结束：<input type="text" name="endCreateDate" placeholder="YYYY-MM-DD HH:mm:ss"/></li>
+
+                        <li>未登录天数：<input type="number" name="inactiveDays" min="0" step="1"/></li>
+
+                        <li>
+
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            </form>
+
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+
+            <a class="btn btn-danger multiple disabled" onclick="imUserListBatchDelete()" shiro:hasPermission="social:user:list:delete">
+
+                <i class="fa fa-remove"></i> 批量删除
+
+            </a>
+
+        </div>
+
+        <div class="col-sm-12 select-table table-striped user-list-table-wrap">
+
+            <table id="bootstrap-table"></table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- 查看/修改用户 -->
+
+<div id="user-list-member-modal" style="display:none;padding:15px 20px;max-height:70vh;overflow-y:auto;">
+
+    <form id="user-list-member-form" class="form-horizontal">
+
+        <input type="hidden" id="user-list-member-id"/>
+
+        <div class="row">
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+
+                    <label class="col-sm-4 control-label">设备号：</label>
+
+                    <div class="col-sm-8"><input type="text" class="form-control" id="ul-eqno"/></div>
+
+                </div>
+
+            </div>
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+
+                    <label class="col-sm-4 control-label">idno：</label>
+
+                    <div class="col-sm-8"><input type="text" class="form-control" id="ul-idno" readonly/></div>
+
+                </div>
+
+            </div>
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+
+                    <label class="col-sm-4 control-label">昵称：</label>
+
+                    <div class="col-sm-8"><input type="text" class="form-control" id="ul-nickname"/></div>
+
+                </div>
+
+            </div>
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+
+                    <label class="col-sm-4 control-label">性别：</label>
+
+                    <div class="col-sm-8">
+
+                        <select class="form-control" id="ul-sex">
+
+                            <option value="">请选择</option>
+
+                            <option value="1">男</option>
+
+                            <option value="2">女</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+
+                    <label class="col-sm-4 control-label">状态：</label>
+
+                    <div class="col-sm-8">
+
+                        <select class="form-control" id="ul-state">
+
+                            <option value="0">正常</option>
+
+                            <option value="1">永久封禁</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+
+                    <label class="col-sm-4 control-label">余额：</label>
+
+                    <div class="col-sm-8"><input type="text" class="form-control" id="ul-balance" readonly/></div>
+
+                </div>
+
+            </div>
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+
+                    <label class="col-sm-4 control-label">是否会员：</label>
+
+                    <div class="col-sm-8">
+
+                        <select class="form-control" id="ul-isvip">
+
+                            <option value="0">否</option>
+
+                            <option value="1">是</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+
+                    <label class="col-sm-4 control-label">会员到期：</label>
+
+                    <div class="col-sm-8"><input type="text" class="form-control" id="ul-viptime" placeholder="yyyy-MM-dd HH:mm:ss"/></div>
+
+                </div>
+
+            </div>
+
+            <div class="col-sm-12">
+
+                <div class="form-group">
+
+                    <label class="col-sm-2 control-label">签名：</label>
+
+                    <div class="col-sm-10"><input type="text" class="form-control" id="ul-sign"/></div>
+
+                </div>
+
+            </div>
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+
+                    <label class="col-sm-4 control-label"><span class="text-danger">*</span> 头像：</label>
+
+                    <div class="col-sm-8">
+                        <input type="hidden" id="ul-icon"/>
+                        <div class="ul-image-upload">
+                            <div class="ul-image-preview" id="ul-icon-preview"></div>
+                            <label class="ul-image-add" id="ul-icon-add-btn">
+                                <input type="file" accept="image/*" onchange="imUserListUploadImage('icon', this)"/>
+                                <span>+</span>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+
+                    <label class="col-sm-4 control-label"><span class="text-danger">*</span> 名片二维码：</label>
+
+                    <div class="col-sm-8">
+                        <input type="hidden" id="ul-qrcode"/>
+                        <div class="ul-image-upload">
+                            <div class="ul-image-preview" id="ul-qrcode-preview"></div>
+                            <label class="ul-image-add" id="ul-qrcode-add-btn">
+                                <input type="file" accept="image/*" onchange="imUserListUploadImage('qrcode', this)"/>
+                                <span>+</span>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+
+                    <label class="col-sm-4 control-label">密保问题：</label>
+
+                    <div class="col-sm-8"><input type="text" class="form-control" id="ul-mbname"/></div>
+
+                </div>
+
+            </div>
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+
+                    <label class="col-sm-4 control-label">密保答案：</label>
+
+                    <div class="col-sm-8"><input type="text" class="form-control" id="ul-mbda"/></div>
+
+                </div>
+
+            </div>
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+
+                    <label class="col-sm-4 control-label">设备 id：</label>
+
+                    <div class="col-sm-8"><input type="text" class="form-control" id="ul-eqid"/></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+
+<!-- 变更余额 -->
+
+<div id="user-list-balance-modal" style="display:none;padding:15px 20px;">
+
+    <form id="user-list-balance-form" class="form-horizontal">
+
+        <input type="hidden" id="user-list-balance-id"/>
+
+        <div class="form-group">
+
+            <label class="col-sm-3 control-label"><span class="text-danger">*</span> 类型：</label>
+
+            <div class="col-sm-8">
+
+                <select class="form-control" id="ul-btype">
+
+                    <option value="">请选择</option>
+
+                    <option value="1">增加</option>
+
+                    <option value="0">扣减</option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+        <div class="form-group">
+
+            <label class="col-sm-3 control-label"><span class="text-danger">*</span> 金额：</label>
+
+            <div class="col-sm-8"><input type="number" class="form-control" id="ul-money" min="0" step="0.01"/></div>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+
+<th:block th:include="include :: footer" />
+
+<script th:src="@{/web4x/js/im-table.js?v=20260605q}"></script>
+
+<script th:src="@{/web4x/js/im-user-list.js?v=20260605q}"></script>
+
+<script th:inline="javascript">
+
+    $(function () {
+
+        imUserListInitTable(
+
+            [[${@permission.isPermitted('social:user:list:view')}]],
+
+            [[${@permission.isPermitted('social:user:list:edit')}]],
+
+            [[${@permission.isPermitted('social:user:list:delete')}]],
+
+            [[${@permission.isPermitted('social:user:list:ChangeBalance')}]],
+
+            [[${@permission.isPermitted('social:user:list:transaction')}]],
+
+            [[${@permission.isPermitted('social:user:list:clear')}]]
+
+        );
+
+    });
+
+</script>
+
+</body>
+
+</html>
+

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('封禁记录查询')" />
+    <style>
+        .ban-log-table-wrap { overflow-x: auto; }
+        .ban-log-avatar { width: 40px; height: 40px; object-fit: cover; margin-right: 4px; border-radius: 4px; }
+        .ban-log-table-wrap td.ban-log-ellipsis,
+        .ban-log-table-wrap th.ban-log-ellipsis {
+            max-width: 160px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="ban-logs-form">
+                <div class="select-list">
+                    <ul>
+                        <li>账号：<input type="text" name="phone"/></li>
+                        <li>账户名：<input type="text" name="acount"/></li>
+                        <li>id号：<input type="text" name="idno"/></li>
+                        <li>昵称：<input type="text" name="nickname"/></li>
+                        <li>注册开始：<input type="text" name="beginCreateDate" placeholder="YYYY-MM-DD HH:mm:ss"/></li>
+                        <li>注册结束：<input type="text" name="endCreateDate" placeholder="YYYY-MM-DD HH:mm:ss"/></li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-danger multiple disabled" onclick="imRiskBanLogsBatchFeng()" shiro:hasPermission="risk:security:ban-logs:ban">
+                <i class="fa fa-ban"></i> 批量封禁
+            </a>
+            <a class="btn btn-warning multiple disabled" onclick="imRiskBanLogsBatchJie()" shiro:hasPermission="risk:security:ban-logs:unban">
+                <i class="fa fa-unlock"></i> 批量解封
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped ban-log-table-wrap">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js?v=20260605k}"></script>
+<script th:src="@{/web4x/js/im-risk-ban-logs.js?v=20260605k}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imRiskBanLogsInitTable(
+            [[${@permission.isPermitted('risk:security:ban-logs:ban')}]],
+            [[${@permission.isPermitted('risk:security:ban-logs:unban')}]]
+        );
+    });
+</script>
+</body>
+</html>
