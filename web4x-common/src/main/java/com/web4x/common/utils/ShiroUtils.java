@@ -58,11 +58,26 @@ public class ShiroUtils
     public static void setSysUser(SysUser user)
     {
         Subject subject = getSubject();
+        releaseRunAs();
+        if (principalBridge != null && principalBridge.isActive())
+        {
+            principalBridge.onSessionUserUpdated(user);
+            return;
+        }
         PrincipalCollection principalCollection = subject.getPrincipals();
         String realmName = principalCollection.getRealmNames().iterator().next();
         PrincipalCollection newPrincipalCollection = new SimplePrincipalCollection(user, realmName);
-        // 重新加载Principal
         subject.runAs(newPrincipalCollection);
+    }
+
+    /** IM 模式下 runAs 会把 JWT 换成 SysUser，导致 kickout 等过滤器 ClassCastException */
+    public static void releaseRunAs()
+    {
+        Subject subject = getSubject();
+        if (subject != null && subject.isRunAs())
+        {
+            subject.releaseRunAs();
+        }
     }
 
     public static Long getUserId()

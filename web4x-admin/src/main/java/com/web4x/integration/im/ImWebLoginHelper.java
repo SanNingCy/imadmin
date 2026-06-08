@@ -40,6 +40,7 @@ public class ImWebLoginHelper
             Subject subject = UserUtils.getSubject();
             if (subject != null && subject.getPrincipal() != null)
             {
+                com.web4x.common.utils.ShiroUtils.releaseRunAs();
                 try
                 {
                     UserUtils.clearCache();

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('签到奖励配置')" />
+    <style>
+        .signset-page tr.detail-view > td {
+            text-align: left !important;
+        }
+        .signset-detail-wrap {
+            padding: 10px 15px;
+            text-align: left;
+        }
+        .signset-detail-toolbar {
+            margin-bottom: 10px;
+            text-align: left;
+        }
+        .signset-detail-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .signset-detail-table th,
+        .signset-detail-table td {
+            border: 1px solid #e7eaec;
+            padding: 8px 12px;
+            text-align: center;
+        }
+        .signset-detail-table th {
+            background: #f5f5f5;
+        }
+        .signset-page .bootstrap-table .table-hover > tbody > tr.detail-view > td,
+        .signset-page .bootstrap-table .table-hover > tbody > tr.detail-view.hover > td {
+            background-color: #fff !important;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="container-div signset-page">
+    <div class="row">
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<div id="signset-main-modal" style="display:none;">
+    <form id="signset-main-modal-form" class="form-horizontal" style="padding:15px 20px;">
+        <input type="hidden" id="signset-id"/>
+        <div class="form-group">
+            <label class="col-sm-4 control-label"><span class="text-danger">*</span> 最低奖励金额：</label>
+            <div class="col-sm-7"><input type="text" class="form-control" id="signset-min"/></div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label"><span class="text-danger">*</span> 最高奖励金额：</label>
+            <div class="col-sm-7"><input type="text" class="form-control" id="signset-max"/></div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label"><span class="text-danger">*</span> 连签每日金额：</label>
+            <div class="col-sm-7"><input type="text" class="form-control" id="signset-daymoney"/></div>
+        </div>
+    </form>
+</div>
+
+<div id="signset-item-modal" style="display:none;">
+    <form id="signset-item-modal-form" class="form-horizontal" style="padding:15px 20px;">
+        <input type="hidden" id="signset-item-id"/>
+        <input type="hidden" id="signset-item-sid"/>
+        <div class="form-group">
+            <label class="col-sm-4 control-label"><span class="text-danger">*</span> 连签天数：</label>
+            <div class="col-sm-7"><input type="text" class="form-control" id="signset-item-day"/></div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label"><span class="text-danger">*</span> 追加金额：</label>
+            <div class="col-sm-7"><input type="text" class="form-control" id="signset-item-money"/></div>
+        </div>
+    </form>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js}"></script>
+<script th:src="@{/web4x/js/im-signin-reward.js}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imSignSetInitTable(
+            [[${@permission.isPermitted('asset:rate:signin-reward:view')}]],
+            [[${@permission.isPermitted('asset:rate:signin-reward:edit')}]]
+        );
+    });
+</script>
+</body>
+</html>

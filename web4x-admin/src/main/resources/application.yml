@@ -1,6 +1,9 @@
 spring:
   profiles:
     active: dev
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
 #    active: env82
 # thymeleaf静态资源配置
 # 默认路径
@@ -111,5 +114,5 @@ withdrawal:
   # 提现手动审核时允许验签的 BSC 钱包地址（预留，配置后仅该地址签名可通过）
   auditWalletAddress: 0x74e67668E1f02286E6208f90afb3499892C6b120
 
-# ----- web4x 若依集成（仅追加，勿改上文 IM 配置）-----
-im.shiro.enabled: true
+# web4x admin: use Ruoyi Shiro + sys_user_ry (set true only for IM JWT login)
+im.shiro.enabled: false

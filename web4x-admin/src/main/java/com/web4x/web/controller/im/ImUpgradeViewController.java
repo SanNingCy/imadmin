@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * 注意：仅负责渲染页面
  */
 @Controller
-@RequestMapping("/im/upgrade")
+@RequestMapping({"/im/upgrade", "/upgrade/upgrade"})
 public class ImUpgradeViewController {
 
     private static final String VIEW_NAME = "im/upgrade/upgrade";

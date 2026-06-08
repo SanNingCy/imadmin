@@ -174,7 +174,7 @@ public class Web4xIntegrationEnvironmentPostProcessor implements EnvironmentPost
 
     private static void fillRuoyiDefaultsIfMissing(ConfigurableEnvironment environment, Map<String, Object> target)
     {
-        putDefaultIfMissing(target, environment, "im.shiro.enabled", "true");
+        putDefaultIfMissing(target, environment, "im.shiro.enabled", "false");
         putDefaultIfMissing(target, environment, "user.password.maxRetryCount", "5");
         putDefaultIfMissing(target, environment, "shiro.user.loginUrl", "/login");
         putDefaultIfMissing(target, environment, "shiro.user.unauthorizedUrl", "/unauth");

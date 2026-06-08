@@ -18,8 +18,12 @@ import com.web4x.common.core.domain.entity.SysMenu;
 import com.web4x.common.core.domain.entity.SysUser;
 
 /**
- * 若依首页侧栏菜单：与 IM 后台相同树形（{@link MenuUtils#getMenus()} / treeData2）。
+ * 历史桥接：从 IM {@code sys_menu_two} 构建侧栏树。
+ * 当前若依页面侧栏使用 {@code sys_menu_ry}，请用 {@link SysMenuViewSupport}。
+ *
+ * @deprecated 侧栏菜单已改读 {@code sys_menu_ry}，保留仅供 IM API 或其他调用方参考。
  */
+@Deprecated
 @Component
 @Conditional(ImShiroEnabledCondition.class)
 public class ImMenuTreeBridge
@@ -28,7 +32,11 @@ public class ImMenuTreeBridge
 
     public List<SysMenu> selectMenusForUser(SysUser user)
     {
-        List<Menu> imRoots = buildImMenuTree(UserUtils.getMenuList());
+        List<Menu> imRoots = MenuUtils.getMenus();
+        if (imRoots == null || imRoots.isEmpty())
+        {
+            return new ArrayList<>();
+        }
         List<SysMenu> menus = new ArrayList<>();
         for (Menu imRoot : imRoots)
         {
@@ -95,10 +103,7 @@ public class ImMenuTreeBridge
                 children.add(convertTree(child));
             }
             menu.setChildren(children);
-            if (StringUtils.isBlank(im.getPath()))
-            {
-                menu.setUrl("#");
-            }
+            menu.setUrl("#");
         }
         return menu;
     }
@@ -118,8 +123,7 @@ public class ImMenuTreeBridge
         }
         menu.setParentId(parentId);
         menu.setMenuName(im.getName());
-        String url = StringUtils.defaultIfBlank(im.getPath(), "#");
-        menu.setUrl(url);
+        menu.setUrl(StringUtils.defaultIfBlank(im.getPath(), "#"));
         menu.setTarget(im.getTarget());
         menu.setIcon(StringUtils.defaultIfBlank(im.getIcon(), "fa fa-folder-o"));
         menu.setPerms(im.getPermission());

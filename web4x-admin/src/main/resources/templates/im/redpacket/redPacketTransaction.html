@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('红包交易记录')" />
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="red-packet-form">
+                <div class="select-list">
+                    <ul>
+                        <li>发红包人ID：<input type="text" name="uIdno" placeholder="发红包人ID"/></li>
+                        <li>发送对象ID：<input type="text" name="uid2Idno" placeholder="发送对象ID"/></li>
+                        <li>
+                            红包类型：
+                            <select name="packetType">
+                                <option value="">请选择红包类型</option>
+                                <option value="single">单聊红包</option>
+                                <option value="group">群聊红包</option>
+                            </select>
+                        </li>
+                        <li class="select-time">
+                            <label>时间范围：</label>
+                            <input type="text" class="time-input" id="beginCreateDate" placeholder="开始日期" name="beginCreateDate" data-type="datetime" data-format="yyyy-MM-dd HH:mm:ss"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endCreateDate" placeholder="结束日期" name="endCreateDate" data-type="datetime" data-format="yyyy-MM-dd HH:mm:ss"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js}"></script>
+<script th:src="@{/web4x/js/im-red-packet-transaction.js}"></script>
+</body>
+</html>

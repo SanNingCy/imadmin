@@ -61,6 +61,12 @@ public class ImSysUserPrincipalBridge implements SysUserPrincipalBridge
         return user != null && UserService.validatePassword(rawPassword, user.getPassword());
     }
 
+    @Override
+    public void onSessionUserUpdated(SysUser user)
+    {
+        UserUtils.clearCache();
+    }
+
     static SysUser toSysUser(User im)
     {
         SysUser sys = new SysUser();

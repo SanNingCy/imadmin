@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('入金记录')" />
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="payment-record-form">
+                <div class="select-list">
+                    <ul>
+                        <li>用户ID：<input type="text" name="userId" placeholder="用户ID"/></li>
+                        <li>ID号：<input type="text" name="idno" placeholder="ID号"/></li>
+                        <li>交易流水号：<input type="text" name="transactionNumber" placeholder="交易流水号"/></li>
+                        <li>合作方单号(wx方)：<input type="text" name="partnerNumber" placeholder="合作方单号(wx方)"/></li>
+                        <li>收款地址：<input type="text" name="receivingAddress" placeholder="收款地址"/></li>
+                        <li>
+                            交易状态：
+                            <select name="paymentStatus">
+                                <option value="">请选择交易状态</option>
+                                <option value="1">成功</option>
+                                <option value="2">失败</option>
+                            </select>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js}"></script>
+<script th:src="@{/web4x/js/im-payment-record.js}"></script>
+</body>
+</html>

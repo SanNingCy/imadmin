@@ -104,12 +104,39 @@ public class UserUtils {
 	 * @param user
 	 */
 	public static void clearCache(User user){
-		CacheUtils.remove(USER_CACHE, USER_CACHE_ID_ + user.getId());
-		CacheUtils.remove(USER_CACHE, USER_CACHE_LOGIN_NAME_ + user.getLoginName());
-		CacheUtils.remove(USER_CACHE, USER_CACHE_LOGIN_NAME_ + user.getOldLoginName());
+		if (user == null) {
+			return;
+		}
+		if (StringUtils.isNotBlank(user.getId())) {
+			CacheUtils.remove(USER_CACHE, USER_CACHE_ID_ + user.getId());
+		}
+		if (StringUtils.isNotBlank(user.getLoginName())) {
+			CacheUtils.remove(USER_CACHE, USER_CACHE_LOGIN_NAME_ + user.getLoginName());
+		}
+		if (StringUtils.isNotBlank(user.getOldLoginName())) {
+			CacheUtils.remove(USER_CACHE, USER_CACHE_LOGIN_NAME_ + user.getOldLoginName());
+		}
 		if (user.getOffice() != null && user.getOffice().getId() != null){
 			CacheUtils.remove(USER_CACHE, USER_CACHE_LIST_BY_OFFICE_ID_ + user.getOffice().getId());
 		}
+	}
+
+	/**
+	 * 改密后从数据库强制刷新 Redis 用户缓存，避免事务提交前其他请求用旧密码回填缓存。
+	 */
+	public static User reloadByLoginName(String loginName) {
+		if (StringUtils.isBlank(loginName)) {
+			return null;
+		}
+		CacheUtils.remove(USER_CACHE, USER_CACHE_LOGIN_NAME_ + loginName);
+		User user = SpringContextHolder.getBean(UserMapper.class).getByLoginName(new User(null, loginName));
+		if (user == null) {
+			return null;
+		}
+		CacheUtils.remove(USER_CACHE, USER_CACHE_ID_ + user.getId());
+		CacheUtils.put(USER_CACHE, USER_CACHE_ID_ + user.getId(), user);
+		CacheUtils.put(USER_CACHE, USER_CACHE_LOGIN_NAME_ + user.getLoginName(), user);
+		return user;
 	}
 
 	/**

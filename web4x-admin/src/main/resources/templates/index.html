@@ -14,7 +14,7 @@
     <link th:href="@{/css/animate.min.css}" rel="stylesheet"/>
     <link th:href="@{/css/style.min.css}" rel="stylesheet"/>
     <link th:href="@{/css/skins.css}" rel="stylesheet"/>
-    <link th:href="@{/web4x/css/ry-ui.css?v=4.8.3}" rel="stylesheet"/>
+    <link th:href="@{/web4x/css/ry-ui.css?v=4.8.4}" rel="stylesheet"/>
     <style type="text/css">#noticeItems li a{transition:background .15s;border-radius:2px}#noticeItems li a:hover{background:#f7f9fb;text-decoration:none}#noticeItems li a:active{background:#eef2f7}#noticeItems li a:focus{background:transparent;outline:0}#noticeList .mark-all-read{font-size:12px;color:#5b9bd5;text-decoration:none;padding:2px 8px;border-radius:3px;transition:background 0.15s}#noticeList .mark-all-read:hover{background:#eef5fc;color:#2b7cc1}#noticeList .mark-all-read:active{background:#eef5fc;color:#2b7cc1}#noticeList .mark-all-read:focus{outline:none;background:transparent}
 </style>
 </head>
@@ -52,21 +52,21 @@
                     <a class="menuItem" th:href="@{/system/main}"><i class="fa fa-home"></i> <span class="nav-label">首页</span> </a>
                 </li>
                 <li th:each="menu : ${menus}">
-                	<a th:class="@{${!#strings.isEmpty(menu.url) && menu.url != '#'} ? ${menu.target}}" th:href="@{${#strings.isEmpty(menu.url)} ? |#| : ${menu.url}}" th:data-refresh="${menu.isRefresh == '0'}">
+                	<a th:class="@{${!#strings.isEmpty(menu.url) && menu.url != '#'} ? ${menu.target}}" th:href="@{${not #lists.isEmpty(menu.children)} ? |#| : (${(#strings.isEmpty(menu.url) || menu.url == '#')} ? |#| : ${menu.url})}" th:data-refresh="${menu.isRefresh == '0'}">
                 		<i class="fa fa-bar-chart-o" th:class="${menu.icon}"></i>
                     	<span class="nav-label" th:text="${menu.menuName}">一级菜单</span>
-                    	<span th:class="${#strings.isEmpty(menu.url) || menu.url == '#'} ? |fa arrow|"></span>
+                    	<span th:if="${not #lists.isEmpty(menu.children)}" class="fa arrow"></span>
                 	</a>
                     <ul class="nav nav-second-level collapse">
 						<li th:each="cmenu : ${menu.children}">
-							<a th:if="${#lists.isEmpty(cmenu.children)}" th:class="${#strings.isEmpty(cmenu.target)} ? |menuItem| : ${cmenu.target}" th:utext="${cmenu.menuName}" th:href="@{${cmenu.url}}" th:data-refresh="${cmenu.isRefresh == '0'}">二级菜单</a>
+							<a th:if="${#lists.isEmpty(cmenu.children)}" th:class="${#strings.isEmpty(cmenu.target)} ? |menuItem| : ${cmenu.target}" th:utext="${cmenu.menuName}" th:href="@{|${cmenu.url}|}" th:data-refresh="${cmenu.isRefresh == '0'}">二级菜单</a>
 							<a th:if="${not #lists.isEmpty(cmenu.children)}" href="javascript:;">[[${cmenu.menuName}]]<span class="fa arrow"></span></a>
 							<ul th:if="${not #lists.isEmpty(cmenu.children)}" class="nav nav-third-level">
 								<li th:each="emenu : ${cmenu.children}">
-								    <a th:if="${#lists.isEmpty(emenu.children)}" th:class="${#strings.isEmpty(emenu.target)} ? |menuItem| : ${emenu.target}" th:text="${emenu.menuName}" th:href="@{${emenu.url}}" th:data-refresh="${emenu.isRefresh == '0'}">三级菜单</a>
+								    <a th:if="${#lists.isEmpty(emenu.children)}" th:class="${#strings.isEmpty(emenu.target)} ? |menuItem| : ${emenu.target}" th:text="${emenu.menuName}" th:href="@{|${emenu.url}|}" th:data-refresh="${emenu.isRefresh == '0'}">三级菜单</a>
 								    <a th:if="${not #lists.isEmpty(emenu.children)}" href="javascript:;">[[${emenu.menuName}]]<span class="fa arrow"></span></a>
 								    <ul th:if="${not #lists.isEmpty(emenu.children)}" class="nav nav-four-level">
-								      	<li th:each="fmenu : ${emenu.children}"><a th:if="${#lists.isEmpty(fmenu.children)}" th:class="${#strings.isEmpty(fmenu.target)} ? |menuItem| : ${fmenu.target}" th:text="${fmenu.menuName}" th:href="@{${fmenu.url}}" th:data-refresh="${fmenu.isRefresh == '0'}">四级菜单</a></li>
+								      	<li th:each="fmenu : ${emenu.children}"><a th:if="${#lists.isEmpty(fmenu.children)}" th:class="${#strings.isEmpty(fmenu.target)} ? |menuItem| : ${fmenu.target}" th:text="${fmenu.menuName}" th:href="@{|${fmenu.url}|}" th:data-refresh="${fmenu.isRefresh == '0'}">四级菜单</a></li>
 								    </ul>
 								</li>
 							</ul>
@@ -174,7 +174,7 @@
 <script th:src="@{/ajax/libs/layer/layer.min.js}"></script>
 <script th:src="@{/web4x/js/ry-ui.js?v=4.8.3}"></script>
 <script th:src="@{/web4x/js/common.js?v=4.8.3}"></script>
-<script th:src="@{/web4x/index.js?v=20201208}"></script>
+<script th:src="@{/web4x/index.js?v=20260606s1}"></script>
 <script th:src="@{/ajax/libs/fullscreen/jquery.fullscreen.js}"></script>
 <script th:inline="javascript">
 window.history.forward(1);
@@ -229,9 +229,17 @@ function toggleMenu() {
 
 /** 刷新时访问路径页签 */
 function applyPath(url) {
-	$('a[href$="' + decodeURI(url) + '"]').click();
-	if (!$('a[href$="' + url + '"]').hasClass("noactive")) {
-	    $('a[href$="' + url + '"]').parent("li").addClass("selected").parents("li").addClass("active").end().parents("ul").addClass("in");
+	var $dataObj = findMenuByUrl(url);
+	if (!$dataObj.length) {
+	    if ($.common.equals("history", mode)) {
+	        storage.set('publicPath', "");
+	    }
+		tabActive();
+		return;
+	}
+	$dataObj.first().click();
+	if (!$dataObj.first().hasClass("noactive")) {
+	    $dataObj.first().parent("li").addClass("selected").parents("li").addClass("active").end().parents("ul").addClass("in");
 	}
 }
 

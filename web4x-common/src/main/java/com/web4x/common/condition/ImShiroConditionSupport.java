@@ -22,7 +22,7 @@ public final class ImShiroConditionSupport
         String value = resolveProperty(environment, PROPERTY);
         if (value == null)
         {
-            return true;
+            return false;
         }
         return "true".equalsIgnoreCase(value);
     }

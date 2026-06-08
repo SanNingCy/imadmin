@@ -4,6 +4,7 @@ import com.seekweb4.chat.modules.member.entity.Member;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import com.seekweb4.chat.core.persistence.DataEntity;
 import com.seekweb4.chat.common.utils.excel.annotation.ExcelField;
 import lombok.Data;
@@ -36,7 +37,9 @@ public class BalanceLog extends DataEntity<BalanceLog> {
 	/** 查询条件：用户靓号（lianghao） */
 	private String lianghao;
 	
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date beginCreateDate;		// 开始 创建时间
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date endCreateDate;		// 结束 创建时间
 	
 	// 以下字段用于返回数据，不持久化到数据库

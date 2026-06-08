@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('平台费率设置')" />
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="rate-config-form">
+                <div class="select-list">
+                    <ul>
+                        <li>id：<input type="text" name="id" placeholder="id号"/></li>
+                        <li>费率：<input type="text" name="rate" placeholder="费率"/></li>
+                        <li>
+                            费率类型：
+                            <select name="paymentType">
+                                <option value="">请选择费率类型</option>
+                                <option value="1">入金wx</option>
+                                <option value="2">提现</option>
+                                <option value="3">IM内部</option>
+                            </select>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="imRateConfigOpenModal('add')" shiro:hasPermission="asset:rate:platform:add">
+                <i class="fa fa-plus"></i> 新建
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<div id="rate-config-modal" style="display:none;">
+    <form id="rate-config-modal-form" class="form-horizontal" style="padding:15px 20px;">
+        <input type="hidden" id="rate-config-id"/>
+        <div class="form-group">
+            <label class="col-sm-3 control-label"><span class="text-danger">*</span> 费率类型：</label>
+            <div class="col-sm-8">
+                <select class="form-control" id="rate-config-paymentType">
+                    <option value="1">入金wx</option>
+                    <option value="2">提现</option>
+                    <option value="3">IM内部</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label"><span class="text-danger">*</span> 费率：</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="rate-config-rate" placeholder="例如 0.1 表示 10%"/>
+            </div>
+        </div>
+    </form>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js}"></script>
+<script th:src="@{/web4x/js/im-rate-config.js}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imRateConfigInitTable(
+            [[${@permission.isPermitted('asset:rate:platform:view')}]],
+            [[${@permission.isPermitted('asset:rate:platform:add')}]],
+            [[${@permission.isPermitted('asset:rate:platform:view')}]]
+        );
+    });
+</script>
+</body>
+</html>

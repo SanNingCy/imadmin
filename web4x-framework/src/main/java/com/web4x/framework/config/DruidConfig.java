@@ -9,7 +9,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+import com.alibaba.druid.spring.boot4.autoconfigure.stat.DruidStatViewServletConfiguration;
 import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 import com.alibaba.druid.pool.DruidDataSource;
@@ -31,6 +33,7 @@ import jakarta.servlet.ServletResponse;
  * @author web4x
  */
 @Configuration
+@Import(DruidStatViewServletConfiguration.class)
 public class DruidConfig
 {
     /** 排除 DataSourceAutoConfiguration 时需手动注册，供监控页 Filter 使用 */
@@ -131,11 +134,15 @@ public class DruidConfig
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Bean
-    @ConditionalOnProperty(name = "spring.datasource.druid.statViewServlet.enabled", havingValue = "true")
+    @ConditionalOnProperty(name = "spring.datasource.druid.stat-view-servlet.enabled", havingValue = "true")
     public FilterRegistrationBean removeDruidFilterRegistrationBean(DruidStatProperties properties)
     {
         // 获取web监控页面的参数
         DruidStatProperties.StatViewServlet config = properties.getStatViewServlet();
+        if (config == null)
+        {
+            config = new DruidStatProperties.StatViewServlet();
+        }
         // 提取common.js的配置路径
         String pattern = config.getUrlPattern() != null ? config.getUrlPattern() : "/druid/*";
         String commonJsPattern = pattern.replaceAll("\\*", "js/common.js");

@@ -127,7 +127,10 @@ public class SystemAuthorizingRealm extends AuthorizingRealm {
 	 */
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-		String username = JWTUtil.getLoginName(principals.toString());
+		String username = resolveLoginName(principals);
+		if (username == null) {
+			return null;
+		}
 		// 获取当前已登录的用户
 		User user = getUserService().getUserByLoginName(username);
 		if (user != null) {
@@ -216,6 +219,27 @@ public class SystemAuthorizingRealm extends AuthorizingRealm {
 			userService = SpringContextHolder.getBean(UserService.class);
 		}
 		return userService;
+	}
+
+	private String resolveLoginName(PrincipalCollection principals) {
+		if (principals == null) {
+			return null;
+		}
+		Object principal = principals.getPrimaryPrincipal();
+		if (principal instanceof String) {
+			return JWTUtil.getLoginName((String) principal);
+		}
+		if (principal != null) {
+			try {
+				java.lang.reflect.Method getLoginName = principal.getClass().getMethod("getLoginName");
+				Object value = getLoginName.invoke(principal);
+				if (value instanceof String && StringUtils.isNotBlank((String) value)) {
+					return (String) value;
+				}
+			} catch (Exception ignored) {
+			}
+		}
+		return JWTUtil.getLoginName(principals.toString());
 	}
 
 }

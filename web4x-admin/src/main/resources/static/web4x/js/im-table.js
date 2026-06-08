@@ -16,6 +16,46 @@ function imOmitEmptyParams(obj) {
     return result;
 }
 
+/** HTML 转义，用于 title 属性 */
+function imEscapeHtml(text) {
+    return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+}
+
+/** 限制 td 宽度，防止长文本撑开表格 */
+function imEllipsisCell(maxWidth) {
+    return function () {
+        return {
+            css: {
+                "max-width": maxWidth + "px",
+                "width": maxWidth + "px",
+                "overflow": "hidden",
+                "white-space": "nowrap",
+                "text-overflow": "ellipsis"
+            }
+        };
+    };
+}
+
+/** 截断展示 + 悬浮 title 显示完整内容 */
+function imFormatText(value, maxLen, emptyText) {
+    if (value == null || value === "") {
+        return emptyText != null ? emptyText : "-";
+    }
+    var text = String(value);
+    var display = text;
+    if (maxLen && text.length > maxLen) {
+        display = text.substring(0, maxLen) + "...";
+    }
+    var style = "display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
+    return '<span class="im-cell-ellipsis" style="' + style + '" title="' + imEscapeHtml(text) + '">'
+        + imEscapeHtml(display) + "</span>";
+}
+
 /** IM 分页查询参数（pageNo/pageSize，非若依 pageNum） */
 function imBuildPageQuery(pageNo, pageSize, sort, order) {
     var query = {
@@ -182,7 +222,11 @@ function imInitTable(options) {
             || path.indexOf('/reason/') > -1 || path.indexOf('/customer/') > -1
             || path.indexOf('/buttonConfig/') > -1 || path.indexOf('/admin/asset/') > -1
             || path.indexOf('/group/') > -1 || path.indexOf('/friend/') > -1
-            || path.indexOf('/chatlog/') > -1) {
+            || path.indexOf('/chatlog/') > -1 || path.indexOf('/balancelog/') > -1
+            || path.indexOf('/rechagelog/') > -1
+            || path.indexOf('/redPacketTransaction/') > -1
+            || path.indexOf('/grouphongbaolog/') > -1
+            || path.indexOf('/signset/') > -1) {
             imTableBeforeSend(xhr);
         }
     });

@@ -292,6 +292,8 @@ public class ShiroConfig
         filterChainDefinitionMap.put("/login", "anon,captchaValidate");
         // 注册相关
         filterChainDefinitionMap.put("/register", "anon,captchaValidate");
+        // Druid 监控（菜单 /monitor/data 跳转 /druid/index.html）
+        filterChainDefinitionMap.put("/druid/**", "user");
         // 系统权限列表
         // filterChainDefinitionMap.putAll(SpringUtils.getBean(IMenuService.class).selectPermsAll());
 

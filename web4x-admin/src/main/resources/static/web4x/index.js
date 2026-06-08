@@ -19,7 +19,34 @@ function findMenuByUrl(dataUrl) {
 var isMobile = false;
 var sidebarHeight = isMobile ? '100%' : '96%';
 
+/** 统一侧边栏菜单文字结构并设置完整名称 tooltip */
+function imSidebarLimitMenuText() {
+    $('#side-menu a').each(function () {
+        var $a = $(this);
+        var $label = $a.children('.nav-label').first();
+        if (!$label.length) {
+            var $icons = $a.children('i').detach();
+            var $arrow = $a.children('span.fa.arrow').detach();
+            var text = $.trim($a.text());
+            $a.empty();
+            $icons.each(function () {
+                $a.append(this);
+            });
+            $label = $('<span class="nav-label"></span>').text(text);
+            $a.append($label);
+            if ($arrow.length) {
+                $a.append($arrow);
+            }
+        }
+        var fullText = $.trim($label.text());
+        if (fullText) {
+            $a.attr('title', fullText);
+        }
+    });
+}
+
 $(function() {
+    imSidebarLimitMenuText();
     // MetsiMenu
     $('#side-menu').metisMenu();
 

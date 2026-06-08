@@ -34,6 +34,11 @@ spring:
 #      uri: mongodb://localhost:27017/admin
       uri: mongodb://admin:admin@192.168.1.30:27017/admin
   datasource:
+    druid:
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        reset-enable: false
     username: root
     password: root
 #    url: jdbc:mysql://192.168.1.30:3306/im?useUnicode=true&characterEncoding=utf-8&useSSL=false&nullCatalogMeansCurrent=true&serverTimezone=Asia/Shanghai
@@ -143,6 +148,8 @@ socket:
   poolMax: 1000
 
 im:
+  shiro:
+    enabled: false
   admin:
     host: http://192.168.1.30:18080
     password: fyhKop-3kanti-hatzox

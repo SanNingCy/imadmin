@@ -76,8 +76,10 @@ public class KickoutSessionControlFilter  extends AccessControlFilter{
             return true;
         }
         Session session = subject.getSession();
-        String token  = (String) subject.getPrincipal();
-        String loginName = JWTUtil.getLoginName(token);
+        String loginName = resolveLoginName(subject);
+        if (loginName == null) {
+            return true;
+        }
         Serializable sessionId = session.getId();
 
         // 初始化用户的队列放到缓存里
@@ -146,5 +148,24 @@ public class KickoutSessionControlFilter  extends AccessControlFilter{
             return false;
         }
         return true;
+    }
+
+    private String resolveLoginName(Subject subject) {
+        Object principal = subject.getPrincipal();
+        if (principal == null) {
+            return null;
+        }
+        if (principal instanceof String) {
+            return JWTUtil.getLoginName((String) principal);
+        }
+        try {
+            java.lang.reflect.Method getLoginName = principal.getClass().getMethod("getLoginName");
+            Object value = getLoginName.invoke(principal);
+            if (value instanceof String && org.apache.commons.lang3.StringUtils.isNotBlank((String) value)) {
+                return (String) value;
+            }
+        } catch (Exception ignored) {
+        }
+        return JWTUtil.getLoginName(String.valueOf(principal));
     }
 }

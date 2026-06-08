@@ -26,9 +26,7 @@ import com.web4x.framework.shiro.service.SysPasswordService;
 import com.web4x.system.service.ISysUserService;
 
 /**
- * 个人信息 业务处理
- * 
- * @author web4x
+ * 个人信息（若依 sys_user_ry）
  */
 @Controller
 @RequestMapping("/system/user/profile")
@@ -40,13 +38,10 @@ public class SysProfileController extends BaseController
 
     @Autowired
     private ISysUserService userService;
-    
+
     @Autowired
     private SysPasswordService passwordService;
 
-    /**
-     * 个人信息
-     */
     @GetMapping()
     public String profile(ModelMap mmap)
     {
@@ -61,7 +56,7 @@ public class SysProfileController extends BaseController
     @ResponseBody
     public boolean checkPassword(String password)
     {
-        SysUser user = loadRyUser();
+        SysUser user = loadUserWithPassword();
         return user != null && passwordService.matches(user, password);
     }
 
@@ -78,7 +73,7 @@ public class SysProfileController extends BaseController
     @ResponseBody
     public AjaxResult resetPwd(String oldPassword, String newPassword)
     {
-        SysUser user = loadRyUser();
+        SysUser user = loadUserWithPassword();
         if (user == null)
         {
             return error("用户不存在或已失效，请重新登录");
@@ -101,8 +96,8 @@ public class SysProfileController extends BaseController
         return error("修改密码异常，请联系管理员");
     }
 
-    /** 从 sys_user_ry 加载完整用户（会话中的 IM 桥接用户不含 password） */
-    private SysUser loadRyUser()
+    /** 从 sys_user_ry 加载完整用户（会话用户可能不含 password） */
+    private SysUser loadUserWithPassword()
     {
         SysUser sessionUser = getSysUser();
         if (sessionUser == null || StringUtils.isEmpty(sessionUser.getLoginName()))
@@ -112,9 +107,6 @@ public class SysProfileController extends BaseController
         return userService.selectUserByLoginName(sessionUser.getLoginName());
     }
 
-    /**
-     * 修改用户
-     */
     @GetMapping("/edit")
     public String edit(ModelMap mmap)
     {
@@ -123,9 +115,6 @@ public class SysProfileController extends BaseController
         return prefix + "/edit";
     }
 
-    /**
-     * 修改头像
-     */
     @GetMapping("/avatar")
     public String avatar(ModelMap mmap)
     {
@@ -134,9 +123,6 @@ public class SysProfileController extends BaseController
         return prefix + "/avatar";
     }
 
-    /**
-     * 修改用户
-     */
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PostMapping("/update")
     @ResponseBody
@@ -163,9 +149,6 @@ public class SysProfileController extends BaseController
         return error();
     }
 
-    /**
-     * 保存头像
-     */
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PostMapping("/updateAvatar")
     @ResponseBody

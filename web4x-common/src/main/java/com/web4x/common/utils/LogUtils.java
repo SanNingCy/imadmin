@@ -120,7 +120,17 @@ public class LogUtils
 
     protected static String getUsername()
     {
-        return (String) SecurityUtils.getSubject().getPrincipal();
+        com.web4x.common.core.domain.entity.SysUser user = ShiroUtils.getSysUser();
+        if (user != null && StringUtils.isNotEmpty(user.getLoginName()))
+        {
+            return user.getLoginName();
+        }
+        Object principal = SecurityUtils.getSubject().getPrincipal();
+        if (principal instanceof String)
+        {
+            return (String) principal;
+        }
+        return principal != null ? principal.toString() : "";
     }
 
     public static Logger getAccessLog()

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('提现申请审核')" />
+    <style>
+        .withdraw-fn-switch {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 8px;
+            padding: 4px 14px;
+            background: #f8f9fb;
+            border: 1px solid #e7eaec;
+            border-radius: 4px;
+            vertical-align: middle;
+            line-height: 32px;
+        }
+        .withdraw-fn-switch .withdraw-fn-text {
+            color: #676a6c;
+            font-weight: normal;
+            white-space: nowrap;
+            margin: 0;
+        }
+        .withdraw-fn-switch .toggle-switch {
+            padding-top: 0;
+            margin-bottom: 0;
+        }
+        .withdraw-fn-switch .withdraw-fn-status {
+            display: inline-block;
+            min-width: 36px;
+            font-size: 12px;
+            color: #999;
+        }
+        .withdraw-fn-switch .withdraw-fn-status.is-on {
+            color: #1ab394;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="withdraw-apply-form">
+                <div class="select-list">
+                    <ul>
+                        <li>用户id：<input type="text" name="userId" placeholder="用户id"/></li>
+                        <li>提现交易号：<input type="text" name="transactionNumber" placeholder="提现交易号"/></li>
+                        <li>
+                            种类：
+                            <select name="coinId">
+                                <option value="">请选择种类</option>
+                                <option value="1">积分</option>
+                                <option value="2">代币</option>
+                            </select>
+                        </li>
+                        <li>
+                            提现状态：
+                            <select name="status">
+                                <option value="">请选择提现状态</option>
+                                <option value="0">发起提现</option>
+                                <option value="1">正在提现</option>
+                                <option value="2">提现成功</option>
+                                <option value="3">提现失败</option>
+                                <option value="4">申请中</option>
+                                <option value="5">拒绝提现</option>
+                            </select>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                        <li class="withdraw-fn-switch" shiro:hasPermission="ops:system:features:edit">
+                            <span class="withdraw-fn-text">提现功能</span>
+                            <label class="toggle-switch switch-solid" for="withdraw-fn-toggle" title="控制移动端提现功能开关">
+                                <input type="checkbox" id="withdraw-fn-toggle"/>
+                                <span></span>
+                            </label>
+                            <span class="withdraw-fn-status" id="withdraw-fn-label">关闭</span>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<div id="withdraw-apply-view-modal" style="display:none;">
+    <form class="form-horizontal" style="padding:15px 20px;">
+        <div class="form-group"><label class="col-sm-3 control-label">ID：</label><div class="col-sm-8"><p class="form-control-static" id="wa-view-id"></p></div></div>
+        <div class="form-group"><label class="col-sm-3 control-label">用户id：</label><div class="col-sm-8"><p class="form-control-static" id="wa-view-userId"></p></div></div>
+        <div class="form-group"><label class="col-sm-3 control-label">ID号：</label><div class="col-sm-8"><p class="form-control-static" id="wa-view-idno"></p></div></div>
+        <div class="form-group"><label class="col-sm-3 control-label">用户昵称：</label><div class="col-sm-8"><p class="form-control-static" id="wa-view-nickname"></p></div></div>
+        <div class="form-group"><label class="col-sm-3 control-label">提现交易号：</label><div class="col-sm-8"><p class="form-control-static" id="wa-view-transactionNumber"></p></div></div>
+        <div class="form-group"><label class="col-sm-3 control-label">种类：</label><div class="col-sm-8"><p class="form-control-static" id="wa-view-coinId"></p></div></div>
+        <div class="form-group"><label class="col-sm-3 control-label">提现金额：</label><div class="col-sm-8"><p class="form-control-static" id="wa-view-amount"></p></div></div>
+        <div class="form-group"><label class="col-sm-3 control-label">实际提现金额：</label><div class="col-sm-8"><p class="form-control-static" id="wa-view-actualAmount"></p></div></div>
+        <div class="form-group"><label class="col-sm-3 control-label">费率金额：</label><div class="col-sm-8"><p class="form-control-static" id="wa-view-rateAmount"></p></div></div>
+        <div class="form-group"><label class="col-sm-3 control-label">外部提现ID：</label><div class="col-sm-8"><p class="form-control-static" id="wa-view-withdrawalId"></p></div></div>
+        <div class="form-group"><label class="col-sm-3 control-label">提现状态：</label><div class="col-sm-8"><p class="form-control-static" id="wa-view-status"></p></div></div>
+        <div class="form-group"><label class="col-sm-3 control-label">收款地址：</label><div class="col-sm-8"><p class="form-control-static" id="wa-view-receivingAddress"></p></div></div>
+        <div class="form-group"><label class="col-sm-3 control-label">提现hash：</label><div class="col-sm-8"><p class="form-control-static" id="wa-view-withdrawalHash"></p></div></div>
+        <div class="form-group"><label class="col-sm-3 control-label">备注：</label><div class="col-sm-8"><p class="form-control-static" id="wa-view-remark"></p></div></div>
+        <div class="form-group"><label class="col-sm-3 control-label">创建时间：</label><div class="col-sm-8"><p class="form-control-static" id="wa-view-createTime"></p></div></div>
+        <div class="form-group"><label class="col-sm-3 control-label">更新时间：</label><div class="col-sm-8"><p class="form-control-static" id="wa-view-updateTime"></p></div></div>
+    </form>
+</div>
+
+<div id="withdraw-apply-audit-modal" style="display:none;">
+    <form id="withdraw-apply-audit-form" class="form-horizontal" style="padding:15px 20px;">
+        <input type="hidden" id="wa-audit-id"/>
+        <div class="form-group">
+            <label class="col-sm-3 control-label"><span class="text-danger">*</span> 审核结果：</label>
+            <div class="col-sm-8">
+                <select class="form-control" id="wa-audit-status">
+                    <option value="0">通过（发起提现）</option>
+                    <option value="5">拒绝</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group" id="wa-audit-google-group">
+            <label class="col-sm-3 control-label">谷歌验证码：</label>
+            <div class="col-sm-8"><input type="text" class="form-control" id="wa-audit-googleCode" placeholder="手动审核模式时必填"/></div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">备注：</label>
+            <div class="col-sm-8"><textarea class="form-control" id="wa-audit-remark" rows="3" placeholder="拒绝时必填"></textarea></div>
+        </div>
+    </form>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js?v=20260605w}"></script>
+<script th:src="@{/web4x/js/im-withdraw-apply.js?v=20260606w6}"></script>
+<script th:inline="javascript">
+    var imWithdrawApplyListUrl = ctx + "admin/asset/withdrawApply/page";
+    $(function () {
+        imWithdrawApplyInitPage(
+            [[${@permission.isPermitted('asset:fund:withdraw:view')}]],
+            [[${@permission.isPermitted('asset:fund:withdraw:review')}]],
+            [[${@permission.isPermitted('ops:system:features:edit')}]]
+        );
+    });
+</script>
+</body>
+</html>

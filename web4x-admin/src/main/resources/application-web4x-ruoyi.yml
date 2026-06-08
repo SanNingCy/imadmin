@@ -12,7 +12,7 @@ web4x:
 
 im:
   shiro:
-    enabled: true
+    enabled: false
 
 shiro:
   session:
@@ -66,6 +66,10 @@ spring:
       testWhileIdle: true
       testOnBorrow: false
       testOnReturn: false
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        reset-enable: false
       slave:
         enabled: false
 

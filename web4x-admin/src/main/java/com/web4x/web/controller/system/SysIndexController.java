@@ -24,8 +24,8 @@ import com.web4x.common.utils.DateUtils;
 import com.web4x.common.utils.ServletUtils;
 import com.web4x.common.utils.StringUtils;
 import com.web4x.framework.shiro.service.SysPasswordService;
-import com.web4x.integration.im.ImMenuTreeBridge;
 import com.web4x.integration.im.ImSysUserPrincipalBridge;
+import com.web4x.integration.im.SysMenuViewSupport;
 import com.web4x.system.service.ISysConfigService;
 import com.web4x.system.service.ISysMenuService;
 
@@ -47,25 +47,17 @@ public class SysIndexController extends BaseController
     private SysPasswordService passwordService;
 
     @Autowired(required = false)
-    private ImMenuTreeBridge imMenuTreeBridge;
-
-    @Autowired(required = false)
     private ImSysUserPrincipalBridge imUserBridge;
 
-    // 系统首页
     @GetMapping("/index")
     public String index(ModelMap mmap, HttpServletRequest request)
     {
-        // 取身份信息
         SysUser user = getSysUser();
         if (user == null)
         {
             return "redirect:/login";
         }
-        // 根据用户id取出菜单（IM 启用时用 sys_menu_two）
-        List<SysMenu> menus = imMenuTreeBridge != null
-                ? imMenuTreeBridge.selectMenusForUser(user)
-                : menuService.selectMenusByUser(user);
+        List<SysMenu> menus = SysMenuViewSupport.normalizeForSidebar(menuService.selectMenusByUser(user));
         mmap.put("menus", menus);
         mmap.put("user", user);
         mmap.put("sideTheme", configService.selectConfigByKey("sys.index.sideTheme"));
@@ -77,7 +69,6 @@ public class SysIndexController extends BaseController
         mmap.put("mainClass", contentMainClass(footer, tagsView));
         mmap.put("copyrightYear", Web4xConfig.getCopyrightYear());
         mmap.put("demoEnabled", Web4xConfig.isDemoEnabled());
-        // IM 登录用户无若依 pwdUpdateDate，跳过初始/过期密码弹窗
         boolean imIntegrated = imUserBridge != null;
         mmap.put("isDefaultModifyPwd", imIntegrated ? false : initPasswordIsModify(user.getPwdUpdateDate()));
         mmap.put("isPasswordExpired", imIntegrated ? false : passwordIsExpiration(user.getPwdUpdateDate()));
@@ -159,8 +150,7 @@ public class SysIndexController extends BaseController
         return "main";
     }
 
-    // IM 菜单 /dictionary → 若依字典管理
-    @GetMapping("/dictionary")
+    @GetMapping({"/dictionary", "/system/dict"})
     public String dictionary()
     {
         return "redirect:/system/dict/data";

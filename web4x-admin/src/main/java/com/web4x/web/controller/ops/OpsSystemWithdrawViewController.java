@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 @RequestMapping({
-        "/ops/system/withdraw", "/system/withdraw", "/withdrawConfig", "/withdraw"
+        "/ops/system/withdraw", "/system/withdraw", "/withdrawConfig"
 })
 public class OpsSystemWithdrawViewController {
 

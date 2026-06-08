@@ -11,7 +11,9 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
+import com.web4x.common.condition.ImShiroEnabledCondition;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.Serializable;
@@ -25,6 +27,7 @@ import com.seekweb4.chat.config.web.Servlets;
  * @version 2017-7-24
  */
 @Component("sessionDAO")
+@Conditional(ImShiroEnabledCondition.class)
 public class CacheSessionDAO extends EnterpriseCacheSessionDAO implements SessionDAO {
 
 

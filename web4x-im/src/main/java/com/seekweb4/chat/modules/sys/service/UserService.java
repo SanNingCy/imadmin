@@ -12,6 +12,8 @@ import com.seekweb4.chat.modules.sys.mapper.UserMapper;
 import com.seekweb4.chat.modules.sys.utils.UserUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.Date;
 import java.util.List;
@@ -113,9 +115,22 @@ public class UserService  extends CrudService<UserMapper, User> {
 		User user = new User(id);
 		user.setPassword(entryptPassword(newPassword));
 		mapper.updatePasswordById(user);
-		// 清除用户缓存
 		user.setLoginName(loginName);
 		UserUtils.clearCache(user);
+		scheduleReloadUserCacheAfterCommit(loginName);
+	}
+
+	private void scheduleReloadUserCacheAfterCommit(String loginName) {
+		if (TransactionSynchronizationManager.isSynchronizationActive()) {
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCommit() {
+					UserUtils.reloadByLoginName(loginName);
+				}
+			});
+		} else {
+			UserUtils.reloadByLoginName(loginName);
+		}
 	}
 
 	@Transactional(readOnly = false)

@@ -9,7 +9,6 @@ import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import com.web4x.integration.im.ImWebLoginHelper;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,53 +22,38 @@ import com.web4x.common.utils.StringUtils;
 import com.web4x.framework.web.service.ConfigService;
 
 /**
- * 登录验证
- * 
- * @author web4x
+ * 登录验证（若依 UserRealm + sys_user_ry）
  */
 @Controller
 public class SysLoginController extends BaseController
 {
-    /**
-     * 是否开启记住我功能
-     */
     @Value("${shiro.rememberMe.enabled: false}")
     private boolean rememberMe;
 
     @Autowired
     private ConfigService configService;
 
-    @Autowired(required = false)
-    private ImWebLoginHelper imWebLoginHelper;
-
     @GetMapping("/login")
     public String login(HttpServletRequest request, HttpServletResponse response, ModelMap mmap)
     {
-        // 如果是Ajax请求，返回Json字符串。
         if (ServletUtils.isAjaxRequest(request))
         {
             return ServletUtils.renderString(response, "{\"code\":\"1\",\"msg\":\"未登录或登录超时。请重新登录\"}");
         }
-        // 是否开启记住我
         mmap.put("isRemembered", rememberMe);
-        // 是否开启用户注册
         mmap.put("isAllowRegister", Convert.toBool(configService.getKey("sys.account.registerUser"), false));
         return "login";
     }
 
     @PostMapping("/login")
     @ResponseBody
-    public AjaxResult ajaxLogin(String username, String password, Boolean rememberMe, HttpServletResponse response)
+    public AjaxResult ajaxLogin(String username, String password, Boolean rememberMe)
     {
         UsernamePasswordToken token = new UsernamePasswordToken(username, password, rememberMe);
         Subject subject = SecurityUtils.getSubject();
         try
         {
             subject.login(token);
-            if (imWebLoginHelper != null)
-            {
-                imWebLoginHelper.writeTokenCookie(response);
-            }
             return success();
         }
         catch (AuthenticationException e)
@@ -84,16 +68,9 @@ public class SysLoginController extends BaseController
     }
 
     @GetMapping("/logout")
-    public String logout(HttpServletRequest request, HttpServletResponse response)
+    public String logout()
     {
-        if (imWebLoginHelper != null)
-        {
-            imWebLoginHelper.logout(response);
-        }
-        else
-        {
-            ShiroUtils.logout();
-        }
+        ShiroUtils.logout();
         return "redirect:/login";
     }
 

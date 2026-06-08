@@ -12,4 +12,9 @@ public interface SysUserPrincipalBridge
     SysUser resolve(Object principal);
 
     boolean validatePassword(String loginName, String rawPassword);
+
+    /** IM 模式下会话 principal 保持 JWT，仅刷新用户缓存 */
+    default void onSessionUserUpdated(SysUser user)
+    {
+    }
 }

@@ -228,8 +228,9 @@ public class SysUserController extends BaseController
     {
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
+        String plainPassword = user.getPassword();
         user.setSalt(ShiroUtils.randomSalt());
-        user.setPassword(passwordService.encryptPassword(user.getLoginName(), user.getPassword(), user.getSalt()));
+        user.setPassword(passwordService.encryptPassword(user.getLoginName(), plainPassword, user.getSalt()));
         if (userService.resetUserPwd(user) > 0)
         {
             if (ShiroUtils.getUserId().longValue() == user.getUserId().longValue())

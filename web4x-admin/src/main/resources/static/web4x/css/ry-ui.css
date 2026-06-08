@@ -867,7 +867,18 @@ label {
 
 /** 表头标题与数据列对齐居中（bootstrap-table 表头/表体为双表结构） */
 .select-table .bootstrap-table .fixed-table-container table {
-	table-layout: fixed !important;
+	table-layout: auto !important;
+	width: max-content;
+	min-width: 100%;
+}
+/** 列多时横向滚动，表头与表体在 fixed-table-body 内同步滚动 */
+.select-table .bootstrap-table .fixed-table-body {
+	overflow-x: auto !important;
+}
+/** 冻结列演示页保持隐藏横向滚动 */
+.select-table .bootstrap-table .fixed-columns .fixed-table-body,
+.select-table .bootstrap-table .fixed-columns-right .fixed-table-body {
+	overflow: hidden !important;
 }
 .select-table .bootstrap-table .fixed-table-container th,
 .select-table .bootstrap-table .fixed-table-container td,
@@ -1328,4 +1339,19 @@ table.rc-table-resizing thead > th > a {
 
 :-ms-input-placeholder {
 	color: #b3b3b3!important;
+}
+
+/** 侧边栏菜单名过长时省略，悬浮 title 显示完整名称（title 由 index.js 设置） */
+.navbar-static-side #side-menu .nav-label {
+	display: inline-block;
+	max-width: 110px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	vertical-align: middle;
+}
+.fixed-sidebar.mini-navbar .nav li:hover > a > span.nav-label,
+.canvas-menu.mini-navbar .nav li:hover > a > span.nav-label {
+	max-width: none;
+	overflow: visible;
 }
