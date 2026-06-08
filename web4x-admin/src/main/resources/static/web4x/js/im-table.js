@@ -223,6 +223,7 @@ function imInitTable(options) {
             || path.indexOf('/buttonConfig/') > -1 || path.indexOf('/admin/asset/') > -1
             || path.indexOf('/group/') > -1 || path.indexOf('/friend/') > -1
             || path.indexOf('/chatlog/') > -1 || path.indexOf('/balancelog/') > -1
+            || path.indexOf('/sys/dict/') > -1
             || path.indexOf('/rechagelog/') > -1
             || path.indexOf('/redPacketTransaction/') > -1
             || path.indexOf('/grouphongbaolog/') > -1

@@ -158,7 +158,7 @@ public class SysIndexController extends BaseController
     @GetMapping({"/dictionary", "/system/dict"})
     public String dictionary()
     {
-        return "redirect:/system/dict/data";
+        return "redirect:/sys/dict/type";
     }
 
     // content-main class

@@ -1341,6 +1341,87 @@ table.rc-table-resizing thead > th > a {
 	color: #b3b3b3!important;
 }
 
+/** 侧边栏用户信息区（若依 / AdminLTE 风格） */
+.navbar-static-side .sidebar-user-panel,
+.navbar-static-side #side-menu > li.sidebar-user-panel {
+	border-left: none !important;
+}
+.navbar-static-side .user-panel {
+	position: relative;
+	width: 100%;
+	padding: 15px;
+	overflow: hidden;
+	white-space: nowrap;
+}
+.navbar-static-side .user-panel::after {
+	content: "";
+	display: table;
+	clear: both;
+}
+.navbar-static-side .user-panel > .pull-left.image {
+	float: left;
+	width: 45px;
+}
+.navbar-static-side .user-panel > .pull-left.image > a.menuItem {
+	display: block;
+	padding: 0;
+	margin: 0;
+	font-weight: normal;
+	background: transparent !important;
+}
+.navbar-static-side .user-panel > .pull-left.image img {
+	width: 45px;
+	height: 45px;
+	object-fit: cover;
+}
+.navbar-static-side .user-panel > .pull-left.info {
+	float: left;
+	padding: 5px 5px 5px 15px;
+	line-height: 1.2;
+}
+.navbar-static-side .user-panel > .pull-left.info > p {
+	margin: 0 0 8px;
+	font-weight: 600;
+	font-size: 12px;
+	color: inherit;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 120px;
+}
+.navbar-static-side .user-panel > .pull-left.info > a {
+	display: inline-block;
+	padding: 0;
+	font-size: 12px;
+	line-height: 1.4;
+	font-weight: normal;
+	background: transparent !important;
+}
+.navbar-static-side .user-panel > .pull-left.info > a + a {
+	margin-left: 8px;
+}
+.navbar-static-side .user-panel > .pull-left.info > a:hover,
+.navbar-static-side .user-panel > .pull-left.info > a:focus {
+	text-decoration: none;
+	opacity: 0.85;
+}
+.navbar-static-side .user-panel > .pull-left.info > a > .fa,
+.navbar-static-side .user-panel > .pull-left.info > a > .ion,
+.navbar-static-side .user-panel > .pull-left.info > a > .glyphicon {
+	margin-right: 3px;
+}
+body.mini-navbar .navbar-static-side .user-panel {
+	padding: 12px 0;
+	text-align: center;
+}
+body.mini-navbar .navbar-static-side .user-panel > .pull-left.image {
+	float: none;
+	width: auto;
+}
+body.mini-navbar .navbar-static-side .user-panel > .pull-left.info {
+	display: none;
+}
+
 /** 侧边栏菜单名过长时省略，悬浮 title 显示完整名称（title 由 index.js 设置） */
 .navbar-static-side #side-menu .nav-label {
 	display: inline-block;
@@ -1354,4 +1435,140 @@ table.rc-table-resizing thead > th > a {
 .canvas-menu.mini-navbar .nav li:hover > a > span.nav-label {
 	max-width: none;
 	overflow: visible;
+}
+
+/** 列表图片缩略图（朋友圈/群组等共用） */
+.piamom-media-cell {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	max-width: 280px;
+	align-items: flex-start;
+	justify-content: flex-start;
+}
+.piamom-media-img {
+	object-fit: cover;
+	border-radius: 4px;
+	cursor: pointer;
+	flex-shrink: 0;
+	background: #f5f5f5;
+}
+.piamom-media-fallback {
+	display: inline-block;
+	font-size: 12px;
+	line-height: 40px;
+	padding: 0 6px;
+	color: #337ab7;
+}
+
+/** IM 图片预览查看器（居中弹窗，底部操作栏，支持拖拽） */
+.im-group-image-viewer-mask {
+	position: fixed;
+	inset: 0;
+	z-index: 19891020;
+	background: rgba(0, 0, 0, .45);
+	display: none;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+}
+.im-group-image-viewer-mask.active {
+	display: flex;
+}
+.im-group-image-viewer-dialog {
+	display: flex;
+	flex-direction: column;
+	width: 860px;
+	max-width: 92vw;
+	max-height: 88vh;
+	background: #fff;
+	border-radius: 6px;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+	overflow: hidden;
+}
+.im-group-image-viewer-stage {
+	height: 460px;
+	max-height: calc(88vh - 72px);
+	overflow: hidden;
+	position: relative;
+	background: #2f4050;
+	cursor: grab;
+}
+.im-group-image-viewer-stage.is-dragging {
+	cursor: grabbing;
+}
+.im-group-image-viewer-nav {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	z-index: 2;
+	width: 42px;
+	height: 72px;
+	border: 0;
+	background: rgba(0, 0, 0, .35);
+	color: #fff;
+	font-size: 22px;
+	line-height: 72px;
+	text-align: center;
+	padding: 0;
+}
+.im-group-image-viewer-nav:hover {
+	background: rgba(0, 0, 0, .55);
+	color: #fff;
+}
+.im-group-image-viewer-nav.prev {
+	left: 0;
+	border-radius: 0 4px 4px 0;
+}
+.im-group-image-viewer-nav.next {
+	right: 0;
+	border-radius: 4px 0 0 4px;
+}
+.im-group-image-viewer-nav.is-hidden {
+	display: none;
+}
+.im-group-image-viewer-counter {
+	position: absolute;
+	right: 12px;
+	bottom: 10px;
+	z-index: 2;
+	padding: 2px 10px;
+	border-radius: 12px;
+	background: rgba(0, 0, 0, .45);
+	color: #fff;
+	font-size: 12px;
+	line-height: 20px;
+}
+.im-group-image-viewer-counter.is-hidden {
+	display: none;
+}
+.im-group-image-viewer-img-wrap {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.im-group-image-viewer-img {
+	max-width: 100%;
+	max-height: 100%;
+	transition: transform .2s ease;
+	user-select: none;
+	pointer-events: none;
+}
+.im-group-image-viewer-img.is-dragging {
+	transition: none;
+}
+.im-group-image-viewer-toolbar {
+	flex-shrink: 0;
+	padding: 12px 15px 14px;
+	border-top: 1px solid #e7eaec;
+	background: #fff;
+	text-align: center;
+}
+.im-group-image-viewer-toolbar .btn {
+	margin: 0 4px;
+}
+body.im-group-image-viewer-open {
+	overflow: hidden;
 }

@@ -21,7 +21,9 @@ var sidebarHeight = isMobile ? '100%' : '96%';
 
 /** 统一侧边栏菜单文字结构并设置完整名称 tooltip */
 function imSidebarLimitMenuText() {
-    $('#side-menu a').each(function () {
+    $('#side-menu a').filter(function () {
+        return $(this).closest('.user-panel').length === 0;
+    }).each(function () {
         var $a = $(this);
         var $label = $a.children('.nav-label').first();
         if (!$label.length) {
@@ -311,7 +313,7 @@ $(function() {
         // 获取标识数据
         var dataUrl = $(this).attr('href'),
         dataIndex = $(this).data('index'),
-        menuName = $(this).data('title') || $.trim($(this).text()),
+        menuName = $(this).data('title') || $.trim($(this).text()) || $.trim($(this).attr('title')),
         isRefresh = $(this).data("refresh"),
         flag = true;
 

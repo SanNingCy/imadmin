@@ -3,13 +3,8 @@
  */
 var imBalanceLogApi = ctx + "balancelog/balanceLog";
 
-var IM_BALANCE_TYPE = {
-    "1": "红包",
-    "2": "转账",
-    "3": "充值",
-    "4": "签到",
-    "6": "礼物"
-};
+var IM_BALANCE_TYPE_DICT = "balance_type";
+var IM_BALANCE_TYPE_LABEL_MAP = {};
 
 var IM_BALANCE_STATE = {
     "1": { text: "收入", cls: "success" },
@@ -31,8 +26,49 @@ function imBalanceLogMemberField(row, field) {
     return "-";
 }
 
+function imBalanceLogBuildTypeLabelMap(values) {
+    IM_BALANCE_TYPE_LABEL_MAP = {};
+    $.each(values || [], function (_, item) {
+        var val = item && item.value != null ? String(item.value) : "";
+        var label = item && item.label != null ? String(item.label) : "";
+        if (val !== "" && label !== "") {
+            IM_BALANCE_TYPE_LABEL_MAP[val] = label;
+        }
+    });
+}
+
 function imBalanceLogFormatType(value) {
-    return IM_BALANCE_TYPE[String(value)] || value || "-";
+    if (value == null || value === "") {
+        return "-";
+    }
+    var key = String(value);
+    return IM_BALANCE_TYPE_LABEL_MAP[key] || key;
+}
+
+function imBalanceLogFillTypeSelect(values) {
+    var $select = $("#balance-log-form select[name='type']");
+    if (!$select.length) {
+        return;
+    }
+    $select.find("option:not([value=''])").remove();
+    $.each(values || [], function (_, item) {
+        if (item.value == null || item.label == null) {
+            return;
+        }
+        $("<option></option>")
+            .val(String(item.value))
+            .text(String(item.label))
+            .appendTo($select);
+    });
+}
+
+function imBalanceLogLoadTypeDict(done) {
+    imDictLoadMap(function (dictMap) {
+        var values = (dictMap && dictMap[IM_BALANCE_TYPE_DICT]) || [];
+        if (typeof done === "function") {
+            done(values);
+        }
+    });
 }
 
 function imBalanceLogFormatState(value) {
@@ -162,6 +198,14 @@ function imBalanceLogInitTable() {
     });
 }
 
+function imBalanceLogInitPage() {
+    imBalanceLogLoadTypeDict(function (values) {
+        imBalanceLogBuildTypeLabelMap(values);
+        imBalanceLogFillTypeSelect(values);
+        imBalanceLogInitTable();
+    });
+}
+
 $(function () {
-    imBalanceLogInitTable();
+    imBalanceLogInitPage();
 });

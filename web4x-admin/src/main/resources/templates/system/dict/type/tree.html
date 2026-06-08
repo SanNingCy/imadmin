@@ -10,7 +10,7 @@
 </style>
 <body class="hold-transition box box-main">
 	<input id="columnId" type="hidden" th:value="${columnId}"/>
-	<input id="treeId"   type="hidden" th:value="${dict?.dictId}"/>
+	<input id="treeId"   type="hidden"/>
 	<input id="dictType" type="hidden" th:value="${dict?.dictType}"/>
 	<div class="wrapper"><div class="treeShowHideButton" onclick="$.tree.toggleSearch();">
 		<label id="btnShow" title="显示搜索" style="display:none;">︾</label>
@@ -24,17 +24,37 @@
 	</div>
 	<th:block th:include="include :: footer" />
 	<th:block th:include="include :: ztree-js" />
+	<script th:src="@{/web4x/js/im-table.js}"></script>
+	<script th:src="@{/web4x/js/im-dict.js}"></script>
 	<script th:inline="javascript">
 		$(function() {
-			var url = ctx + "system/dict/treeData";
-			var options = {
-		        url: url,
-		        onClick : zOnClick
-		    };
-			$.tree.init(options);
+			imDictAjax({
+				url: imDictApi + "/listData",
+				type: "GET",
+				dataType: "json",
+				success: function(res) {
+					if (!imDictIsSuccess(res)) {
+						return;
+					}
+					var nodes = $.map(res.list || [], function(item) {
+						return {
+							id: item.id,
+							pId: 0,
+							name: item.type,
+							title: item.type
+						};
+					});
+					var options = {
+						data: { simpleData: { enable: true } },
+						callback: { onClick: zOnClick }
+					};
+					$.fn.zTree.init($("#tree"), options, nodes);
+				}
+			});
 		});
 		
 		function zOnClick(event, treeId, treeNode) {
+		    $("#treeId").val(treeNode.id);
 		    $("#dictType").val(treeNode.title);
 		}
 	</script>

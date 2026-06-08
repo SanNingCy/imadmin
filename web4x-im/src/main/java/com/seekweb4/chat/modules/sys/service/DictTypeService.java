@@ -5,8 +5,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import com.seekweb4.chat.common.utils.CacheUtils;
 import com.seekweb4.chat.common.utils.StringUtils;
 import com.seekweb4.chat.core.persistence.Page;
 import com.seekweb4.chat.core.service.CrudService;
@@ -53,7 +54,7 @@ public class DictTypeService extends CrudService<DictTypeMapper, DictType> {
 	@Transactional(readOnly = false)
 	public void save(DictType dictType) {
 		super.save(dictType);
-		CacheUtils.remove(DictUtils.CACHE_DICT_MAP);
+		scheduleReloadDictCacheAfterCommit();
 	}
 
 	@Transactional(readOnly = false)
@@ -65,26 +66,45 @@ public class DictTypeService extends CrudService<DictTypeMapper, DictType> {
 			dictValue.preUpdate();
 			dictValueMapper.update(dictValue);
 		}
-		CacheUtils.remove(DictUtils.CACHE_DICT_MAP);
+		scheduleReloadDictCacheAfterCommit();
 	}
 
 	@Transactional(readOnly = false)
 	public void deleteDictValue(DictValue dictValue) {
 		dictValueMapper.delete(dictValue);
-		CacheUtils.remove(DictUtils.CACHE_DICT_MAP);
+		scheduleReloadDictCacheAfterCommit();
 	}
 
 	@Transactional(readOnly = false)
 	public void batchDeleteDictValue(String[] ids) {
 		dictValueMapper.batchDelete(ids);
-		CacheUtils.remove(DictUtils.CACHE_DICT_MAP);
+		scheduleReloadDictCacheAfterCommit();
+	}
+
+	@Transactional(readOnly = false)
+	public void batchDelete(String[] ids) {
+		super.batchDelete(ids);
+		scheduleReloadDictCacheAfterCommit();
 	}
 
 	@Transactional(readOnly = false)
 	public void delete(DictType dictType) {
 		super.delete(dictType);
 		dictValueMapper.delete(new DictValue(dictType));
-		CacheUtils.remove(DictUtils.CACHE_DICT_MAP);
+		scheduleReloadDictCacheAfterCommit();
+	}
+
+	private void scheduleReloadDictCacheAfterCommit() {
+		if (TransactionSynchronizationManager.isSynchronizationActive()) {
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCommit() {
+					DictUtils.reloadCache();
+				}
+			});
+			return;
+		}
+		DictUtils.reloadCache();
 	}
 
 }

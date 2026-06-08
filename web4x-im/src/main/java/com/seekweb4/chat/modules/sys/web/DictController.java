@@ -104,6 +104,7 @@ public class DictController extends BaseController {
 			return AjaxJson.error(errMsg);
 		}
 		dictTypeService.save(dictType);
+		DictUtils.reloadCache();
 		return AjaxJson.success("保存字典类型'" + dictType.getDescription() + "'成功！");
 	}
 
@@ -163,6 +164,7 @@ public class DictController extends BaseController {
 		}
 		
 		dictTypeService.saveDictValue(dictValue);
+		DictUtils.reloadCache();
 		return AjaxJson.success("保存键值'" + dictValue.getLabel() + "'成功！");
 	}
 
@@ -176,6 +178,7 @@ public class DictController extends BaseController {
 			return AjaxJson.error("演示模式，不允许操作！");
 		}
 		dictTypeService.batchDeleteDictValue(ids.split(","));
+		DictUtils.reloadCache();
 		return AjaxJson.success("删除键值成功！");
 	}
 
@@ -192,6 +195,7 @@ public class DictController extends BaseController {
 		}
 		String idArray[] =ids.split(",");
 		dictTypeService.batchDelete(idArray);
+		DictUtils.reloadCache();
 		return AjaxJson.success("删除字典成功！");
 	}
 

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('群投诉记录')" />
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="group-complaints-form">
+                <div class="select-list">
+                    <ul>
+                        <li>用户ID：<input type="text" name="u.id" placeholder="用户ID"/></li>
+                        <li>群组ID：<input type="text" name="group.id" placeholder="群组ID"/></li>
+                        <li class="select-time">
+                            <label>添加时间：</label>
+                            <input type="text" class="time-input" id="complaints-beginCreateDate" placeholder="开始日期" name="beginCreateDate" data-type="datetime" data-format="yyyy-MM-dd HH:mm:ss"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="complaints-endCreateDate" placeholder="结束日期" name="endCreateDate" data-type="datetime" data-format="yyyy-MM-dd HH:mm:ss"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<!-- 投诉详情弹窗 -->
+<div id="group-complaints-modal" style="display:none;">
+    <form class="form-horizontal" style="padding:15px 20px 0;">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">用户：</label>
+            <div class="col-sm-8">
+                <p class="form-control-static" id="complaints-view-user"></p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">群组：</label>
+            <div class="col-sm-8">
+                <p class="form-control-static" id="complaints-view-group"></p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">投诉原因：</label>
+            <div class="col-sm-8">
+                <p class="form-control-static" id="complaints-view-reason"></p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">聊天记录：</label>
+            <div class="col-sm-8">
+                <pre id="complaints-view-log" style="max-height:120px;overflow:auto;white-space:pre-wrap;"></pre>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">图片：</label>
+            <div class="col-sm-8" id="complaints-view-imgs"></div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">描述：</label>
+            <div class="col-sm-8">
+                <p class="form-control-static" id="complaints-view-info"></p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">添加时间：</label>
+            <div class="col-sm-8">
+                <p class="form-control-static" id="complaints-view-createDate"></p>
+            </div>
+        </div>
+    </form>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js}"></script>
+<script th:src="@{/web4x/js/im-group-common.js}"></script>
+<script th:src="@{/web4x/js/im-group-complaints.js}"></script>
+</body>
+</html>

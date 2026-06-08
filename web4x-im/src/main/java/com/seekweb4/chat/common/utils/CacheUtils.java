@@ -2,6 +2,7 @@ package com.seekweb4.chat.common.utils;
 
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.data.redis.core.RedisTemplate;
 
 /**
  * Cache工具类
@@ -101,6 +102,17 @@ public class CacheUtils {
 	 */
 	public static void remove(String cacheName, String key) {
 		getCache(cacheName).evict(key);
+		forceDeleteRedisKeys(cacheName, key);
+	}
+
+	private static void forceDeleteRedisKeys(String cacheName, String key) {
+		try {
+			RedisTemplate<String, Object> redisTemplate =
+					SpringContextHolder.getBean("redisTemplate", RedisTemplate.class);
+			redisTemplate.delete(cacheName + "::" + key);
+			redisTemplate.delete(key);
+		} catch (Exception ignored) {
+		}
 	}
 
 

@@ -60,49 +60,36 @@ public class DictUtils {
 	}
 
 	public static List<DictValue> getDictList(String type){
-		@SuppressWarnings("unchecked")
-		Map<String, List<DictValue>> dictMap = (Map<String, List<DictValue>>)CacheUtils.get(CACHE_DICT_MAP);
-		// 如果缓存为空或包含 null key，重新构建缓存
-		if (dictMap == null || dictMap.containsKey(null)) {
-			dictMap = Maps.newHashMap();
-			for (DictType dictType : SpringContextHolder.getBean(DictTypeService.class).findList(new DictType())){
-				// 过滤掉 type 为 null 或空字符串的字典类型，避免 JSON 序列化时出现 null key
-				if (StringUtils.isNotBlank(dictType.getType())) {
-					List<DictValue> dictList = dictMap.get(dictType.getType());
-					dictType = SpringContextHolder.getBean(DictTypeService.class).get(dictType.getId());
-					// 重新获取后再次检查 type 是否为 null，因为数据库中的 type 可能为 null
-					if (dictType != null && StringUtils.isNotBlank(dictType.getType())) {
-						if (dictList != null){
-							dictList.addAll(dictType.getDictValueList());
-						}else{
-							dictMap.put(dictType.getType(), Lists.newArrayList(dictType.getDictValueList()));
-						}
-					}
-				}
-			}
-			CacheUtils.put(CACHE_DICT_MAP, dictMap);
-		}
-		List<DictValue> dictList = dictMap.get(type);
-		if (dictList == null){
-			dictList = Lists.newArrayList();
-		}
-		return dictList;
+		List<DictValue> dictList = getDictMap().get(type);
+		return dictList != null ? dictList : Lists.newArrayList();
 	}
 
 	public static Map<String, List<DictValue>> getDictMap() {
 		@SuppressWarnings("unchecked")
 		Map<String, List<DictValue>> dictMap = (Map<String, List<DictValue>>) CacheUtils.get(CACHE_DICT_MAP);
-		// 如果缓存为空或包含 null key，重新构建缓存
 		if (dictMap == null || dictMap.containsKey(null)) {
-			dictMap = Maps.newHashMap();
-			List<DictType> dict = SpringContextHolder.getBean(DictTypeService.class).getDict();
-			for (DictType dictType : dict) {
-				// 过滤掉 type 为 null 或空字符串的字典类型，避免 JSON 序列化时出现 null key
-				if (StringUtils.isNotBlank(dictType.getType())) {
-					dictMap.put(dictType.getType(), dictType.getDictValueList());
-				}
-			}
+			dictMap = buildDictMapFromDb();
 			CacheUtils.put(CACHE_DICT_MAP, dictMap);
+		}
+		return dictMap;
+	}
+
+	public static void reloadCache() {
+		clearCache();
+		CacheUtils.put(CACHE_DICT_MAP, buildDictMapFromDb());
+	}
+
+	public static void clearCache() {
+		CacheUtils.remove(CACHE_DICT_MAP);
+	}
+
+	private static Map<String, List<DictValue>> buildDictMapFromDb() {
+		Map<String, List<DictValue>> dictMap = Maps.newHashMap();
+		List<DictType> dict = SpringContextHolder.getBean(DictTypeService.class).getDict();
+		for (DictType dictType : dict) {
+			if (StringUtils.isNotBlank(dictType.getType())) {
+				dictMap.put(dictType.getType(), Lists.newArrayList(dictType.getDictValueList()));
+			}
 		}
 		return dictMap;
 	}

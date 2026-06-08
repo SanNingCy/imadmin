@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('会议室订单')" />
+    <style>
+        .live-order-table-wrap { overflow-x: auto; }
+        #live-order-form .select-time label {
+            width: 95px;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="live-order-form">
+                <div class="select-list">
+                    <ul>
+                        <li>订单号：<input type="text" name="orderNo" placeholder="请输入订单号"/></li>
+                        <li>用户ID：<input type="text" name="userIdno" placeholder="请输入用户ID"/></li>
+                        <li>
+                            状态：
+                            <select name="liveStatus" id="live-order-search-status">
+                                <option value="">请选择状态</option>
+                                <option value="pending_create">待创建</option>
+                                <option value="active">进行中</option>
+                                <option value="destroyed">房间已销毁</option>
+                            </select>
+                        </li>
+                        <li class="select-time">
+                            <label>开始时间范围：</label>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始日期" data-type="datetime"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束日期" data-type="datetime"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="imLiveOrderResetSearch()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-sm-12 select-table table-striped live-order-table-wrap">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js?v=20260608}"></script>
+<script th:src="@{/web4x/js/im-live-common.js?v=20260608}"></script>
+<script th:src="@{/web4x/js/im-live-order.js?v=20260608}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imLiveOrderInitTable();
+    });
+</script>
+</body>
+</html>

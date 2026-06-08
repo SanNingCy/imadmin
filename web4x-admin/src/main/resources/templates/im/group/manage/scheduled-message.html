@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('群定时消息管理')" />
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="group-scheduled-form">
+                <div class="select-list">
+                    <ul>
+                        <li>群组IDNO：<input type="text" name="group.idno" placeholder="群组IDNO"/></li>
+                        <li>文本：<input type="text" name="title" placeholder="文本"/></li>
+                        <li>
+                            类型：
+                            <select name="type">
+                                <option value="">请选择类型</option>
+                                <option value="1">纯文本</option>
+                                <option value="2">文本+图片</option>
+                                <option value="3">文本+视频</option>
+                                <option value="4">文本+文件</option>
+                            </select>
+                        </li>
+                        <li>
+                            提醒类型：
+                            <select name="txtype">
+                                <option value="">请选择提醒类型</option>
+                                <option value="1">仅一次</option>
+                                <option value="2">重复</option>
+                            </select>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js}"></script>
+<script th:src="@{/web4x/js/im-piamom-common.js}"></script>
+<script th:src="@{/web4x/js/im-group-common.js}"></script>
+<script th:src="@{/web4x/js/im-group-scheduled-message.js}"></script>
+<script th:inline="javascript">
+    window.imFilePath = /*[[${@environment.getProperty('filePath', '')}]]*/ '';
+</script>
+</body>
+</html>

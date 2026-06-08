@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('群组信息列表')" />
+    <style>
+        .group-info-table-wrap { overflow-x: auto; }
+        #group-info-member-modal .select-table {
+            margin-top: 0;
+            padding-top: 0;
+            padding-bottom: 8px;
+            box-shadow: none;
+        }
+        #group-info-member-modal .group-info-member-table-wrap {
+            padding: 0 15px 8px;
+        }
+        #group-info-member-modal .fixed-table-pagination {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="group-info-form">
+                <div class="select-list">
+                    <ul>
+                        <li>群主ID：<input type="text" name="u.id" placeholder="群主ID"/></li>
+                        <li>群组名称：<input type="text" name="name" placeholder="群组名称"/></li>
+                        <li>群ID：<input type="text" name="idno" placeholder="群ID"/></li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped group-info-table-wrap">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<!-- 查看/修改群信息弹窗 -->
+<div id="group-info-modal" style="display:none;">
+    <form id="group-info-modal-form" class="form-horizontal" style="padding:15px 20px 0;">
+        <input type="hidden" id="group-info-id"/>
+        <div class="form-group">
+            <label class="col-sm-3 control-label"><span class="text-danger">*</span> 群组名称：</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="group-info-name" placeholder="请输入群组名称"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">群ID：</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="group-info-idno" placeholder="群ID"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">群公告：</label>
+            <div class="col-sm-8">
+                <textarea class="form-control" id="group-info-gonggao" rows="4" placeholder="请输入群公告"></textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">群员发言间隔：</label>
+            <div class="col-sm-8">
+                <div class="input-group">
+                    <input type="number" class="form-control" id="group-info-jiange" min="0" placeholder="0"/>
+                    <span class="input-group-addon">秒</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">全员禁言：</label>
+            <div class="col-sm-8">
+                <select class="form-control" id="group-info-allJy">
+                    <option value="0">否</option>
+                    <option value="1">是</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">图片AI回复：</label>
+            <div class="col-sm-8">
+                <select class="form-control" id="group-info-openpic">
+                    <option value="0">否</option>
+                    <option value="1">是</option>
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- 群成员列表弹窗 -->
+<div id="group-info-member-modal" style="display:none;">
+    <div style="padding:10px 15px 0;">
+        <form id="group-info-member-form">
+            <div class="select-list">
+                <ul>
+                    <li>用户ID：<input type="text" name="u.id" placeholder="请输入用户ID"/></li>
+                    <li>群组ID：<input type="text" name="group.id" id="group-info-member-group-id" placeholder="群组ID"/></li>
+                    <li>
+                        身份：
+                        <select name="type">
+                            <option value="">请选择身份</option>
+                            <option value="1">群主</option>
+                            <option value="2">管理员</option>
+                            <option value="3">普通成员</option>
+                        </select>
+                    </li>
+                    <li>
+                        是否被禁言：
+                        <select name="isjy">
+                            <option value="">请选择</option>
+                            <option value="1">是</option>
+                            <option value="0">否</option>
+                        </select>
+                    </li>
+                    <li>
+                        <a class="btn btn-primary btn-rounded btn-sm" onclick="imGroupInfoMemberSearch()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                        <a class="btn btn-warning btn-rounded btn-sm" onclick="imGroupInfoMemberReset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                    </li>
+                </ul>
+            </div>
+        </form>
+    </div>
+    <div class="group-info-member-table-wrap select-table table-striped">
+        <table id="group-info-member-table"></table>
+    </div>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js}"></script>
+<script th:src="@{/web4x/js/im-piamom-common.js}"></script>
+<script th:src="@{/web4x/js/im-group-common.js}"></script>
+<script th:src="@{/web4x/js/im-group-info.js}"></script>
+<script th:inline="javascript">
+    window.imFilePath = /*[[${@environment.getProperty('filePath', '')}]]*/ '';
+    $(function () {
+        imGroupInfoInitTable(
+            [[${@permission.isPermitted('group:manage:info:view')}]],
+            [[${@permission.isPermitted('group:manage:info:edit')}]],
+            [[${@permission.isPermitted('group:manage:info:delete')}]],
+            [[${@permission.isPermitted('group:manage:info:member')}]]
+        );
+    });
+</script>
+</body>
+</html>
