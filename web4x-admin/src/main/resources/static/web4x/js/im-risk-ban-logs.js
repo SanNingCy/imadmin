@@ -28,18 +28,6 @@ function imRiskBanLogsFormatState(val) {
     return '<span class="label label-success">正常</span>';
 }
 
-function imRiskBanLogsFormatIcon(val) {
-    if (!val) return "-";
-    var html = [];
-    String(val).split("|").forEach(function (src) {
-        src = $.trim(src);
-        if (src) {
-            html.push('<img class="ban-log-avatar" src="' + src.replace(/"/g, "&quot;") + '" alt="avatar"/>');
-        }
-    });
-    return html.length ? html.join("") : "-";
-}
-
 function imRiskBanLogsEllipsis(val) {
     if (val == null || val === "") return "-";
     var text = String(val);
@@ -105,18 +93,35 @@ function imRiskBanLogsBatchJie() {
 }
 
 function imRiskBanLogsInitTable(canBan, canUnban) {
+    imInitListMediaPreview();
     imInitTable({
         url: imRiskBanLogsApi + "/banList",
         formId: "ban-logs-form",
         queryParams: imRiskBanLogsQueryParams,
         responseHandler: imPageResponse,
         modalName: "封禁记录",
+        escape: false,
+        onPostBody: function () {
+            imBindListMediaPreview($("#bootstrap-table"));
+        },
         columns: [
             { checkbox: true },
             { field: "eqno", title: "设备号", sortable: true, class: "ban-log-ellipsis", formatter: imRiskBanLogsEllipsis },
             { field: "idno", title: "id号", sortable: true, class: "ban-log-ellipsis", formatter: imRiskBanLogsEllipsis },
             { field: "nickname", title: "昵称", sortable: true },
-            { field: "icon", title: "头像", formatter: imRiskBanLogsFormatIcon },
+            {
+                field: "icon",
+                title: "头像",
+                width: 80,
+                escape: false,
+                ellipsis: false,
+                cellStyle: function () {
+                    return { css: { "text-align": "center", "vertical-align": "middle" } };
+                },
+                formatter: function (value, row) {
+                    return imFormatListMedia(value, "ban-log-icon-" + row.id);
+                }
+            },
             { field: "sex", title: "性别", sortable: true, formatter: imRiskBanLogsFormatSex },
             { field: "sign", title: "签名", sortable: true, class: "ban-log-ellipsis", formatter: imRiskBanLogsEllipsis },
             { field: "state", title: "状态", sortable: true, formatter: imRiskBanLogsFormatState },

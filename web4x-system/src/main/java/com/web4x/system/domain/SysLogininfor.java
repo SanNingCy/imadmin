@@ -3,6 +3,7 @@ package com.web4x.system.domain;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.web4x.common.annotation.Excel;
 import com.web4x.common.annotation.Excel.ColumnType;
 import com.web4x.common.core.domain.BaseEntity;
@@ -49,6 +50,7 @@ public class SysLogininfor extends BaseEntity
     private String msg;
 
     /** 访问时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Excel(name = "访问时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
     private Date loginTime;
 

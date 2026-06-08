@@ -123,7 +123,10 @@
 		        {
 		            field: 'loginTime',
 		            title: '登录时间',
-		            sortable: true
+		            sortable: true,
+		            formatter: function(value) {
+		                return $.common.dateFormat(value, 'yyyy-MM-dd HH:mm:ss');
+		            }
 		        }]
 		    };
 		    $.table.init(options);

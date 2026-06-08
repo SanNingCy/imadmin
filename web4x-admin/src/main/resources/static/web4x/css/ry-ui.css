@@ -906,6 +906,38 @@ label {
 	text-align: left !important;
 }
 
+/** 列表文本列全局省略（imApplyTableEllipsisColumns + imFormatText） */
+.select-table .bootstrap-table .fixed-table-container tbody td.im-table-ellipsis-cell {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.select-table .bootstrap-table .fixed-table-container tbody td.im-table-ellipsis-cell .im-cell-ellipsis {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width: 100%;
+}
+.select-table .bootstrap-table .fixed-table-container tbody td.im-table-no-ellipsis {
+	overflow: visible;
+	white-space: normal;
+}
+
+/** 操作列全局加宽，避免按钮换行 */
+.select-table .bootstrap-table .fixed-table-container th.im-table-operate-cell,
+.select-table .bootstrap-table .fixed-table-container td.im-table-operate-cell {
+	min-width: 280px;
+	white-space: nowrap;
+}
+.select-table .bootstrap-table .fixed-table-container td.im-table-operate-cell .btn {
+	margin-bottom: 2px;
+}
+/** 普通列最小宽度兜底（与 imApplyTableColumnWidths 配合） */
+.select-table .bootstrap-table .fixed-table-container tbody td.im-table-ellipsis-cell {
+	min-width: 120px;
+}
+
 .table-striped .table>thead>tr>th, .table-striped .table>tbody>tr>th {
 	border-bottom: 1px solid #ccc!important;
 	border-top: 0px!important;

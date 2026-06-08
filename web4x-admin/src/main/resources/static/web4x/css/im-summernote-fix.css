@@ -1,0 +1,38 @@
+/**
+ * Summernote modal above layui-layer; keep centered in viewport.
+ */
+body > .note-modal {
+	z-index: 19891035 !important;
+	position: fixed !important;
+	top: 0 !important;
+	right: 0 !important;
+	bottom: 0 !important;
+	left: 0 !important;
+	overflow-x: hidden;
+	overflow-y: auto;
+	outline: 0;
+}
+body > .note-modal.in {
+	display: flex !important;
+	align-items: center;
+	justify-content: center;
+	padding: 16px;
+}
+body > .note-modal .modal-dialog {
+	margin: 0 auto !important;
+	position: relative;
+	width: 600px;
+	max-width: 100%;
+	flex: 0 0 auto;
+}
+body > .modal-backdrop.in {
+	z-index: 19891034 !important;
+}
+.note-popover,
+.note-image-popover,
+.note-air-popover {
+	z-index: 19891035 !important;
+}
+.note-dropdown-menu {
+	z-index: 19891035 !important;
+}

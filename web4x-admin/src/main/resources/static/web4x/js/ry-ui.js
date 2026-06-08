@@ -1721,35 +1721,44 @@ var table = {
                 });
                 return flag ? str : '';
             },
-            // 日期格式化 时间戳  -> yyyy-MM-dd HH-mm-ss
+            // 日期格式化 时间戳 / 字符串 -> yyyy-MM-dd HH:mm:ss
             dateFormat: function(date, format) {
                 var that = this;
                 if (that.isEmpty(date)) return "";
-                if (!date) return;
                 if (!format) format = "yyyy-MM-dd";
-                switch (typeof date) {
-                case "string":
-                    date = date.replace("T", " ");
-                    date = date.replace(/-/g, "/");
-                    date = new Date(date);
-                    break;
-                case "number":
-                    date = new Date(date);
-                    break;
+                if (typeof date === "string" && /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(date)) {
+                    return date;
                 }
-                if (!date instanceof Date) return;
+                var d;
+                if (typeof date === "number") {
+                    d = new Date(date);
+                } else if (typeof date === "string") {
+                    var trimmed = $.trim(date);
+                    if (/^\d+$/.test(trimmed)) {
+                        d = new Date(Number(trimmed));
+                    } else {
+                        d = new Date(trimmed.replace("T", " ").replace(/-/g, "/"));
+                    }
+                } else if (date instanceof Date) {
+                    d = date;
+                } else {
+                    return "";
+                }
+                if (!(d instanceof Date) || isNaN(d.getTime())) {
+                    return "";
+                }
                 var dict = {
-                    "yyyy": date.getFullYear(),
-                    "M": date.getMonth() + 1,
-                    "d": date.getDate(),
-                    "H": date.getHours(),
-                    "m": date.getMinutes(),
-                    "s": date.getSeconds(),
-                    "MM": ("" + (date.getMonth() + 101)).substr(1),
-                    "dd": ("" + (date.getDate() + 100)).substr(1),
-                    "HH": ("" + (date.getHours() + 100)).substr(1),
-                    "mm": ("" + (date.getMinutes() + 100)).substr(1),
-                    "ss": ("" + (date.getSeconds() + 100)).substr(1)
+                    "yyyy": d.getFullYear(),
+                    "M": d.getMonth() + 1,
+                    "d": d.getDate(),
+                    "H": d.getHours(),
+                    "m": d.getMinutes(),
+                    "s": d.getSeconds(),
+                    "MM": ("" + (d.getMonth() + 101)).substr(1),
+                    "dd": ("" + (d.getDate() + 100)).substr(1),
+                    "HH": ("" + (d.getHours() + 100)).substr(1),
+                    "mm": ("" + (d.getMinutes() + 100)).substr(1),
+                    "ss": ("" + (d.getSeconds() + 100)).substr(1)
                 };
                 return format.replace(/(yyyy|MM?|dd?|HH?|ss?|mm?)/g,
                 function() {
