@@ -521,6 +521,7 @@ function imAnnounceOpenUserPicker() {
 
 function imAnnounceInitTable(canView, canEdit, canDelete) {
     imAnnounceInitSearchDatetime();
+    imInitListMediaPreview();
     imInitTable({
         url: imAnnounceApi + "/list",
         method: "post",
@@ -528,6 +529,10 @@ function imAnnounceInitTable(canView, canEdit, canDelete) {
         queryParams: imAnnounceQueryParams,
         responseHandler: imPageResponse,
         modalName: "公告",
+        escape: false,
+        onPostBody: function () {
+            imBindListMediaPreview($("#bootstrap-table"));
+        },
         columns: [
             { checkbox: true },
             {
@@ -574,8 +579,13 @@ function imAnnounceInitTable(canView, canEdit, canDelete) {
             {
                 field: "imageUrl",
                 title: "公告缩略图",
-                formatter: function (v) {
-                    return v ? '<img src="' + v + '" style="width:50px;height:50px;object-fit:contain;" alt="thumb"/>' : "";
+                width: 100,
+                escape: false,
+                cellStyle: function () {
+                    return { css: { "text-align": "left", "vertical-align": "middle" } };
+                },
+                formatter: function (v, row) {
+                    return imFormatListMedia(v, "announce-thumb-" + row.id);
                 }
             },
             {

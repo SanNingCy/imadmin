@@ -30,8 +30,7 @@ function imUpgradeFormatUrl(val) {
 }
 
 function imUpgradeFormatQr(val) {
-    if (!val) return "";
-    return '<img src="' + val + '" style="width:72px;height:72px;object-fit:contain;" alt="二维码"/>';
+    return imFormatListMedia(val, "upgrade-qrcode-preview");
 }
 
 function imUpgradeFormatContent(val) {
@@ -308,12 +307,17 @@ function imUpgradeExport() {
 
 /** 初始化版本列表表格（列定义放独立 js，避免 Thymeleaf 内联脚本转义导致语法错误） */
 function imUpgradeInitTable(canView, canEdit, canDelete) {
+    imInitListMediaPreview();
     imInitTable({
         url: imUpgradeApi + "/list",
         formId: "upgrade-form",
         queryParams: imUpgradeQueryParams,
         responseHandler: imPageResponse,
         modalName: "版本更新",
+        escape: false,
+        onPostBody: function () {
+            imBindListMediaPreview($("#bootstrap-table"));
+        },
         columns: [
             { checkbox: true },
             {
@@ -338,8 +342,13 @@ function imUpgradeInitTable(canView, canEdit, canDelete) {
             {
                 field: "qrCode",
                 title: "二维码",
-                formatter: function (value) {
-                    return imUpgradeFormatQr(value);
+                width: 100,
+                escape: false,
+                cellStyle: function () {
+                    return { css: { "text-align": "left", "vertical-align": "middle" } };
+                },
+                formatter: function (value, row) {
+                    return imFormatListMedia(value, "upgrade-qrcode-" + row.id);
                 }
             },
             {

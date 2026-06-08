@@ -168,6 +168,28 @@ function imInitTable(options) {
     $.table.init(options);
 }
 
+/** 列表图片预览初始化（需引入 im-piamom-common.js，与朋友圈列表一致） */
+function imInitListMediaPreview() {
+    if (typeof imPiamomInitMediaEvents === "function") {
+        imPiamomInitMediaEvents();
+    }
+}
+
+/** 表格渲染后绑定图片预览与加载失败回退 */
+function imBindListMediaPreview($root) {
+    if (typeof imPiamomBindMediaImagesIn === "function") {
+        imPiamomBindMediaImagesIn($root || $("#bootstrap-table"));
+    }
+}
+
+/** 列表图片列格式化（需引入 im-piamom-common.js） */
+function imFormatListMedia(value, cacheKey) {
+    if (typeof imPiamomFormatMedia === "function") {
+        return imPiamomFormatMedia(value, cacheKey);
+    }
+    return value ? imEscapeHtml(String(value)) : "-";
+}
+
 (function imTableBootstrapPatch() {
     if (typeof jQuery === 'undefined' || !jQuery.table) {
         return;
