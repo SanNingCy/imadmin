@@ -132,26 +132,8 @@ function imUserListFormatYesNo(val) {
 
 
 
-function imUserListFormatImages(val) {
-
-    if (!val) return "-";
-
-    var html = [];
-
-    String(val).split("|").forEach(function (src) {
-
-        src = $.trim(src);
-
-        if (src) {
-
-            html.push('<img class="user-list-img" src="' + src.replace(/"/g, "&quot;") + '" alt="img"/>');
-
-        }
-
-    });
-
-    return html.length ? html.join("") : "-";
-
+function imUserListImageCellStyle() {
+    return { css: { "text-align": "left", "vertical-align": "middle" } };
 }
 
 
@@ -936,6 +918,8 @@ function imUserListOpenTransaction(uid) {
 
 function imUserListInitTable(canView, canEdit, canDelete, canChangeBalance, canTransaction, canClear) {
 
+    imInitListMediaPreview();
+
     imInitTable({
 
         url: imUserListApi + "/list",
@@ -947,6 +931,12 @@ function imUserListInitTable(canView, canEdit, canDelete, canChangeBalance, canT
         responseHandler: imPageResponse,
 
         modalName: "用户",
+
+        escape: false,
+
+        onPostBody: function () {
+            imBindListMediaPreview($("#bootstrap-table"));
+        },
 
         columns: [
 
@@ -978,13 +968,43 @@ function imUserListInitTable(canView, canEdit, canDelete, canChangeBalance, canT
 
             { field: "endtime", title: "靓号到期时间", sortable: true },
 
-            { field: "qrcode", title: "名片二维码", formatter: imUserListFormatImages },
+            {
+                field: "qrcode",
+                title: "名片二维码",
+                width: 80,
+                escape: false,
+                ellipsis: false,
+                cellStyle: imUserListImageCellStyle,
+                formatter: function (value, row) {
+                    return imFormatListMedia(value, "user-list-qrcode-" + row.id);
+                }
+            },
 
-            { field: "qrcode2", title: "登录二维码", formatter: imUserListFormatImages },
+            {
+                field: "qrcode2",
+                title: "登录二维码",
+                width: 80,
+                escape: false,
+                ellipsis: false,
+                cellStyle: imUserListImageCellStyle,
+                formatter: function (value, row) {
+                    return imFormatListMedia(value, "user-list-qrcode2-" + row.id);
+                }
+            },
 
             { field: "nickname", title: "昵称", sortable: true },
 
-            { field: "icon", title: "头像", formatter: imUserListFormatImages },
+            {
+                field: "icon",
+                title: "头像",
+                width: 80,
+                escape: false,
+                ellipsis: false,
+                cellStyle: imUserListImageCellStyle,
+                formatter: function (value, row) {
+                    return imFormatListMedia(value, "user-list-icon-" + row.id);
+                }
+            },
 
             { field: "sex", title: "性别", sortable: true, formatter: imUserListFormatSex },
 

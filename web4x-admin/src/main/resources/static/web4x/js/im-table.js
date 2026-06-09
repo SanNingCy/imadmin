@@ -373,9 +373,9 @@ function imBindListMediaPreview($root) {
 }
 
 /** 列表图片列格式化（需引入 im-piamom-common.js） */
-function imFormatListMedia(value, cacheKey) {
+function imFormatListMedia(value, cacheKey, max) {
     if (typeof imPiamomFormatMedia === "function") {
-        return imPiamomFormatMedia(value, cacheKey);
+        return imPiamomFormatMedia(value, cacheKey, max);
     }
     return value ? imEscapeHtml(String(value)) : "-";
 }

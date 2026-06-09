@@ -68,8 +68,10 @@
 
 <th:block th:include="include :: footer" />
 <script th:src="@{/web4x/js/im-table.js?v=20260605m}"></script>
+<script th:src="@{/web4x/js/im-piamom-common.js}"></script>
 <script th:src="@{/web4x/js/im-user-ban.js?v=20260605p}"></script>
 <script th:inline="javascript">
+    window.imFilePath = /*[[${@environment.getProperty('filePath', '')}]]*/ '';
     $(function () {
         imUserBanInitTable(
             [[${@permission.isPermitted('social:user:ban:ban')}]],

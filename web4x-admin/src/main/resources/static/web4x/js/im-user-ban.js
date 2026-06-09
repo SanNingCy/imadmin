@@ -43,18 +43,6 @@ function imUserBanFormatState(val) {
     return '<span class="label label-success">正常</span>';
 }
 
-function imUserBanFormatIcon(val) {
-    if (!val) return "-";
-    var html = [];
-    String(val).split("|").forEach(function (src) {
-        src = $.trim(src);
-        if (src) {
-            html.push('<img class="ban-avatar" src="' + src.replace(/"/g, "&quot;") + '" alt="avatar"/>');
-        }
-    });
-    return html.length ? html.join("") : "-";
-}
-
 function imUserBanRequest(method, ids, successMsg) {
     $.ajax({
         url: imUserBanApi + (method === "feng" ? "/feng" : "/jie"),
@@ -114,12 +102,17 @@ function imUserBanBatchJie() {
 }
 
 function imUserBanInitTable(canBan, canUnban) {
+    imInitListMediaPreview();
     imInitTable({
         url: imUserBanApi + "/list",
         formId: "ban-form",
         queryParams: imUserBanQueryParams,
         responseHandler: imPageResponse,
         modalName: "用户",
+        escape: false,
+        onPostBody: function () {
+            imBindListMediaPreview($("#bootstrap-table"));
+        },
         columns: [
             { checkbox: true },
             { field: "eqno", title: "设备号", sortable: true, width: 160, class: "ban-ellipsis", formatter: imUserBanFormatEllipsis },
@@ -127,7 +120,19 @@ function imUserBanInitTable(canBan, canUnban) {
             { field: "acount", title: "账号", sortable: true, width: 120, class: "ban-ellipsis", formatter: imUserBanFormatEllipsis },
             { field: "idno", title: "idno", sortable: true, width: 120, class: "ban-ellipsis", formatter: imUserBanFormatEllipsis },
             { field: "nickname", title: "昵称", sortable: true },
-            { field: "icon", title: "头像", formatter: imUserBanFormatIcon },
+            {
+                field: "icon",
+                title: "头像",
+                width: 80,
+                escape: false,
+                ellipsis: false,
+                cellStyle: function () {
+                    return { css: { "text-align": "left", "vertical-align": "middle" } };
+                },
+                formatter: function (value, row) {
+                    return imFormatListMedia(value, "user-ban-icon-" + row.id);
+                }
+            },
             { field: "sex", title: "性别", sortable: true, formatter: imUserBanFormatSex },
             { field: "sign", title: "签名", sortable: true, width: 120, class: "ban-ellipsis", formatter: imUserBanFormatEllipsis },
             { field: "state", title: "状态", sortable: true, formatter: imUserBanFormatState },

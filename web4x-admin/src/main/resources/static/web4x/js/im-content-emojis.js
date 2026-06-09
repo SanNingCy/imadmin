@@ -14,19 +14,18 @@ function imContentEmojisQueryParams(params) {
     return imOmitEmptyParams(query);
 }
 
-function imContentEmojisFormatImg(val) {
-    if (!val) return "-";
-    var src = String(val).replace(/"/g, "&quot;");
-    return '<img class="emoji-img" src="' + src + '" alt="emoji"/>';
-}
-
 function imContentEmojisInitTable() {
+    imInitListMediaPreview();
     imInitTable({
         url: imContentEmojisApi + "/list",
         formId: "emojis-form",
         queryParams: imContentEmojisQueryParams,
         responseHandler: imPageResponse,
         modalName: "表情包",
+        escape: false,
+        onPostBody: function () {
+            imBindListMediaPreview($("#bootstrap-table"));
+        },
         columns: [
             {
                 field: "u.id",
@@ -48,7 +47,15 @@ function imContentEmojisInitTable() {
                 field: "img",
                 title: "表情",
                 sortable: true,
-                formatter: function (v) { return imContentEmojisFormatImg(v); }
+                width: 80,
+                escape: false,
+                ellipsis: false,
+                cellStyle: function () {
+                    return { css: { "text-align": "left", "vertical-align": "middle" } };
+                },
+                formatter: function (value, row) {
+                    return imFormatListMedia(value, "content-emojis-img-" + row.id);
+                }
             },
             { field: "createDate", title: "添加时间", sortable: true }
         ]

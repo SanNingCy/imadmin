@@ -232,13 +232,14 @@ function imPiamomSquareListInitTable(canView, canEdit, canDelete) {
             {
                 field: "imageUrls",
                 title: "媒体",
-                width: 280,
+                width: 220,
                 escape: false,
                 cellStyle: function () {
                     return { css: { "text-align": "left", "vertical-align": "middle" } };
                 },
                 formatter: function (v, row) {
-                    return imPiamomFormatSquareMedia(v, row.video, "square-" + row.id);
+                    var max = typeof IM_LIST_MEDIA_COMPACT_MAX !== "undefined" ? IM_LIST_MEDIA_COMPACT_MAX : 4;
+                    return imPiamomFormatSquareMedia(v, row.video, "square-" + row.id, max);
                 }
             },
             { field: "type", title: "类型", sortable: true, width: 80, formatter: imPiamomFormatSquareType },

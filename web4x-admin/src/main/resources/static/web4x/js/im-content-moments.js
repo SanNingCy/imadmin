@@ -17,15 +17,6 @@ function imContentMomentsQueryParams(params) {
     return imOmitEmptyParams(query);
 }
 
-function imContentMomentsSplitUrls(value) {
-    if (!value) return [];
-    return String(value).split("|").map(function (item) {
-        return $.trim(item);
-    }).filter(function (item) {
-        return !!item;
-    });
-}
-
 function imContentMomentsEscapeHtml(text) {
     return String(text)
         .replace(/&/g, "&amp;")
@@ -41,43 +32,38 @@ function imContentMomentsFormatEllipsis(val) {
     return '<span class="moment-ellipsis-inner" title="' + safe + '">' + safe + "</span>";
 }
 
-function imContentMomentsFormatImages(val) {
-    var urls = imContentMomentsSplitUrls(val);
-    if (!urls.length) return "-";
-    return urls.map(function (src) {
-        var safe = src.replace(/"/g, "&quot;");
-        return '<img class="moment-media-img" src="' + safe + '" onclick="imContentMomentsPreviewImage(' + JSON.stringify(src) + ')" alt="img"/>';
-    }).join("");
-}
+var imContentMomentsVideoEventsBound = false;
 
-function imContentMomentsPreviewImage(src) {
-    if (!src || typeof layer === "undefined") return;
-    layer.open({
-        type: 1,
-        title: false,
-        closeBtn: 1,
-        shadeClose: true,
-        area: ["auto", "auto"],
-        content: '<img src="' + src.replace(/"/g, "&quot;") + '" style="max-width:90vw;max-height:80vh;"/>'
+function imContentMomentsInitVideoEvents() {
+    if (imContentMomentsVideoEventsBound) {
+        return;
+    }
+    imContentMomentsVideoEventsBound = true;
+    $(document).on("click", ".moment-video-play", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        imContentMomentsOpenVideo($(this).attr("data-video-url"));
     });
 }
 
 function imContentMomentsOpenVideo(url) {
-    if (!url) return;
-    $("#moment-video-player").attr("src", url);
+    if (!url || typeof layer === "undefined") {
+        return;
+    }
+    if (typeof imPiamomNormalizeMediaUrl === "function") {
+        url = imPiamomNormalizeMediaUrl(url);
+    }
+    if (!url) {
+        return;
+    }
+    var safeSrc = String(url).replace(/"/g, "&quot;");
     layer.open({
         type: 1,
         title: "视频预览",
         area: ["720px", "480px"],
         shadeClose: true,
-        content: $("#moment-video-modal"),
-        end: function () {
-            var player = document.getElementById("moment-video-player");
-            if (player) {
-                player.pause();
-                player.removeAttribute("src");
-            }
-        }
+        content: '<div style="padding:10px;"><video controls autoplay playsinline style="width:100%;max-height:480px;" src="'
+            + safeSrc + '"></video></div>'
     });
 }
 
@@ -109,12 +95,18 @@ function imContentMomentsRemove(id) {
 }
 
 function imContentMomentsInitTable(canView, canDelete) {
+    imInitListMediaPreview();
+    imContentMomentsInitVideoEvents();
     imInitTable({
         url: imContentMomentsApi + "/list",
         formId: "moments-form",
         queryParams: imContentMomentsQueryParams,
         responseHandler: imPageResponse,
         modalName: "朋友圈动态",
+        escape: false,
+        onPostBody: function () {
+            imBindListMediaPreview($("#bootstrap-table"));
+        },
         columns: [
             {
                 field: "u.idno",
@@ -152,19 +144,32 @@ function imContentMomentsInitTable(canView, canDelete) {
             {
                 field: "imgs",
                 title: "图片",
-                formatter: function (v) { return imContentMomentsFormatImages(v); }
+                width: 200,
+                escape: false,
+                cellStyle: function () {
+                    return { css: { "text-align": "left", "vertical-align": "middle" } };
+                },
+                formatter: function (v, row) {
+                    var max = typeof IM_LIST_MEDIA_COMPACT_MAX !== "undefined" ? IM_LIST_MEDIA_COMPACT_MAX : 4;
+                    return imFormatListMedia(v, "moments-imgs-" + row.id, max);
+                }
             },
             {
                 field: "vimg",
                 title: "视频封面",
-                formatter: function (v) { return imContentMomentsFormatImages(v); }
+                escape: false,
+                formatter: function (v, row) {
+                    return imFormatListMedia(v, "moments-vimg-" + row.id);
+                }
             },
             {
                 field: "video",
                 title: "视频",
+                escape: false,
                 formatter: function (v) {
                     if (!v) return "-";
-                    return '<a class="btn btn-default btn-xs" href="javascript:void(0)" onclick="imContentMomentsOpenVideo(' + JSON.stringify(String(v)) + ')"><i class="fa fa-play"></i> 查看视频</a>';
+                    return '<a class="btn btn-default btn-xs moment-video-play" href="javascript:void(0)" data-video-url="'
+                        + imEscapeHtml(String(v)) + '"><i class="fa fa-play"></i> 查看视频</a>';
                 }
             },
             { field: "createDate", title: "添加时间", sortable: true },

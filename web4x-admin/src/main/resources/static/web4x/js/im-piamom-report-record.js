@@ -297,11 +297,15 @@ function imPiamomReportRecordInitTable(canView, canAudit) {
             {
                 field: "imageUrls",
                 title: "举证图",
-                width: 180,
+                width: 200,
                 escape: false,
+                cellStyle: function () {
+                    return { css: { "text-align": "left", "vertical-align": "middle" } };
+                },
                 formatter: function (v, row) {
                     var urls = row.imageUrlList && row.imageUrlList.length ? row.imageUrlList : v;
-                    return imPiamomFormatMedia(urls, "report-list-" + row.id);
+                    var max = typeof IM_LIST_MEDIA_COMPACT_MAX !== "undefined" ? IM_LIST_MEDIA_COMPACT_MAX : 4;
+                    return imPiamomFormatMedia(urls, "report-list-" + row.id, max);
                 }
             },
             { field: "targetType", title: "对象类型", width: 90, formatter: imPiamomFormatTargetType },

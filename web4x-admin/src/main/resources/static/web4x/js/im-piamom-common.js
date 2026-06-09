@@ -29,8 +29,14 @@ function imPiamomParseImageUrls(value) {
     if (!trimmed || trimmed === "[]") {
         return [];
     }
-    // 已是单个 http(s) 地址
-    if (/^https?:\/\//i.test(trimmed)) {
+    // 多图用 | 拼接（朋友圈 imgs 等）；须在单 URL 判断之前拆分，否则 http://a|http://b 会被当成一个地址
+    if (trimmed.indexOf("|") !== -1) {
+        return trimmed.split("|").map(function (item) {
+            return imPiamomNormalizeMediaUrl($.trim(item));
+        }).filter(Boolean);
+    }
+    // 已是单个 http(s) 或内嵌图片（登录二维码等后端生成的 data URL）
+    if (/^https?:\/\//i.test(trimmed) || /^data:/i.test(trimmed) || /^blob:/i.test(trimmed)) {
         return [imPiamomNormalizeMediaUrl(trimmed)];
     }
     try {
@@ -62,7 +68,7 @@ function imPiamomNormalizeMediaUrl(src) {
     src = src.replace(/^[\["']+|[\]"']+$/g, "");
     // MySQL/JSON 转义残留：\/ -> /
     src = src.replace(/\\\//g, "/").replace(/\\/g, "");
-    if (/^https?:\/\//i.test(src)) {
+    if (/^https?:\/\//i.test(src) || /^data:/i.test(src) || /^blob:/i.test(src)) {
         return src;
     }
     var base = window.imFilePath || "";
@@ -86,6 +92,16 @@ function imPiamomInitMediaEvents() {
     }
     imPiamomMediaEventsBound = true;
     $(document).on("click", ".piamom-media-img", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var galleryId = $(this).attr("data-gallery");
+        var index = parseInt($(this).attr("data-index"), 10);
+        if (isNaN(index)) {
+            index = 0;
+        }
+        imPiamomPreviewGallery(galleryId, index);
+    });
+    $(document).on("click", ".piamom-media-more", function (e) {
         e.preventDefault();
         e.stopPropagation();
         var galleryId = $(this).attr("data-gallery");
@@ -166,21 +182,35 @@ function imPiamomFormatMedia(value, cacheKey, max) {
     if (!urls.length) {
         return "-";
     }
+    var compact = max != null && max > 0;
     var display = urls;
-    if (max != null && max > 0) {
+    var overflow = 0;
+    var moreIndex = 0;
+    if (compact && urls.length > max) {
+        display = urls.slice(0, Math.max(max - 1, 1));
+        overflow = urls.length - display.length;
+        moreIndex = display.length;
+    } else if (compact) {
         display = urls.slice(0, max);
     }
-    var thumbSize = display.length > 4 ? 40 : 48;
+    var thumbSize = compact ? null : (display.length > 4 ? 40 : 48);
     var galleryId = cacheKey != null ? String(cacheKey) : ("g" + Date.now() + Math.random());
     imPiamomMediaGalleryCache[galleryId] = urls;
+    var safeGalleryId = imEscapeHtml(galleryId);
+    var cellClass = "piamom-media-cell" + (compact ? " piamom-media-cell--compact" : "");
 
-    var html = '<div class="piamom-media-cell">';
+    var html = '<div class="' + cellClass + '">';
     display.forEach(function (src, index) {
         var safe = src.replace(/"/g, "&quot;");
-        html += '<img class="piamom-media-img" style="width:' + thumbSize + "px;height:" + thumbSize + 'px" '
-            + 'src="' + safe + '" data-src="' + safe + '" data-gallery="' + imEscapeHtml(galleryId) + '" data-index="' + index + '" '
+        var sizeStyle = thumbSize ? (' style="width:' + thumbSize + "px;height:" + thumbSize + 'px"') : "";
+        html += '<img class="piamom-media-img" ' + sizeStyle
+            + ' src="' + safe + '" data-src="' + safe + '" data-gallery="' + safeGalleryId + '" data-index="' + index + '" '
             + 'referrerpolicy="no-referrer" loading="lazy" alt=""/>';
     });
+    if (overflow > 0) {
+        html += '<span class="piamom-media-more" data-gallery="' + safeGalleryId + '" data-index="' + moreIndex
+            + '" title="共' + urls.length + '张，点击查看">+' + overflow + "</span>";
+    }
     html += "</div>";
     return html;
 }
@@ -427,9 +457,12 @@ function imPiamomFormatReadStatus(val) {
         : '<span class="label label-warning">未读</span>';
 }
 
+/** 列表媒体列默认最多展示位数（超出显示 +N，保持单行） */
+var IM_LIST_MEDIA_COMPACT_MAX = 4;
+
 /** 广场媒体：图片 + 视频链接 */
-function imPiamomFormatSquareMedia(imageUrls, video, cacheKey) {
-    var imgHtml = imPiamomFormatMedia(imageUrls, cacheKey);
+function imPiamomFormatSquareMedia(imageUrls, video, cacheKey, max) {
+    var imgHtml = imPiamomFormatMedia(imageUrls, cacheKey, max);
     var videos = imPiamomParseImageUrls(video);
     if (imgHtml === "-" && !videos.length) {
         return "-";

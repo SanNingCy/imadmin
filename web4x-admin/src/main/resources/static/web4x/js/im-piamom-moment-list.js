@@ -211,13 +211,14 @@ function imPiamomMomentListInitTable(canView, canEdit, canDelete) {
             {
                 field: "imageUrls",
                 title: "图片",
-                width: 300,
+                width: 200,
                 escape: false,
                 cellStyle: function () {
                     return { css: { "text-align": "left", "vertical-align": "middle" } };
                 },
                 formatter: function (v, row) {
-                    return imPiamomFormatMedia(v, "moment-" + row.id);
+                    var max = typeof IM_LIST_MEDIA_COMPACT_MAX !== "undefined" ? IM_LIST_MEDIA_COMPACT_MAX : 4;
+                    return imPiamomFormatMedia(v, "moment-" + row.id, max);
                 }
             },
             { field: "viewCount", title: "浏览", sortable: true, width: 70 },
