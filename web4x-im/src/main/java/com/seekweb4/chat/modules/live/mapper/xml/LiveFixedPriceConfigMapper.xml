@@ -7,6 +7,7 @@
         <result column="duration_id" property="durationId"/>
         <result column="tier_id" property="tierId"/>
         <result column="fixed_price" property="fixedPrice"/>
+        <result column="pricing_mode" property="pricingMode"/>
         <result column="status" property="status"/>
         <result column="remark" property="remark"/>
         <result column="create_by" property="createBy"/>
@@ -47,6 +48,9 @@
             <if test="fixedPrice != null">
                 and c.fixed_price = #{fixedPrice}
             </if>
+            <if test="pricingMode != null and pricingMode != ''">
+                and c.pricing_mode = #{pricingMode}
+            </if>
             <if test="createBy != null and createBy != ''">
                 and c.create_by = #{createBy}
             </if>
@@ -58,7 +62,7 @@
 
     <select id="selectAdminPageList" resultMap="VoResultMap">
         select
-        c.id, c.duration_id, c.tier_id, c.fixed_price, c.status, c.remark,
+        c.id, c.duration_id, c.tier_id, c.fixed_price, c.pricing_mode, c.status, c.remark,
         c.create_by, c.update_by, c.create_time, c.update_time, c.is_deleted,
         d.duration_name as join_duration_name,
         d.duration_value as join_duration_value,
@@ -85,7 +89,7 @@
 
     <select id="selectByPrimaryKey" resultMap="VoResultMap">
         select
-        c.id, c.duration_id, c.tier_id, c.fixed_price, c.status, c.remark,
+        c.id, c.duration_id, c.tier_id, c.fixed_price, c.pricing_mode, c.status, c.remark,
         c.create_by, c.update_by, c.create_time, c.update_time, c.is_deleted,
         d.duration_name as join_duration_name,
         d.duration_value as join_duration_value,
@@ -108,10 +112,10 @@
 
     <insert id="insert" parameterType="com.seekweb4.chat.modules.live.entity.LiveFixedPriceConfig" useGeneratedKeys="true" keyProperty="id">
         insert into t_live_fixed_price_config (
-            duration_id, tier_id, fixed_price, status, remark, create_by, update_by, create_time, update_time, is_deleted
+            duration_id, tier_id, fixed_price, pricing_mode, status, remark, create_by, update_by, create_time, update_time, is_deleted
         )
         values (
-            #{durationId}, #{tierId}, #{fixedPrice}, #{status}, #{remark}, #{createBy}, #{updateBy}, now(), now(), #{isDeleted}
+            #{durationId}, #{tierId}, #{fixedPrice}, #{pricingMode}, #{status}, #{remark}, #{createBy}, #{updateBy}, now(), now(), #{isDeleted}
         )
     </insert>
 
@@ -126,6 +130,9 @@
             </if>
             <if test="fixedPrice != null">
                 fixed_price = #{fixedPrice},
+            </if>
+            <if test="pricingMode != null">
+                pricing_mode = #{pricingMode},
             </if>
             <if test="status != null">
                 status = #{status},

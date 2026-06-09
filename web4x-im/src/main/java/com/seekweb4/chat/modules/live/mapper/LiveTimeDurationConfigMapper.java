@@ -26,4 +26,6 @@ public interface LiveTimeDurationConfigMapper extends BaseMapper<LiveTimeDuratio
 
     /** 未删除的全部时长，用于后台下拉（含禁用） */
     List<LiveConfigSelectOptionVo> listSelectOptions();
+
+    LiveTimeDurationConfig selectByDurationValue(@Param("durationValue") Integer durationValue);
 }

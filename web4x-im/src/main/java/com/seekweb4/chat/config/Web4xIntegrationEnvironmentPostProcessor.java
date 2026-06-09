@@ -194,7 +194,7 @@ public class Web4xIntegrationEnvironmentPostProcessor implements EnvironmentPost
         putDefaultIfMissing(target, environment, "xss.excludes", "/system/notice/*");
         putDefaultIfMissing(target, environment, "xss.urlPatterns", "/system/*,/monitor/*,/tool/*");
         putDefaultIfMissing(target, environment, "csrf.enabled", "false");
-        putDefaultIfMissing(target, environment, "web4x.name", "Web4x");
+        putDefaultIfMissing(target, environment, "web4x.name", "SeekWeb4");
         putDefaultIfMissing(target, environment, "web4x.version", "4.8.3");
         putDefaultIfMissing(target, environment, "web4x.demoEnabled", "false");
     }

@@ -126,6 +126,14 @@
         where id = #{id}
     </update>
 
+    <select id="selectByTierValue" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from t_live_user_tier_config
+        where is_deleted = 0 and tier_value = #{tierValue}
+        order by id desc
+        limit 1
+    </select>
+
     <insert id="insert" parameterType="com.seekweb4.chat.modules.live.entity.LiveUserTierConfig" useGeneratedKeys="true" keyProperty="id">
         insert into t_live_user_tier_config (tier_name, tier_value, tier_sort, status, create_by, update_by, create_time, update_time, remark, is_deleted)
         values (#{tierName}, #{tierValue}, #{tierSort}, #{status}, #{createBy}, #{updateBy}, now(), now(), #{remark}, #{isDeleted})

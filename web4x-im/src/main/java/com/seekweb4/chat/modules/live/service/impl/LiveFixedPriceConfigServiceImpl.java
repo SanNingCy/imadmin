@@ -10,6 +10,7 @@ import com.seekweb4.chat.modules.live.mapper.LiveTimeDurationConfigMapper;
 import com.seekweb4.chat.modules.live.mapper.LiveUserTierConfigMapper;
 import com.seekweb4.chat.modules.live.entity.LiveTimeDurationConfig;
 import com.seekweb4.chat.modules.live.entity.LiveUserTierConfig;
+import com.seekweb4.chat.modules.live.constant.LivePricingMode;
 import com.seekweb4.chat.modules.live.service.LiveFixedPriceConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -62,8 +63,11 @@ public class LiveFixedPriceConfigServiceImpl implements LiveFixedPriceConfigServ
 
     @Override
     public boolean create(LiveFixedPriceConfig config) {
+        if (StringUtils.isBlank(config.getPricingMode())) {
+            config.setPricingMode(LivePricingMode.ODIC);
+        }
         validateRefsAndPrice(config.getDurationId(), config.getTierId(), config.getFixedPrice());
-        assertNoDuplicateDurationTier(config.getDurationId(), config.getTierId(), null);
+        assertNoDuplicateDurationTier(config.getDurationId(), config.getTierId(), config.getPricingMode(), null);
         config.setIsDeleted(0);
         if (config.getStatus() == null) {
             config.setStatus(1);
@@ -79,15 +83,16 @@ public class LiveFixedPriceConfigServiceImpl implements LiveFixedPriceConfigServ
             throw new IllegalArgumentException("id 不能为空");
         }
         LiveFixedPriceConfigVo existing = fixedPriceConfigMapper.selectByPrimaryKey(config.getId());
-        if (existing == null) {
+        if (existing == null || LivePricingMode.USDT.equals(existing.getPricingMode())) {
             throw new IllegalArgumentException("记录不存在");
         }
         Long durationId = config.getDurationId() != null ? config.getDurationId() : existing.getDurationId();
         Long tierId = config.getTierId() != null ? config.getTierId() : existing.getTierId();
         BigDecimal price = config.getFixedPrice() != null ? config.getFixedPrice() : existing.getFixedPrice();
+        String pricingMode = StringUtils.isNotBlank(existing.getPricingMode()) ? existing.getPricingMode() : LivePricingMode.ODIC;
         validateRefsAndPrice(durationId, tierId, price);
         if (config.getDurationId() != null || config.getTierId() != null) {
-            assertNoDuplicateDurationTier(durationId, tierId, config.getId());
+            assertNoDuplicateDurationTier(durationId, tierId, pricingMode, config.getId());
         }
         config.setUpdateTime(new Date());
         return fixedPriceConfigMapper.updateByPrimaryKeySelective(config) > 0;
@@ -95,6 +100,10 @@ public class LiveFixedPriceConfigServiceImpl implements LiveFixedPriceConfigServ
 
     @Override
     public boolean delete(Long id, String updateBy) {
+        LiveFixedPriceConfigVo existing = fixedPriceConfigMapper.selectByPrimaryKey(id);
+        if (existing == null || LivePricingMode.USDT.equals(existing.getPricingMode())) {
+            throw new IllegalArgumentException("记录不存在");
+        }
         LiveFixedPriceConfig config = new LiveFixedPriceConfig();
         config.setId(id);
         config.setIsDeleted(1);
@@ -126,8 +135,9 @@ public class LiveFixedPriceConfigServiceImpl implements LiveFixedPriceConfigServ
         }
     }
 
-    private void assertNoDuplicateDurationTier(Long durationId, Long tierId, Long excludeId) {
-        if (fixedPriceConfigMapper.countByDurationAndTier(durationId, tierId, excludeId) > 0) {
+    private void assertNoDuplicateDurationTier(Long durationId, Long tierId, String pricingMode, Long excludeId) {
+        String mode = StringUtils.isNotBlank(pricingMode) ? pricingMode : LivePricingMode.ODIC;
+        if (fixedPriceConfigMapper.countByDurationAndTier(durationId, tierId, mode, excludeId) > 0) {
             throw new IllegalArgumentException("该时长与人数档位组合已存在固定价格配置");
         }
     }

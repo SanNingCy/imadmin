@@ -3,7 +3,7 @@
 # 本文件仅补充若依 Thymeleaf 后台所需项，可按需修改。
 
 web4x:
-  name: Web4x
+  name: SeekWeb4
   version: 4.8.3
   copyrightYear: 2026
   demoEnabled: false

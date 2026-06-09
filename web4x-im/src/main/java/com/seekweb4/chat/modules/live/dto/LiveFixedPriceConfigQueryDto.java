@@ -20,4 +20,7 @@ public class LiveFixedPriceConfigQueryDto extends LiveAdminPageQueryDto {
     private String createBy;
 
     private String updateBy;
+
+    /** 定价模式：ODIC / USDT */
+    private String pricingMode;
 }

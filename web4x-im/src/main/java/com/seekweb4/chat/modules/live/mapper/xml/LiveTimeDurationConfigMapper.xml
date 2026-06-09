@@ -126,6 +126,14 @@
         where id = #{id}
     </update>
 
+    <select id="selectByDurationValue" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from t_live_time_duration_config
+        where is_deleted = 0 and duration_value = #{durationValue}
+        order by id desc
+        limit 1
+    </select>
+
     <insert id="insert" parameterType="com.seekweb4.chat.modules.live.entity.LiveTimeDurationConfig" useGeneratedKeys="true" keyProperty="id">
         insert into t_live_time_duration_config (duration_name, duration_value, duration_sort, status, remark, create_by, update_by, create_time, update_time, is_deleted)
         values (#{durationName}, #{durationValue}, #{durationSort}, #{status}, #{remark}, #{createBy}, #{updateBy}, now(), now(), #{isDeleted})

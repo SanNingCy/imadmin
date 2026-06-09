@@ -448,7 +448,9 @@ function imFormatListMedia(value, cacheKey, max) {
             || path.indexOf('/redPacketTransaction/') > -1
             || path.indexOf('/grouphongbaolog/') > -1
             || path.indexOf('/signset/') > -1
-            || path.indexOf('/admin/piamom/') > -1) {
+            || path.indexOf('/admin/piamom/') > -1
+            || path.indexOf('/admin/live/') > -1)
+        {
             imTableBeforeSend(xhr);
         }
     });

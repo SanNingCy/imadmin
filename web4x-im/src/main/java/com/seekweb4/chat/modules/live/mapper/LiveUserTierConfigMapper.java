@@ -26,4 +26,6 @@ public interface LiveUserTierConfigMapper extends BaseMapper<LiveUserTierConfig>
 
     /** 未删除的全部人数档位，用于后台下拉（含禁用） */
     List<LiveConfigSelectOptionVo> listSelectOptions();
+
+    LiveUserTierConfig selectByTierValue(@Param("tierValue") Integer tierValue);
 }

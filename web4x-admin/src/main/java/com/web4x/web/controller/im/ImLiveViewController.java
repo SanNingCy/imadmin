@@ -36,4 +36,9 @@ public class ImLiveViewController {
     public String fixedPrice() {
         return PREFIX + "/fixed-price";
     }
+
+    @GetMapping({"/usdt-price", "/usdt-price/"})
+    public String usdtPrice() {
+        return PREFIX + "/usdt-price";
+    }
 }

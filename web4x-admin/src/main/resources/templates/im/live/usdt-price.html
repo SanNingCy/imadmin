@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <th:block th:include="include :: header('会议室USDT定价')" />
+
+    <style>
+
+        .live-usdt-tip { color: #888; font-size: 13px; margin: 0 0 10px; }
+
+        .live-usdt-tier-row {
+
+            border: 1px dashed #ddd;
+
+            border-radius: 4px;
+
+            padding: 12px 0 8px;
+
+            margin: 0 0 12px;
+
+            background: #fafafa;
+
+        }
+
+        .live-usdt-tier-row .form-group { margin-left: 0; margin-right: 0; }
+
+        .live-usdt-pick-hint { color: #999; font-size: 12px; margin-top: 4px; }
+
+        .live-usdt-loss-tip { color: #d9534f; font-size: 12px; margin-top: 4px; display: none; }
+
+        .live-usdt-profit-text { font-weight: 600; color: #3c763d; }
+
+        .live-usdt-cost-text { color: #666; }
+
+        #live-usdt-price-tier-list { padding: 0; }
+
+    </style>
+
+</head>
+
+<body class="gray-bg">
+
+<div class="container-div">
+
+    <div class="row">
+
+        <div class="col-sm-12 search-collapse">
+
+            <form id="live-usdt-price-form">
+
+                <div class="select-list">
+
+                    <ul>
+
+                        <li>
+
+                            会议时长：
+
+                            <select name="durationId" id="live-usdt-price-search-duration"></select>
+
+                        </li>
+
+                        <li>
+
+                            会议人数：
+
+                            <select name="tierId" id="live-usdt-price-search-tier"></select>
+
+                        </li>
+
+                        <li>
+
+                            状态：
+
+                            <select name="status" id="live-usdt-price-search-status"></select>
+
+                        </li>
+
+                        <li>
+
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            </form>
+
+        </div>
+
+        <p class="col-sm-12 live-usdt-tip">计价规则：1 USDT = 1000 分钟；成本价 = 时长(分) × 人数 ÷ 1000；利润 = 会议价格 − 成本价。可直接输入时长/人数，系统自动同步到配置表。</p>
+
+
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+
+            <a class="btn btn-success" onclick="imLiveUsdtPriceOpenModal('add')">
+
+                <i class="fa fa-plus"></i> 新建
+
+            </a>
+
+        </div>
+
+
+
+        <div class="col-sm-12 select-table table-striped">
+
+            <table id="bootstrap-table"></table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<div id="live-usdt-price-modal" style="display:none;">
+
+    <form id="live-usdt-price-modal-form" class="form-horizontal" style="padding:15px 20px;max-height:560px;overflow-y:auto;">
+
+        <input type="hidden" id="live-usdt-price-id"/>
+
+        <input type="hidden" id="live-usdt-price-mode" value="add"/>
+
+
+
+        <div class="form-group">
+
+            <label class="col-sm-3 control-label"><span class="text-danger">*</span> 会议时长(分钟)：</label>
+
+            <div class="col-sm-8">
+
+                <input type="number" class="form-control live-usdt-calc-trigger" id="live-usdt-price-duration-minutes" min="1" step="1" placeholder="输入分钟，如 120"/>
+
+                <select class="form-control live-usdt-calc-trigger live-usdt-pick-select" id="live-usdt-price-duration-pick" style="margin-top:6px;">
+
+                    <option value="">快捷选择已有会议时长</option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+
+        <div id="live-usdt-price-tier-panel">
+
+            <div class="form-group">
+
+                <label class="col-sm-3 control-label">人数价格配置：</label>
+
+                <div class="col-sm-8">
+
+                    <button type="button" class="btn btn-default btn-sm" id="live-usdt-price-add-tier" onclick="imLiveUsdtPriceAddTierRow()">
+
+                        <i class="fa fa-plus"></i> 添加会议人数配置
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="form-group">
+
+                <div class="col-sm-offset-3 col-sm-8" id="live-usdt-price-tier-list"></div>
+
+            </div>
+
+        </div>
+
+
+
+        <div id="live-usdt-price-single-panel" style="display:none;">
+
+            <div class="form-group">
+
+                <label class="col-sm-3 control-label"><span class="text-danger">*</span> 会议人数：</label>
+
+                <div class="col-sm-8">
+
+                    <input type="number" class="form-control live-usdt-calc-trigger" id="live-usdt-price-people-count" min="1" step="1" placeholder="输入人数"/>
+
+                    <select class="form-control live-usdt-calc-trigger live-usdt-pick-select" id="live-usdt-price-tier-pick" style="margin-top:6px;">
+
+                        <option value="">快捷选择已有人数档位</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label class="col-sm-3 control-label">成本价(USDT)：</label>
+
+                <div class="col-sm-8">
+
+                    <p class="form-control-static live-usdt-cost-text" id="live-usdt-price-cost-display">-</p>
+
+                </div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label class="col-sm-3 control-label"><span class="text-danger">*</span> 会议价格(USDT)：</label>
+
+                <div class="col-sm-8">
+
+                    <input type="text" class="form-control live-usdt-sale-input live-usdt-calc-trigger" id="live-usdt-price-sale" inputmode="decimal" placeholder="默认等于成本价，可手动修改"/>
+
+                    <div class="live-usdt-loss-tip" id="live-usdt-price-loss-tip">该价格为亏损价格</div>
+
+                </div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label class="col-sm-3 control-label">利润(USDT)：</label>
+
+                <div class="col-sm-8">
+
+                    <p class="form-control-static live-usdt-profit-text" id="live-usdt-price-profit-display">0</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="form-group">
+
+            <label class="col-sm-3 control-label"><span class="text-danger">*</span> 状态：</label>
+
+            <div class="col-sm-8">
+
+                <select class="form-control" id="live-usdt-price-status"></select>
+
+            </div>
+
+        </div>
+
+        <div class="form-group">
+
+            <label class="col-sm-3 control-label">备注：</label>
+
+            <div class="col-sm-8">
+
+                <textarea class="form-control" id="live-usdt-price-remark" rows="2"></textarea>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+
+<th:block th:include="include :: footer" />
+
+<script th:src="@{/web4x/js/im-table.js?v=20260611}"></script>
+
+<script th:src="@{/web4x/js/im-live-common.js?v=20260611}"></script>
+
+<script th:src="@{/web4x/js/im-live-usdt-price.js?v=20260611}"></script>
+
+<script th:inline="javascript">
+
+    $(function () {
+
+        imLiveUsdtPriceInitTable();
+
+    });
+
+</script>
+
+</body>
+
+</html>
+

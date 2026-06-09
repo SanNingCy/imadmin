@@ -23,6 +23,9 @@ public class LiveFixedPriceConfig implements Serializable {
 
     private BigDecimal fixedPrice;
 
+    /** 定价模式：ODIC / USDT */
+    private String pricingMode;
+
     /** 状态 0:禁用 1:启用 */
     private Integer status;
 

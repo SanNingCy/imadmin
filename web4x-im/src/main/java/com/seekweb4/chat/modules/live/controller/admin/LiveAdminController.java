@@ -10,10 +10,15 @@ import com.seekweb4.chat.modules.live.entity.LiveFixedPriceConfig;
 import com.seekweb4.chat.modules.live.entity.LiveOrderRecord;
 import com.seekweb4.chat.modules.live.entity.LiveTimeDurationConfig;
 import com.seekweb4.chat.modules.live.entity.LiveUserTierConfig;
+import com.seekweb4.chat.modules.live.constant.LivePricingMode;
+import com.seekweb4.chat.modules.live.dto.LiveUsdtFixedPriceVo;
+import com.seekweb4.chat.modules.live.dto.LiveUsdtMeetingPriceBatchSaveReq;
+import com.seekweb4.chat.modules.live.dto.LiveUsdtMeetingPriceQueryDto;
 import com.seekweb4.chat.modules.live.service.LiveBillingRuleService;
 import com.seekweb4.chat.modules.live.service.LiveConfigService;
 import com.seekweb4.chat.modules.live.service.LiveFixedPriceConfigService;
 import com.seekweb4.chat.modules.live.service.LiveOrderService;
+import com.seekweb4.chat.modules.live.service.LiveUsdtMeetingPriceConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -46,6 +51,9 @@ public class LiveAdminController extends BaseController {
 
     @Resource
     private LiveFixedPriceConfigService fixedPriceConfigService;
+
+    @Resource
+    private LiveUsdtMeetingPriceConfigService usdtMeetingPriceConfigService;
 
     // ===== 计费规则 =====
 
@@ -294,6 +302,7 @@ public class LiveAdminController extends BaseController {
     @GetMapping(value = "fixedPrice/page", produces = MediaType.APPLICATION_JSON_VALUE)
     public AjaxJson fixedPricePage(LiveFixedPriceConfigQueryDto queryDto) {
         try {
+            queryDto.setPricingMode(LivePricingMode.ODIC);
             return AjaxJson.success().put("page", fixedPriceConfigService.page(queryDto));
         } catch (Exception e) {
             log.error("分页查询固定价格配置失败", e);
@@ -306,14 +315,20 @@ public class LiveAdminController extends BaseController {
     @GetMapping(value = "fixedPrice/queryById", produces = MediaType.APPLICATION_JSON_VALUE)
     public AjaxJson fixedPriceQueryById(@RequestParam Long id) {
         LiveFixedPriceConfigVo vo = fixedPriceConfigService.getById(id);
-        return vo == null ? AjaxJson.error("不存在") : AjaxJson.success().put("config", vo);
+        if (vo == null || LivePricingMode.USDT.equals(vo.getPricingMode())) {
+            return AjaxJson.error("不存在");
+        }
+        return AjaxJson.success().put("config", vo);
     }
 
     @ApiOperation("固定价格配置详情(兼容REST路径)")
     @GetMapping(value = "fixedPrice/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public AjaxJson fixedPriceDetail(@PathVariable Long id) {
         LiveFixedPriceConfigVo vo = fixedPriceConfigService.getById(id);
-        return vo == null ? AjaxJson.error("不存在") : AjaxJson.success().put("config", vo);
+        if (vo == null || LivePricingMode.USDT.equals(vo.getPricingMode())) {
+            return AjaxJson.error("不存在");
+        }
+        return AjaxJson.success().put("config", vo);
     }
 
     @ApiOperation("新增固定价格配置")
@@ -321,6 +336,7 @@ public class LiveAdminController extends BaseController {
     @PostMapping(value = "fixedPrice/save", produces = MediaType.APPLICATION_JSON_VALUE)
     public AjaxJson fixedPriceSave(@RequestBody LiveFixedPriceConfig config) {
         try {
+            config.setPricingMode(LivePricingMode.ODIC);
             boolean ok = fixedPriceConfigService.create(config);
             return ok ? AjaxJson.success("新增成功") : AjaxJson.error("新增失败");
         } catch (Exception e) {
@@ -333,6 +349,7 @@ public class LiveAdminController extends BaseController {
     @PostMapping(value = "fixedPrice/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public AjaxJson fixedPriceCreate(@RequestBody LiveFixedPriceConfig config) {
         try {
+            config.setPricingMode(LivePricingMode.ODIC);
             boolean ok = fixedPriceConfigService.create(config);
             return ok ? AjaxJson.success("新增成功") : AjaxJson.error("新增失败");
         } catch (Exception e) {
@@ -541,6 +558,86 @@ public class LiveAdminController extends BaseController {
             return ok ? AjaxJson.success("删除成功") : AjaxJson.error("删除失败");
         } catch (Exception e) {
             log.error("删除订单失败", e);
+            return AjaxJson.error("删除失败：" + e.getMessage());
+        }
+    }
+
+    // ===== 会议室 USDT 统一定价（复用时长/人数/固定价格表，pricing_mode=USDT） =====
+
+    @ApiOperation("USDT定价-时长下拉")
+    @GetMapping(value = "usdtPrice/options/duration", produces = MediaType.APPLICATION_JSON_VALUE)
+    public AjaxJson usdtPriceDurationOptions() {
+        return AjaxJson.success().put("list", configService.listDurationSelectOptions());
+    }
+
+    @ApiOperation("USDT定价-人数档位下拉")
+    @GetMapping(value = "usdtPrice/options/tier", produces = MediaType.APPLICATION_JSON_VALUE)
+    public AjaxJson usdtPriceTierOptions() {
+        return AjaxJson.success().put("list", configService.listTierSelectOptions());
+    }
+
+    @ApiOperation("分页查询 USDT 会议室定价")
+    @GetMapping(value = "usdtPrice/page", produces = MediaType.APPLICATION_JSON_VALUE)
+    public AjaxJson usdtPricePage(LiveUsdtMeetingPriceQueryDto queryDto) {
+        try {
+            return AjaxJson.success().put("page", usdtMeetingPriceConfigService.page(queryDto));
+        } catch (Exception e) {
+            log.error("分页查询 USDT 定价失败", e);
+            return AjaxJson.error("查询失败：" + e.getMessage());
+        }
+    }
+
+    @ApiOperation("USDT 定价详情")
+    @GetMapping(value = "usdtPrice/queryById", produces = MediaType.APPLICATION_JSON_VALUE)
+    public AjaxJson usdtPriceQueryById(@RequestParam Long id) {
+        LiveUsdtFixedPriceVo config = usdtMeetingPriceConfigService.getById(id);
+        return config == null ? AjaxJson.error("不存在") : AjaxJson.success().put("config", config);
+    }
+
+    @ApiOperation("预览 USDT 成本价")
+    @GetMapping(value = "usdtPrice/previewCost", produces = MediaType.APPLICATION_JSON_VALUE)
+    public AjaxJson usdtPricePreviewCost(@RequestParam Integer durationMinutes,
+                                         @RequestParam Integer peopleCount) {
+        try {
+            BigDecimal cost = usdtMeetingPriceConfigService.previewCost(durationMinutes, peopleCount);
+            return AjaxJson.success().put("costPriceUsdt", cost);
+        } catch (Exception e) {
+            return AjaxJson.error(e.getMessage());
+        }
+    }
+
+    @ApiOperation("批量新增 USDT 定价(同一时长多个人数档位)")
+    @PostMapping(value = "usdtPrice/batchSave", produces = MediaType.APPLICATION_JSON_VALUE)
+    public AjaxJson usdtPriceBatchSave(@RequestBody LiveUsdtMeetingPriceBatchSaveReq req) {
+        try {
+            boolean ok = usdtMeetingPriceConfigService.batchCreate(req);
+            return ok ? AjaxJson.success("新增成功") : AjaxJson.error("新增失败");
+        } catch (Exception e) {
+            log.error("批量新增 USDT 定价失败", e);
+            return AjaxJson.error("新增失败：" + e.getMessage());
+        }
+    }
+
+    @ApiOperation("更新 USDT 定价")
+    @PostMapping(value = "usdtPrice/update", produces = MediaType.APPLICATION_JSON_VALUE)
+    public AjaxJson usdtPriceUpdate(@RequestBody LiveUsdtFixedPriceVo config) {
+        try {
+            boolean ok = usdtMeetingPriceConfigService.update(config);
+            return ok ? AjaxJson.success("更新成功") : AjaxJson.error("更新失败");
+        } catch (Exception e) {
+            log.error("更新 USDT 定价失败", e);
+            return AjaxJson.error("更新失败：" + e.getMessage());
+        }
+    }
+
+    @ApiOperation("删除 USDT 定价(软删)")
+    @DeleteMapping(value = "usdtPrice/delete", produces = MediaType.APPLICATION_JSON_VALUE)
+    public AjaxJson usdtPriceDelete(@RequestParam Long id, @RequestParam(required = false) String updateBy) {
+        try {
+            boolean ok = usdtMeetingPriceConfigService.delete(id, updateBy);
+            return ok ? AjaxJson.success("删除成功") : AjaxJson.error("删除失败");
+        } catch (Exception e) {
+            log.error("删除 USDT 定价失败", e);
             return AjaxJson.error("删除失败：" + e.getMessage());
         }
     }

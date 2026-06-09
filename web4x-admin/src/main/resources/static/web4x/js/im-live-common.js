@@ -70,6 +70,24 @@ function imLiveFormatAmount(val) {
     return Number.isFinite(num) ? String(val) : "-";
 }
 
+function imLiveFormatUsdt(val) {
+    if (val == null || val === "") {
+        return "-";
+    }
+    var num = Number(val);
+    return Number.isFinite(num) ? (num.toFixed(4).replace(/\.?0+$/, "") + " USDT") : "-";
+}
+
+/** 1 USDT = 1000 分钟通话时长；成本 = 时长(分) × 人数 / 1000 */
+function imLiveCalcUsdtCost(durationMinutes, peopleCount) {
+    var minutes = Number(durationMinutes);
+    var people = Number(peopleCount);
+    if (!Number.isFinite(minutes) || !Number.isFinite(people) || minutes <= 0 || people <= 0) {
+        return null;
+    }
+    return Math.round((minutes * people / 1000) * 10000) / 10000;
+}
+
 function imLiveAjax(options) {
     options = options || {};
     options.beforeSend = imTableBeforeSend;
