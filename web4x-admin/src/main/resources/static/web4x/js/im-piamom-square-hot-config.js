@@ -6,6 +6,63 @@
  * - DELETE /admin/piamom/hotConfig/delete?id=
  */
 
+var imPiamomHotConfigEditorReady = false;
+var imPiamomHotConfigPendingComplaintNotice = "";
+
+function imPiamomHotConfigInitEditor(readOnly) {
+    if (!imPiamomHotConfigEditorReady) {
+        $("#hot-config-complaintNotice-editor").summernote({
+            height: 180,
+            lang: "zh-CN",
+            placeholder: "请输入举报页投诉说明",
+            followingToolbar: false,
+            dialogsInBody: true,
+            callbacks: {
+                onImageUpload: function (files) {
+                    imPiamomHotConfigSendSummernoteFile(files[0], this);
+                }
+            }
+        });
+        imPiamomHotConfigEditorReady = true;
+    }
+    if (readOnly) {
+        $("#hot-config-complaintNotice-editor").summernote("disable");
+    } else {
+        $("#hot-config-complaintNotice-editor").summernote("enable");
+    }
+}
+
+function imPiamomHotConfigSendSummernoteFile(file, editor) {
+    var data = new FormData();
+    data.append("file", file);
+    $.ajax({
+        type: "POST",
+        url: ctx + "common/upload",
+        data: data,
+        cache: false,
+        contentType: false,
+        processData: false,
+        dataType: "json",
+        success: function (result) {
+            if (result.code === web_status.SUCCESS || result.code === 200) {
+                $(editor).summernote("insertImage", result.url, result.fileName || "image");
+            } else {
+                $.modal.alertError(result.msg || "图片上传失败");
+            }
+        },
+        error: function () {
+            $.modal.alertWarning("图片上传失败");
+        }
+    });
+}
+
+function imPiamomHotConfigGetComplaintNotice() {
+    if (imPiamomHotConfigEditorReady) {
+        return $("#hot-config-complaintNotice-editor").summernote("code") || "";
+    }
+    return imPiamomHotConfigPendingComplaintNotice || "";
+}
+
 function imPiamomHotConfigResetModal() {
     $("#hot-config-id").val("");
     $("#hot-config-likeThreshold").val("");
@@ -16,7 +73,10 @@ function imPiamomHotConfigResetModal() {
     $("#hot-config-stakeRuleContent").val("");
     $("#hot-config-auditRuleTitle").val("");
     $("#hot-config-auditRuleContent").val("");
-    $("#hot-config-complaintNotice").val("");
+    imPiamomHotConfigPendingComplaintNotice = "";
+    if (imPiamomHotConfigEditorReady) {
+        $("#hot-config-complaintNotice-editor").summernote("code", "");
+    }
     $("#hot-config-creditMin").val("");
     $("#hot-config-creditMax").val("");
     $("#hot-config-status").val("1");
@@ -32,7 +92,11 @@ function imPiamomHotConfigFillModal(info) {
     $("#hot-config-stakeRuleContent").val(info.stakeRuleContent || "");
     $("#hot-config-auditRuleTitle").val(info.auditRuleTitle || "");
     $("#hot-config-auditRuleContent").val(info.auditRuleContent || "");
-    $("#hot-config-complaintNotice").val(info.complaintNotice || "");
+    imPiamomHotConfigPendingComplaintNotice = info.complaintNotice || "";
+    if (imPiamomHotConfigEditorReady) {
+        $("#hot-config-complaintNotice-editor").summernote("code", imPiamomHotConfigPendingComplaintNotice);
+        imPiamomHotConfigPendingComplaintNotice = "";
+    }
     $("#hot-config-creditMin").val(info.creditMin != null ? info.creditMin : "");
     $("#hot-config-creditMax").val(info.creditMax != null ? info.creditMax : "");
     $("#hot-config-status").val(info.status != null ? String(info.status) : "1");
@@ -47,10 +111,17 @@ function imPiamomHotConfigShowModal(mode, readOnly) {
     layer.open({
         type: 1,
         title: titles[mode] || "热门配置",
-        area: ["760px", "620px"],
+        area: ["760px", "90%"],
         shadeClose: true,
         content: $("#hot-config-modal"),
         btn: readOnly ? ["关闭"] : ["保存", "取消"],
+        success: function () {
+            imPiamomHotConfigInitEditor(readOnly);
+            if (imPiamomHotConfigPendingComplaintNotice && imPiamomHotConfigEditorReady) {
+                $("#hot-config-complaintNotice-editor").summernote("code", imPiamomHotConfigPendingComplaintNotice);
+                imPiamomHotConfigPendingComplaintNotice = "";
+            }
+        },
         yes: function (index) {
             if (readOnly) {
                 layer.close(index);
@@ -113,7 +184,7 @@ function imPiamomHotConfigCollectPayload() {
         stakeRuleContent: $("#hot-config-stakeRuleContent").val(),
         auditRuleTitle: $("#hot-config-auditRuleTitle").val(),
         auditRuleContent: $("#hot-config-auditRuleContent").val(),
-        complaintNotice: $("#hot-config-complaintNotice").val(),
+        complaintNotice: imPiamomHotConfigGetComplaintNotice(),
         status: parseInt(status, 10)
     };
 

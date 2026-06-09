@@ -66,10 +66,15 @@ function imMergeEllipsisCellStyle(column, maxWidth) {
 }
 
 /** 列表文本列默认最大宽度（px） */
-var IM_TABLE_ELLIPSIS_DEFAULT_WIDTH = 180;
+var IM_TABLE_ELLIPSIS_DEFAULT_WIDTH = 300;
+/** 列表文本默认最多展示字符数（超出后加 ...；至少容纳 yyyy-MM-dd HH:mm:ss） */
+var IM_TABLE_DATETIME_TEXT_LEN = 40;
+var IM_TABLE_ELLIPSIS_DEFAULT_MAX_LEN = IM_TABLE_DATETIME_TEXT_LEN;
+/** 时间列最小宽度（px，与 IM_TABLE_DATETIME_TEXT_LEN 匹配） */
+var IM_TABLE_DATETIME_MIN_WIDTH = 165;
 
 /** 普通列默认宽度（未设置 width 时，或 width 小于该值时抬升） */
-var IM_TABLE_COLUMN_DEFAULT_WIDTH = 140;
+var IM_TABLE_COLUMN_DEFAULT_WIDTH = 120;
 /** 操作列默认宽度（px） */
 var IM_TABLE_OPERATE_COLUMN_DEFAULT_WIDTH = 240;
 /** 操作列最小宽度 */
@@ -83,6 +88,121 @@ function imParseColumnWidth(width) {
     }
     var num = parseInt(width, 10);
     return isNaN(num) ? null : num;
+}
+
+function imIsLikelyDateTimeField(column) {
+    if (!column || column.field == null) {
+        return false;
+    }
+    var field = String(column.field);
+    return /(?:time|date|Time|Date|At)$/i.test(field);
+}
+
+function imIsDateTimeDisplayText(text) {
+    if (text == null) {
+        return false;
+    }
+    return /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(String(text).trim());
+}
+
+function imResolveEllipsisMaxWidth(tableOptions, column) {
+    var width;
+    if (column && column.ellipsisMaxWidth != null) {
+        width = column.ellipsisMaxWidth;
+    } else if (tableOptions && tableOptions.ellipsisMaxWidth != null) {
+        width = tableOptions.ellipsisMaxWidth;
+    } else {
+        width = IM_TABLE_ELLIPSIS_DEFAULT_WIDTH;
+    }
+    if (column && imIsLikelyDateTimeField(column)) {
+        width = Math.max(width, IM_TABLE_DATETIME_MIN_WIDTH);
+    }
+    return width;
+}
+
+function imResolveEllipsisMaxLen(tableOptions, column) {
+    var maxLen;
+    if (column && column.ellipsisMaxLen != null) {
+        maxLen = column.ellipsisMaxLen;
+    } else if (tableOptions && tableOptions.ellipsisMaxLen != null) {
+        maxLen = tableOptions.ellipsisMaxLen;
+    } else {
+        maxLen = IM_TABLE_ELLIPSIS_DEFAULT_MAX_LEN;
+    }
+    if (column && imIsLikelyDateTimeField(column)) {
+        maxLen = Math.max(maxLen, IM_TABLE_DATETIME_TEXT_LEN);
+    }
+    return maxLen;
+}
+
+function imTruncateDisplayText(text, maxLen) {
+    if (text == null) {
+        return "";
+    }
+    var str = String(text);
+    if (!maxLen || str.length <= maxLen) {
+        return str;
+    }
+    return str.substring(0, maxLen) + "...";
+}
+
+function imShouldTruncateFormatterHtml(html) {
+    if (!html || html.indexOf("<") === -1) {
+        return true;
+    }
+    if (html.indexOf("im-cell-ellipsis") > -1) {
+        return false;
+    }
+    if (/<(?:button|a|img|input|select|textarea)\b/i.test(html)) {
+        return false;
+    }
+    if (/class="[^"]*\bbadge\b/i.test(html)) {
+        return false;
+    }
+    if (/class="[^"]*\bbtn\b/i.test(html)) {
+        return false;
+    }
+    return true;
+}
+
+/** 包装已有 formatter，按字符数截断展示（解决仅依赖 CSS 省略时整段长文仍可见） */
+function imWrapColumnFormatterEllipsis(column, maxLen, emptyText) {
+    if (!column || typeof column.formatter !== "function" || column.ellipsisWrap === false) {
+        return;
+    }
+    var original = column.formatter;
+    column.formatter = function (value, row, index) {
+        var html = original.call(this, value, row, index);
+        if (html == null || html === "") {
+            return emptyText != null ? emptyText : "-";
+        }
+        var str = String(html);
+        if (!imShouldTruncateFormatterHtml(str)) {
+            return str;
+        }
+        if (str.indexOf("<") === -1) {
+            return imFormatText(str, maxLen, emptyText);
+        }
+        var plain = $("<div>").html(str).text();
+        if (!plain) {
+            return str;
+        }
+        var effectiveMaxLen = maxLen;
+        if (imIsDateTimeDisplayText(plain)) {
+            effectiveMaxLen = Math.max(maxLen, IM_TABLE_DATETIME_TEXT_LEN);
+        }
+        var display = imTruncateDisplayText(plain, effectiveMaxLen);
+        if (plain === display) {
+            return str;
+        }
+        var safeFull = imEscapeHtml(plain);
+        var safeDisplay = imEscapeHtml(display);
+        var match = str.match(/^<span([^>]*)>([\s\S]*)<\/span>$/i);
+        if (match) {
+            return "<span" + match[1] + ' title="' + safeFull + '">' + safeDisplay + "</span>";
+        }
+        return imFormatText(plain, effectiveMaxLen, emptyText);
+    };
 }
 
 function imShouldSkipGlobalColumnWidth(column) {
@@ -142,18 +262,20 @@ function imApplyTableEllipsisColumns(columns, tableOptions) {
     if (tableOptions && tableOptions.ellipsis === false) {
         return columns;
     }
-    var maxWidth = (tableOptions && tableOptions.ellipsisMaxWidth) || IM_TABLE_ELLIPSIS_DEFAULT_WIDTH;
-    var maxLen = tableOptions && tableOptions.ellipsisMaxLen;
     var emptyText = (tableOptions && tableOptions.undefinedText) || "-";
     $.each(columns, function (_, column) {
         if (imIsEllipsisSkippedColumn(column)) {
             return;
         }
-        column.cellStyle = imMergeEllipsisCellStyle(column, maxWidth);
+        var colMaxWidth = imResolveEllipsisMaxWidth(tableOptions, column);
+        var maxLen = imResolveEllipsisMaxLen(tableOptions, column);
+        column.cellStyle = imMergeEllipsisCellStyle(column, colMaxWidth);
         column.class = $.trim((column.class || "") + " im-table-ellipsis-cell");
         var colWidth = imParseColumnWidth(column.width);
-        if (colWidth == null || colWidth < maxWidth) {
-            column.width = maxWidth;
+        if (colWidth == null || colWidth > colMaxWidth) {
+            column.width = colMaxWidth;
+        } else if (imIsLikelyDateTimeField(column) && colWidth < colMaxWidth) {
+            column.width = colMaxWidth;
         }
         column.formatter = function (value) {
             if (value == null || value === "") {
@@ -170,27 +292,6 @@ function imApplyTableEllipsisColumns(columns, tableOptions) {
         };
     });
     return columns;
-}
-
-/** 单元格单行省略样式（与 formatter 列配合，避免长文本撑高行高） */
-var IM_TABLE_CELL_NOWRAP_CSS = {
-    "white-space": "nowrap",
-    "overflow": "hidden",
-    "text-overflow": "ellipsis",
-    "max-width": "100%"
-};
-
-function imMergeCellStyleFn(baseFn, extraCss) {
-    if (typeof baseFn !== "function") {
-        return function () {
-            return { css: $.extend({}, extraCss) };
-        };
-    }
-    return function (value, row, index) {
-        var result = baseFn(value, row, index) || {};
-        result.css = $.extend({}, extraCss, result.css || {});
-        return result;
-    };
 }
 
 function imShouldApplyCellNowrap(column) {
@@ -210,7 +311,7 @@ function imShouldApplyCellNowrap(column) {
 }
 
 /**
- * 为含自定义 formatter 的文本列也强制单行省略（imApplyTableEllipsisColumns 会跳过 formatter 列）
+ * 为含自定义 formatter 的文本列强制单行 + 字符截断（imApplyTableEllipsisColumns 会跳过 formatter 列）
  * tableOptions.cellNowrap = false 可关闭
  */
 function imApplyTableCellNowrap(columns, tableOptions) {
@@ -220,6 +321,7 @@ function imApplyTableCellNowrap(columns, tableOptions) {
     if (tableOptions && tableOptions.cellNowrap === false) {
         return columns;
     }
+    var emptyText = (tableOptions && tableOptions.undefinedText) || "-";
     $.each(columns, function (_, column) {
         if (!column) {
             return;
@@ -231,7 +333,18 @@ function imApplyTableCellNowrap(columns, tableOptions) {
         if (!imShouldApplyCellNowrap(column)) {
             return;
         }
-        column.cellStyle = imMergeCellStyleFn(column.cellStyle, IM_TABLE_CELL_NOWRAP_CSS);
+        var colMaxWidth = imResolveEllipsisMaxWidth(tableOptions, column);
+        var maxLen = imResolveEllipsisMaxLen(tableOptions, column);
+        imWrapColumnFormatterEllipsis(column, maxLen, emptyText);
+        var colWidth = imParseColumnWidth(column.width);
+        if (column.ellipsisWidth !== false) {
+            if (colWidth == null || colWidth > colMaxWidth) {
+                column.width = colMaxWidth;
+            } else if (imIsLikelyDateTimeField(column) && colWidth < colMaxWidth) {
+                column.width = colMaxWidth;
+            }
+        }
+        column.cellStyle = imMergeEllipsisCellStyle(column, colMaxWidth);
         column.class = $.trim((column.class || "") + " im-table-ellipsis-cell");
     });
     return columns;
@@ -302,11 +415,11 @@ function imFormatText(value, maxLen, emptyText) {
     if (value == null || value === "") {
         return emptyText != null ? emptyText : "-";
     }
-    var text = String(value);
-    var display = text;
-    if (maxLen && text.length > maxLen) {
-        display = text.substring(0, maxLen) + "...";
+    if (maxLen == null || maxLen === "") {
+        maxLen = IM_TABLE_ELLIPSIS_DEFAULT_MAX_LEN;
     }
+    var text = String(value);
+    var display = imTruncateDisplayText(text, maxLen);
     var style = "display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
     return '<span class="im-cell-ellipsis" style="' + style + '" title="' + imEscapeHtml(text) + '">'
         + imEscapeHtml(display) + "</span>";
@@ -424,6 +537,119 @@ function imInitTable(options) {
     $.table.init(options);
 }
 
+/** IM 接口导出为 GET 直出文件流，与若依 POST+common/download 不同 */
+function imShouldUseImExport(exportUrl, tableOptions) {
+    if (!exportUrl || exportUrl.indexOf("/export") === -1) {
+        return false;
+    }
+    if (tableOptions && tableOptions.exportMethod === "post") {
+        return false;
+    }
+    if (tableOptions && (tableOptions.exportMethod === "get" || tableOptions.exportIm === true)) {
+        return true;
+    }
+    return !!(tableOptions && tableOptions.responseHandler === imPageResponse);
+}
+
+function imBuildExportQuery(formId, tableOptions) {
+    var currentId = $.common.isEmpty(formId)
+        ? (tableOptions.formId || $("form").attr("id"))
+        : formId;
+    var data = {};
+    if (currentId) {
+        $.each($("#" + currentId).serializeArray(), function (_, item) {
+            if (item.value != null && item.value !== "") {
+                data[item.name] = item.value;
+            }
+        });
+    }
+    var tableId = tableOptions.id || "bootstrap-table";
+    var params = $("#" + tableId).bootstrapTable("getOptions");
+    if (params && params.sortName) {
+        data.orderByColumn = params.sortName;
+        data.isAsc = params.sortOrder;
+    }
+    return data;
+}
+
+function imParseExportFileName(xhr, fallbackName) {
+    var disposition = xhr.getResponseHeader("Content-Disposition") || "";
+    var match = /filename\*=UTF-8''([^;]+)|filename="?([^";]+)"?/i.exec(disposition);
+    if (match) {
+        try {
+            return decodeURIComponent(match[1] || match[2]);
+        } catch (e) {
+            return match[1] || match[2];
+        }
+    }
+    return fallbackName || "export.xlsx";
+}
+
+function imDownloadBlob(blob, fileName) {
+    var link = document.createElement("a");
+    var url = window.URL.createObjectURL(blob);
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+}
+
+function imExportExcel(formId, tableOptions) {
+    if (typeof table !== "undefined" && table.set) {
+        table.set();
+    }
+    tableOptions = tableOptions || (typeof table !== "undefined" ? table.options : {});
+    var modalName = tableOptions.modalName || "数据";
+    var exportUrl = tableOptions.exportUrl;
+    if (!exportUrl) {
+        $.modal.alertWarning("未配置导出地址");
+        return;
+    }
+    $.modal.confirm("确定导出所有" + modalName + "吗？", function () {
+        $.modal.loading("正在导出数据，请稍候...");
+        $.ajax({
+            url: exportUrl,
+            type: "GET",
+            data: imBuildExportQuery(formId, tableOptions),
+            xhrFields: { responseType: "blob" },
+            beforeSend: imTableBeforeSend,
+            success: function (data, status, xhr) {
+                $.modal.closeLoading();
+                var contentType = (xhr.getResponseHeader("Content-Type") || "").toLowerCase();
+                if (contentType.indexOf("json") > -1) {
+                    var reader = new FileReader();
+                    reader.onload = function () {
+                        try {
+                            var res = JSON.parse(reader.result);
+                            $.modal.alertError((res && res.msg) ? res.msg : "导出失败");
+                        } catch (e) {
+                            $.modal.alertError("导出失败");
+                        }
+                    };
+                    reader.readAsText(data);
+                    return;
+                }
+                imDownloadBlob(data, imParseExportFileName(xhr, "export.xlsx"));
+            },
+            error: function (xhr) {
+                $.modal.closeLoading();
+                if (xhr.responseText) {
+                    try {
+                        var res = JSON.parse(xhr.responseText);
+                        $.modal.alertError((res && res.msg) ? res.msg : "导出失败");
+                        return;
+                    } catch (e) {
+                        /* ignore */
+                    }
+                }
+                $.modal.alertError("导出失败");
+            }
+        });
+    });
+}
+
 /** 列表图片预览初始化（需引入 im-piamom-common.js，与朋友圈列表一致） */
 function imInitListMediaPreview() {
     if (typeof imPiamomInitMediaEvents === "function") {
@@ -454,6 +680,16 @@ function imFormatListMedia(value, cacheKey, max) {
 
     var ruoyiInit = $.table.init;
     var ruoyiResponseHandler = $.table.responseHandler;
+    var ruoyiExportExcel = $.table.exportExcel;
+
+    $.table.exportExcel = function (formId) {
+        table.set();
+        if (imShouldUseImExport(table.options.exportUrl, table.options)) {
+            imExportExcel(formId, table.options);
+            return;
+        }
+        return ruoyiExportExcel.call($.table, formId);
+    };
 
     $.table.init = function (options) {
         options = options || {};

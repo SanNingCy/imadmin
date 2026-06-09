@@ -943,7 +943,7 @@ label {
 /** 普通列最小宽度兜底（与 imApplyTableColumnWidths 配合） */
 .select-table .bootstrap-table .fixed-table-container thead th.im-table-ellipsis-cell,
 .select-table .bootstrap-table .fixed-table-container tbody td.im-table-ellipsis-cell {
-	min-width: 140px;
+	min-width: 120px;
 }
 
 .table-striped .table>thead>tr>th, .table-striped .table>tbody>tr>th {

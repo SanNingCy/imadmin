@@ -2,9 +2,11 @@
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
     <th:block th:include="include :: header('广场热门配置')" />
+    <th:block th:include="include :: summernote-css" />
     <style>
         .piamom-table-wrap { overflow-x: auto; }
         #hot-config-modal .form-group { margin-bottom: 10px; }
+        #hot-config-complaintNotice-editor { min-height: 180px; }
     </style>
 </head>
 <body class="gray-bg">
@@ -60,8 +62,8 @@
             <textarea class="form-control" id="hot-config-auditRuleContent" rows="3"></textarea>
         </div>
         <div class="form-group">
-            <label>举报页投诉说明（HTML）</label>
-            <textarea class="form-control" id="hot-config-complaintNotice" rows="5"></textarea>
+            <label>举报页投诉说明</label>
+            <div id="hot-config-complaintNotice-editor"></div>
         </div>
         <div class="form-group">
             <label>发布广场最低信用分</label>
@@ -82,9 +84,10 @@
 </div>
 
 <th:block th:include="include :: footer" />
+<th:block th:include="include :: summernote-js" />
 <script th:src="@{/web4x/js/im-table.js?v=20260605s}"></script>
 <script th:src="@{/web4x/js/im-piamom-common.js?v=20260605s}"></script>
-<script th:src="@{/web4x/js/im-piamom-square-hot-config.js?v=20260605s}"></script>
+<script th:src="@{/web4x/js/im-piamom-square-hot-config.js?v=20260609}"></script>
 <script th:inline="javascript">
     $(function () {
         imPiamomHotConfigInitTable(

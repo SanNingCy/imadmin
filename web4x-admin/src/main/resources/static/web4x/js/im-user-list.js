@@ -880,40 +880,15 @@ function imUserListBatchDelete() {
 
 
 
-function imUserListOpenTransaction(uid, idno) {
-
-    var params = { uid: uid };
-
-    if (idno) {
-
-        params.idno = idno;
-
-    }
-
+function imUserListOpenTransaction() {
     var menuUrls = [
-
         ctx + "balancelog/balanceLog",
-
         ctx + "balance"
-
     ];
-
-    if (typeof openMenuPage === "function" && openMenuPage(menuUrls, params)) {
-
+    if (typeof openMenuPage === "function" && openMenuPage(menuUrls)) {
         return;
-
     }
-
-    var url = ctx + "balancelog/balanceLog?uid=" + encodeURIComponent(uid);
-
-    if (idno) {
-
-        url += "&idno=" + encodeURIComponent(idno);
-
-    }
-
-    window.open(url, "_blank");
-
+    window.open(ctx + "balancelog/balanceLog", "_blank");
 }
 
 
@@ -1060,7 +1035,7 @@ function imUserListInitTable(canView, canEdit, canDelete, canChangeBalance, canT
 
                     if (canTransaction) {
 
-                        actions.push('<a class="btn btn-default btn-xs" href="javascript:void(0)" onclick="imUserListOpenTransaction(\'' + row.id + '\',\'' + String(row.idno || "").replace(/'/g, "\\'") + '\')"><i class="fa fa-list"></i>交易明细</a>');
+                        actions.push('<a class="btn btn-default btn-xs" href="javascript:void(0)" onclick="imUserListOpenTransaction()"><i class="fa fa-list"></i>交易明细</a>');
 
                     }
 

@@ -299,10 +299,12 @@ function imUpgradeUploadFile(input) {
 }
 
 function imUpgradeExport() {
-    // 简单导出：直接跳转（与表单查询条件保持一致）
-    var params = $.common.formToJSON("upgrade-form");
-    var query = $.param(params);
-    window.location.href = imUpgradeApi + "/export" + (query ? ("?" + query) : "");
+    imExportExcel("upgrade-form", {
+        exportUrl: imUpgradeApi + "/export",
+        modalName: "版本更新",
+        id: "bootstrap-table",
+        exportMethod: "get"
+    });
 }
 
 /** 初始化版本列表表格（列定义放独立 js，避免 Thymeleaf 内联脚本转义导致语法错误） */
