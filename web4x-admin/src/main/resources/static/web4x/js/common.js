@@ -41,15 +41,22 @@ $(function() {
         }
     });
 	 
-    // laydate 时间控件绑定
+    // laydate 时间控件绑定（select-time + startTime/endTime 联动）
     if ($(".select-time").length > 0 && $('#startTime').length > 0 && $('#endTime').length > 0) {
        layui.use('laydate', function() {
             var laydate = layui.laydate;
+            var startType = $('#startTime').attr("data-type") || 'date';
+            var endType = $('#endTime').attr("data-type") || 'date';
+            var startFormat = $('#startTime').attr("data-format")
+                || (startType === 'datetime' ? 'yyyy-MM-dd HH:mm:ss' : 'yyyy-MM-dd');
+            var endFormat = $('#endTime').attr("data-format")
+                || (endType === 'datetime' ? 'yyyy-MM-dd HH:mm:ss' : 'yyyy-MM-dd');
             startLayDate = laydate.render({
                 elem: '#startTime',
                 max: $('#endTime').val(),
                 theme: 'molv',
-                type: $('#startTime').attr("data-type") || 'date',
+                type: startType,
+                format: startFormat,
                 trigger: 'click',
                 done: function(value, date) {
                     // 结束时间大于开始时间
@@ -62,14 +69,18 @@ $(function() {
                         endLayDate.config.min.month = '';
                         endLayDate.config.min.date = '';
                     }
-                    $('#endTime').trigger('click');
+                    // 仅 date 类型自动打开结束时间；datetime 需用户手动点选，避免连续弹出两个面板
+                    if (startType === 'date') {
+                        $('#endTime').trigger('click');
+                    }
                 }
             });
             endLayDate = laydate.render({
                 elem: '#endTime',
                 min: $('#startTime').val(),
                 theme: 'molv',
-                type: $('#endTime').attr("data-type") || 'date',
+                type: endType,
+                format: endFormat,
                 trigger: 'click',
                 done: function(value, date) {
                     // 开始时间小于结束时间
@@ -87,12 +98,17 @@ $(function() {
         });
     }
 	
-    // laydate time-input 时间控件绑定
+    // laydate time-input 时间控件绑定（排除 select-time 内已联动的 startTime/endTime）
     if ($(".time-input").length > 0) {
         layui.use('laydate', function () {
             var com = layui.laydate;
             $(".time-input").each(function (index, item) {
                 var time = $(item);
+                if (time.attr("id") === "startTime" || time.attr("id") === "endTime") {
+                    if ($(".select-time").length > 0) {
+                        return;
+                    }
+                }
                 // 控制控件外观
                 var type = time.attr("data-type") || 'date';
                 // 控制回显格式
@@ -244,6 +260,74 @@ var closeItem = function(dataId){
             }
         });
     }
+}
+
+/**
+ * 定位到侧栏已有菜单页（不新建临时 Tab），可选带查询参数刷新 iframe。
+ * @param menuUrls 菜单 href，或候选 href 数组
+ * @param queryParams 传给目标页的查询参数对象，如 { uid: "1", idno: "10001" }
+ */
+function openMenuPage(menuUrls, queryParams) {
+    var topWin = window.parent;
+    if (!topWin || topWin === window) {
+        return false;
+    }
+    var urls = $.isArray(menuUrls) ? menuUrls : [menuUrls];
+    var $menu = $();
+    var menuUrl = "";
+    var i;
+    for (i = 0; i < urls.length; i++) {
+        if (typeof topWin.findMenuByUrl === "function") {
+            $menu = topWin.findMenuByUrl(urls[i]);
+        } else {
+            $menu = $(topWin.document).find('a.menuItem[href="' + decodeURI(urls[i]) + '"]');
+        }
+        if ($menu.length) {
+            menuUrl = $menu.attr("href");
+            break;
+        }
+    }
+    if (!$menu.length || !menuUrl) {
+        return false;
+    }
+
+    var query = "";
+    if (queryParams && typeof queryParams === "object") {
+        var parts = [];
+        $.each(queryParams, function (key, val) {
+            if (val != null && val !== "") {
+                parts.push(encodeURIComponent(key) + "=" + encodeURIComponent(val));
+            }
+        });
+        query = parts.join("&");
+    }
+
+    var topWindow = $(topWin.document);
+    var targetUrl = query
+        ? menuUrl + (menuUrl.indexOf("?") > -1 ? "&" : "?") + query
+        : menuUrl;
+
+    function applyIframeSrc() {
+        var $iframe = $(".mainContent .Web4x_iframe[data-id='" + menuUrl + "']", topWindow);
+        if (!$iframe.length) {
+            return false;
+        }
+        if ($iframe.attr("src") !== targetUrl) {
+            $iframe.attr("src", targetUrl);
+        }
+        return true;
+    }
+
+    $menu.trigger("click");
+
+    if (!applyIframeSrc()) {
+        setTimeout(function () {
+            if (!applyIframeSrc()) {
+                setTimeout(applyIframeSrc, 300);
+            }
+        }, 100);
+    }
+    return true;
 }
 
 /** 创建选项卡 */

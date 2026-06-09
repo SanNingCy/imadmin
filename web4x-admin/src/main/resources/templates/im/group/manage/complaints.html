@@ -12,12 +12,7 @@
                     <ul>
                         <li>用户ID：<input type="text" name="u.id" placeholder="用户ID"/></li>
                         <li>群组ID：<input type="text" name="group.id" placeholder="群组ID"/></li>
-                        <li class="select-time">
-                            <label>添加时间：</label>
-                            <input type="text" class="time-input" id="complaints-beginCreateDate" placeholder="开始日期" name="beginCreateDate" data-type="datetime" data-format="yyyy-MM-dd HH:mm:ss"/>
-                            <span>-</span>
-                            <input type="text" class="time-input" id="complaints-endCreateDate" placeholder="结束日期" name="endCreateDate" data-type="datetime" data-format="yyyy-MM-dd HH:mm:ss"/>
-                        </li>
+                        <li th:replace="include :: im-search-time-range('添加时间：', 'beginCreateDate', 'endCreateDate')"></li>
                         <li>
                             <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
                             <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>

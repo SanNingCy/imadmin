@@ -37,9 +37,19 @@
     <script th:src="@{/ajax/libs/iCheck/icheck.min.js?v=1.0.3}"></script>
 	<script th:src="@{/ajax/libs/layer/layer.min.js?v=3.7.0}"></script>
 	<script th:src="@{/ajax/libs/layui/layui.min.js?v=2.8.18}"></script>
-	<script th:src="@{/web4x/js/common.js?v=4.8.3}"></script>
+	<script th:src="@{/web4x/js/common.js?v=4.8.5}"></script>
 	<script th:src="@{/web4x/js/ry-ui.js?v=4.8.8}"></script>
 </div>
+
+<!-- 列表搜索：若依标准开始/结束时间范围（联动 laydate，name 对接后端查询字段） -->
+<li th:fragment="im-search-time-range(label, beginName, endName)" class="select-time">
+    <label th:text="${label}">创建时间：</label>
+    <input type="text" class="time-input" id="startTime" placeholder="开始时间"
+           th:name="${beginName}" data-type="datetime" data-format="yyyy-MM-dd HH:mm:ss"/>
+    <span>-</span>
+    <input type="text" class="time-input" id="endTime" placeholder="结束时间"
+           th:name="${endName}" data-type="datetime" data-format="yyyy-MM-dd HH:mm:ss"/>
+</li>
 
 <!-- ztree树插件 -->
 <div th:fragment="ztree-css">

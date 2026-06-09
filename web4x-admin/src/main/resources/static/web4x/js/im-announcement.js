@@ -92,14 +92,6 @@ function imAnnounceClearTargetUsers() {
     imAnnounceRenderTargetUsers();
 }
 
-function imAnnounceInitSearchDatetime() {
-    $("#announce-form .time-input").datetimepicker({
-        format: "yyyy-mm-dd hh:ii:ss",
-        autoclose: true,
-        todayBtn: true
-    });
-}
-
 function imAnnounceInitModalDatetime() {
     $("#announce-modal .announce-datetime").datetimepicker({
         format: "yyyy-mm-dd hh:ii:ss",
@@ -520,7 +512,6 @@ function imAnnounceOpenUserPicker() {
 }
 
 function imAnnounceInitTable(canView, canEdit, canDelete) {
-    imAnnounceInitSearchDatetime();
     imInitListMediaPreview();
     imInitTable({
         url: imAnnounceApi + "/list",

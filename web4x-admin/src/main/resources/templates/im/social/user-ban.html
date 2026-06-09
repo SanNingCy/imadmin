@@ -42,8 +42,7 @@
                                 <option value="1">永久封禁</option>
                             </select>
                         </li>
-                        <li>注册开始：<input type="text" name="beginCreateDate" placeholder="YYYY-MM-DD HH:mm:ss"/></li>
-                        <li>注册结束：<input type="text" name="endCreateDate" placeholder="YYYY-MM-DD HH:mm:ss"/></li>
+                        <li th:replace="include :: im-search-time-range('注册时间：', 'beginCreateDate', 'endCreateDate')"></li>
                         <li>
                             <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
                             <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>

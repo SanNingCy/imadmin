@@ -30,14 +30,7 @@
                                 <option value="0">否</option>
                             </select>
                         </li>
-                        <li>
-                            开始时间：
-                            <input type="text" class="time-input" name="startTime" placeholder="yyyy-MM-dd HH:mm:ss"/>
-                        </li>
-                        <li>
-                            结束时间：
-                            <input type="text" class="time-input" name="endTime" placeholder="yyyy-MM-dd HH:mm:ss"/>
-                        </li>
+                        <li th:replace="include :: im-search-time-range('时间范围：', 'startTime', 'endTime')"></li>
                         <li>
                             <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
                             <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>

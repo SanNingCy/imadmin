@@ -880,37 +880,39 @@ function imUserListBatchDelete() {
 
 
 
-function imUserListOpenTransaction(uid) {
+function imUserListOpenTransaction(uid, idno) {
 
-    var url = ctx + "asset/fund/balance?uid=" + encodeURIComponent(uid);
+    var params = { uid: uid };
 
-    if (window.parent && window.parent.$ && window.parent.$(".RuoYi_iframe").length) {
+    if (idno) {
 
-        window.parent.$(".RuoYi_iframe").each(function () {
-
-            if (this.contentWindow === window) {
-
-                // 在 iframe 内打开新 tab
-
-            }
-
-        });
+        params.idno = idno;
 
     }
 
-    if (typeof createMenuItem === "function") {
+    var menuUrls = [
 
-        createMenuItem(url, "交易明细");
+        ctx + "balancelog/balanceLog",
 
-    } else if (window.parent && typeof window.parent.createMenuItem === "function") {
+        ctx + "balance"
 
-        window.parent.createMenuItem(url, "交易明细");
+    ];
 
-    } else {
+    if (typeof openMenuPage === "function" && openMenuPage(menuUrls, params)) {
 
-        window.open(url, "_blank");
+        return;
 
     }
+
+    var url = ctx + "balancelog/balanceLog?uid=" + encodeURIComponent(uid);
+
+    if (idno) {
+
+        url += "&idno=" + encodeURIComponent(idno);
+
+    }
+
+    window.open(url, "_blank");
 
 }
 
@@ -1058,7 +1060,7 @@ function imUserListInitTable(canView, canEdit, canDelete, canChangeBalance, canT
 
                     if (canTransaction) {
 
-                        actions.push('<a class="btn btn-default btn-xs" href="javascript:void(0)" onclick="imUserListOpenTransaction(\'' + row.id + '\')"><i class="fa fa-list"></i>交易明细</a>');
+                        actions.push('<a class="btn btn-default btn-xs" href="javascript:void(0)" onclick="imUserListOpenTransaction(\'' + row.id + '\',\'' + String(row.idno || "").replace(/'/g, "\\'") + '\')"><i class="fa fa-list"></i>交易明细</a>');
 
                     }
 

@@ -153,9 +153,7 @@
 
                         </li>
 
-                        <li>注册开始：<input type="text" name="beginCreateDate" placeholder="YYYY-MM-DD HH:mm:ss"/></li>
-
-                        <li>注册结束：<input type="text" name="endCreateDate" placeholder="YYYY-MM-DD HH:mm:ss"/></li>
+                        <li th:replace="include :: im-search-time-range('注册时间：', 'beginCreateDate', 'endCreateDate')"></li>
 
                         <li>未登录天数：<input type="number" name="inactiveDays" min="0" step="1"/></li>
 

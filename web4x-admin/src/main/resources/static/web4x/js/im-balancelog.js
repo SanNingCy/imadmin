@@ -3,6 +3,11 @@
  */
 var imBalanceLogApi = ctx + "balancelog/balanceLog";
 
+function imBalanceLogGetUrlParam(name) {
+    var match = new RegExp("[?&]" + name + "=([^&#]*)").exec(window.location.search);
+    return match ? decodeURIComponent(match[1].replace(/\+/g, " ")) : "";
+}
+
 var IM_BALANCE_TYPE_DICT = "balance_type";
 var IM_BALANCE_TYPE_LABEL_MAP = {};
 
@@ -16,7 +21,12 @@ function imBalanceLogQueryParams(params) {
     var pageNo = params.offset / params.limit + 1;
     var query = imBuildPageQuery(pageNo, pageSize, params.sort, params.order);
     var formValues = $.common.formToJSON("balance-log-form");
-    return $.extend(query, imOmitEmptyParams(formValues));
+    query = $.extend(query, imOmitEmptyParams(formValues));
+    var uid = imBalanceLogGetUrlParam("uid");
+    if (uid) {
+        query["u.id"] = uid;
+    }
+    return query;
 }
 
 function imBalanceLogMemberField(row, field) {
@@ -199,6 +209,10 @@ function imBalanceLogInitTable() {
 }
 
 function imBalanceLogInitPage() {
+    var idno = imBalanceLogGetUrlParam("idno");
+    if (idno) {
+        $("#balance-log-form input[name='idno']").val(idno);
+    }
     imBalanceLogLoadTypeDict(function (values) {
         imBalanceLogBuildTypeLabelMap(values);
         imBalanceLogFillTypeSelect(values);

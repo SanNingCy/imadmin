@@ -8,20 +8,10 @@ function imLiveOrderQueryParams(params) {
     var pageNo = params.offset / params.limit + 1;
     var query = imBuildPageQuery(pageNo, pageSize, params.sort, params.order);
     var formValues = $.common.formToJSON("live-order-form");
-    var startTime = $.trim($("#startTime").val());
-    var endTime = $.trim($("#endTime").val());
-    if (startTime) {
-        formValues.beginTimeStart = startTime;
-    }
-    if (endTime) {
-        formValues.beginTimeEnd = endTime;
-    }
     return $.extend(query, imOmitEmptyParams(formValues));
 }
 
 function imLiveOrderResetSearch() {
-    $("#startTime").val("");
-    $("#endTime").val("");
     $.form.reset();
 }
 
