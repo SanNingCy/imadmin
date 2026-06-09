@@ -15,24 +15,6 @@
 
         .user-list-copy { cursor: pointer; color: #1ab394; }
 
-        /* 长文本列：限制宽度 + 省略号，避免设备号等撑破表格 */
-        .user-list-table-wrap td.user-list-ellipsis,
-        .user-list-table-wrap th.user-list-ellipsis {
-            max-width: 160px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .user-list-table-wrap td.user-list-ellipsis .user-list-ellipsis-inner {
-            display: inline-block;
-            max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            vertical-align: bottom;
-        }
-
         .ul-image-upload { display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
         .ul-image-preview {
             position: relative;

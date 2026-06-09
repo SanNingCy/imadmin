@@ -28,11 +28,15 @@ function imEscapeHtml(text) {
 
 /** 限制 td 宽度，防止长文本撑开表格 */
 function imEllipsisCell(maxWidth) {
+    var width = imParseColumnWidth(maxWidth);
+    if (width == null || width < IM_TABLE_ELLIPSIS_DEFAULT_WIDTH) {
+        width = IM_TABLE_ELLIPSIS_DEFAULT_WIDTH;
+    }
     return function () {
         return {
             css: {
-                "max-width": maxWidth + "px",
-                "width": maxWidth + "px",
+                "max-width": width + "px",
+                "width": width + "px",
                 "overflow": "hidden",
                 "white-space": "nowrap",
                 "text-overflow": "ellipsis"
@@ -62,16 +66,14 @@ function imMergeEllipsisCellStyle(column, maxWidth) {
 }
 
 /** 列表文本列默认最大宽度（px） */
-var IM_TABLE_ELLIPSIS_DEFAULT_WIDTH = 280;
+var IM_TABLE_ELLIPSIS_DEFAULT_WIDTH = 180;
 
-/** 普通列默认宽度（未设置 width 时） */
-var IM_TABLE_COLUMN_DEFAULT_WIDTH = 200;
-/** 普通列最小宽度：已有 width 小于该值时会被抬升 */
-var IM_TABLE_COLUMN_MIN_WIDTH = 120;
+/** 普通列默认宽度（未设置 width 时，或 width 小于该值时抬升） */
+var IM_TABLE_COLUMN_DEFAULT_WIDTH = 140;
 /** 操作列默认宽度（px） */
-var IM_TABLE_OPERATE_COLUMN_DEFAULT_WIDTH = 280;
+var IM_TABLE_OPERATE_COLUMN_DEFAULT_WIDTH = 240;
 /** 操作列最小宽度 */
-var IM_TABLE_OPERATE_COLUMN_MIN_WIDTH = 240;
+var IM_TABLE_OPERATE_COLUMN_MIN_WIDTH = 200;
 /** 复选框列宽度 */
 var IM_TABLE_CHECKBOX_COLUMN_WIDTH = 50;
 
@@ -170,6 +172,71 @@ function imApplyTableEllipsisColumns(columns, tableOptions) {
     return columns;
 }
 
+/** 单元格单行省略样式（与 formatter 列配合，避免长文本撑高行高） */
+var IM_TABLE_CELL_NOWRAP_CSS = {
+    "white-space": "nowrap",
+    "overflow": "hidden",
+    "text-overflow": "ellipsis",
+    "max-width": "100%"
+};
+
+function imMergeCellStyleFn(baseFn, extraCss) {
+    if (typeof baseFn !== "function") {
+        return function () {
+            return { css: $.extend({}, extraCss) };
+        };
+    }
+    return function (value, row, index) {
+        var result = baseFn(value, row, index) || {};
+        result.css = $.extend({}, extraCss, result.css || {});
+        return result;
+    };
+}
+
+function imShouldApplyCellNowrap(column) {
+    if (!column || column.cellWrap === true) {
+        return false;
+    }
+    if (imIsCheckboxColumn(column)) {
+        return false;
+    }
+    if (imIsOperateColumn(column)) {
+        return false;
+    }
+    if (column.escape === false) {
+        return false;
+    }
+    return true;
+}
+
+/**
+ * 为含自定义 formatter 的文本列也强制单行省略（imApplyTableEllipsisColumns 会跳过 formatter 列）
+ * tableOptions.cellNowrap = false 可关闭
+ */
+function imApplyTableCellNowrap(columns, tableOptions) {
+    if (!columns || !$.isArray(columns)) {
+        return columns;
+    }
+    if (tableOptions && tableOptions.cellNowrap === false) {
+        return columns;
+    }
+    $.each(columns, function (_, column) {
+        if (!column) {
+            return;
+        }
+        if (column.escape === false) {
+            column.class = $.trim((column.class || "") + " im-table-media-cell im-table-no-ellipsis");
+            return;
+        }
+        if (!imShouldApplyCellNowrap(column)) {
+            return;
+        }
+        column.cellStyle = imMergeCellStyleFn(column.cellStyle, IM_TABLE_CELL_NOWRAP_CSS);
+        column.class = $.trim((column.class || "") + " im-table-ellipsis-cell");
+    });
+    return columns;
+}
+
 /** 是否为表格操作列 */
 function imIsOperateColumn(column) {
     if (!column || column.operateWidth === false) {
@@ -181,7 +248,7 @@ function imIsOperateColumn(column) {
 
 /**
  * 统一加宽表格各列（含操作列、普通文本列等）
- * tableOptions.columnWidth = false 关闭；columnDefaultWidth / columnMinWidth / operateWidth 可调
+ * tableOptions.columnWidth = false 关闭；columnDefaultWidth / operateWidth 可调
  */
 function imApplyTableColumnWidths(columns, tableOptions) {
     if (!columns || !$.isArray(columns)) {
@@ -191,7 +258,6 @@ function imApplyTableColumnWidths(columns, tableOptions) {
         return columns;
     }
     var defaultWidth = (tableOptions && tableOptions.columnDefaultWidth) || IM_TABLE_COLUMN_DEFAULT_WIDTH;
-    var minWidth = (tableOptions && tableOptions.columnMinWidth) || IM_TABLE_COLUMN_MIN_WIDTH;
     var operateDefault = (tableOptions && tableOptions.operateWidth) || IM_TABLE_OPERATE_COLUMN_DEFAULT_WIDTH;
     var operateMin = (tableOptions && tableOptions.operateMinWidth) || IM_TABLE_OPERATE_COLUMN_MIN_WIDTH;
     var checkboxWidth = (tableOptions && tableOptions.checkboxWidth) || IM_TABLE_CHECKBOX_COLUMN_WIDTH;
@@ -219,8 +285,8 @@ function imApplyTableColumnWidths(columns, tableOptions) {
         var width = imParseColumnWidth(column.width);
         if (width == null) {
             column.width = defaultWidth;
-        } else if (width < minWidth) {
-            column.width = minWidth;
+        } else if (width < defaultWidth) {
+            column.width = defaultWidth;
         }
     });
     return columns;
@@ -397,6 +463,9 @@ function imFormatListMedia(value, cacheKey, max) {
             }
             if (options.ellipsis !== false) {
                 options.columns = imApplyTableEllipsisColumns(options.columns, options);
+            }
+            if (options.cellNowrap !== false) {
+                options.columns = imApplyTableCellNowrap(options.columns, options);
             }
         }
         if (options.responseHandler === imPageResponse) {

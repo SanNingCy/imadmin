@@ -1,166 +1,151 @@
-<!DOCTYPE html>
-<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
-<head>
-    <th:block th:include="include :: header('公共配置')" />
-    <style>
-        #credit-common-config-modal .form-group { margin-bottom: 10px; }
-        .credit-common-config-table-wrap { overflow-x: auto; }
-        .credit-common-config-table-wrap td.credit-common-config-ellipsis,
-        .credit-common-config-table-wrap th.credit-common-config-ellipsis {
-            max-width: 160px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .credit-common-config-table-wrap td.credit-common-config-ellipsis .credit-common-config-ellipsis-inner {
-            display: inline-block;
-            max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            vertical-align: bottom;
-        }
-        .credit-common-config-remark {
-            margin-top: 6px;
-            padding: 6px 10px;
-            border: 1px solid #ffccc7;
-            background: #fff2f0;
-            color: #cf1322;
-            font-size: 12px;
-            line-height: 18px;
-            border-radius: 4px;
-        }
-    </style>
-</head>
-<body class="gray-bg">
-<div class="container-div">
-    <div class="row">
-        <div class="col-sm-12 search-collapse">
-            <form id="credit-common-config-form">
-                <div class="select-list">
-                    <ul>
-                        <li>ID：<input type="text" name="id"/></li>
-                        <li>
-                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
-                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
-                        </li>
-                    </ul>
-                </div>
-            </form>
-        </div>
-        <div class="col-sm-12 select-table table-striped credit-common-config-table-wrap">
-            <table id="bootstrap-table"></table>
-        </div>
-    </div>
-</div>
-
-<div id="credit-common-config-modal" style="display:none;">
-    <form id="credit-common-config-modal-form" class="form-horizontal" style="padding:15px 20px;max-height:70vh;overflow-y:auto;">
-        <input type="hidden" id="credit-common-config-id"/>
-        <div class="form-group">
-            <label class="col-sm-4 control-label">ID：</label>
-            <div class="col-sm-7"><input type="text" class="form-control" id="credit-common-config-id-display" readonly/></div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-4 control-label">新用户信用分底色天数：</label>
-            <div class="col-sm-7">
-                <input type="number" class="form-control credit-common-config-num" id="credit-common-config-newUserDays" min="0" step="1"/>
-                <div class="credit-common-config-remark">用于管理新用户信用分的天数颜色</div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-4 control-label">新用户加人天数：</label>
-            <div class="col-sm-7">
-                <input type="number" class="form-control credit-common-config-num" id="credit-common-config-newUserJoinDays" min="0" step="1"/>
-                <div class="credit-common-config-remark">用于管理新用户多少天可以加入的天数</div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-4 control-label">新人建群天数：</label>
-            <div class="col-sm-7">
-                <input type="number" class="form-control credit-common-config-num" id="credit-common-config-newUserCreateGroupDays" min="0" step="1"/>
-                <div class="credit-common-config-remark">用于管理新用户多少天建群的限制</div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-4 control-label">新人建群人数：</label>
-            <div class="col-sm-7">
-                <input type="number" class="form-control credit-common-config-num" id="credit-common-config-newUserCreateGroupMemberCount" min="0" step="1"/>
-                <div class="credit-common-config-remark">用于管理新用户建群的人数限制</div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-4 control-label">建群数量：</label>
-            <div class="col-sm-7">
-                <input type="number" class="form-control credit-common-config-num" id="credit-common-config-createGroupCount" min="0" step="1"/>
-                <div class="credit-common-config-remark">用于管理新用户建群数量的限制</div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-4 control-label">加好友申请次数：</label>
-            <div class="col-sm-7">
-                <input type="number" class="form-control credit-common-config-num" id="credit-common-config-friendApplyCount" min="0" step="1"/>
-                <div class="credit-common-config-remark">用于管理新用户加好友申请次数的限制</div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-4 control-label">注册天数发送链接天数：</label>
-            <div class="col-sm-7">
-                <input type="number" class="form-control credit-common-config-num" id="credit-common-config-newUserDaysV2" min="0" step="1"/>
-                <div class="credit-common-config-remark">用于管理新用户发送链接的天数</div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-4 control-label">新入群天数：</label>
-            <div class="col-sm-7">
-                <input type="number" class="form-control credit-common-config-num" id="credit-common-config-newInGroupDays" min="0" step="1"/>
-                <div class="credit-common-config-remark">用于管理新人入群时间的颜色天数配置</div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-4 control-label">是否是靓号配置：</label>
-            <div class="col-sm-7">
-                <select class="form-control credit-common-config-flag" id="credit-common-config-isLianghao"></select>
-                <div class="credit-common-config-remark">是：靓号特权，开通靓号自动解除新人限制。否：关闭特权，所有用户按注册天数统一限制。</div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-4 control-label">是否是会员配置：</label>
-            <div class="col-sm-7">
-                <select class="form-control credit-common-config-flag" id="credit-common-config-isVip"></select>
-                <div class="credit-common-config-remark">是：会员特权，开通会员自动解除新人限制。否：关闭特权，所有用户按注册天数统一限制。</div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-4 control-label">登录二次验证至少通过几项：</label>
-            <div class="col-sm-7">
-                <select class="form-control" id="credit-common-config-loginSecondVerifyMinPass"></select>
-                <div class="credit-common-config-remark">登录二次验证至少通过几项：1=任选其一；0=全部验证</div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-4 control-label">创建时间：</label>
-            <div class="col-sm-7"><input type="text" class="form-control" id="credit-common-config-createTime" readonly/></div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-4 control-label">更新时间：</label>
-            <div class="col-sm-7"><input type="text" class="form-control" id="credit-common-config-updateTime" readonly/></div>
-        </div>
-    </form>
-</div>
-
-<th:block th:include="include :: footer" />
-<script th:src="@{/web4x/js/im-table.js?v=20260605r}"></script>
-<script th:src="@{/web4x/js/im-credit-common.js?v=20260605r}"></script>
-<script th:src="@{/web4x/js/im-credit-common-config.js?v=20260605r}"></script>
-<script th:inline="javascript">
-    $(function () {
-        imCreditCommonConfigInitTable(
-            [[${@permission.isPermitted('social:credit:common-configuration:view')}]],
-            [[${@permission.isPermitted('social:credit:common-configuration:edit')}]],
-            [[${@permission.isPermitted('social:credit:common-configuration:delete')}]]
-        );
-    });
-</script>
-</body>
-</html>
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('公共配置')" />
+    <style>
+        #credit-common-config-modal .form-group { margin-bottom: 10px; }
+        .credit-common-config-table-wrap { overflow-x: auto; }
+        .credit-common-config-remark {
+            margin-top: 6px;
+            padding: 6px 10px;
+            border: 1px solid #ffccc7;
+            background: #fff2f0;
+            color: #cf1322;
+            font-size: 12px;
+            line-height: 18px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="credit-common-config-form">
+                <div class="select-list">
+                    <ul>
+                        <li>ID：<input type="text" name="id"/></li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped credit-common-config-table-wrap">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<div id="credit-common-config-modal" style="display:none;">
+    <form id="credit-common-config-modal-form" class="form-horizontal" style="padding:15px 20px;max-height:70vh;overflow-y:auto;">
+        <input type="hidden" id="credit-common-config-id"/>
+        <div class="form-group">
+            <label class="col-sm-4 control-label">ID：</label>
+            <div class="col-sm-7"><input type="text" class="form-control" id="credit-common-config-id-display" readonly/></div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label">新用户信用分底色天数：</label>
+            <div class="col-sm-7">
+                <input type="number" class="form-control credit-common-config-num" id="credit-common-config-newUserDays" min="0" step="1"/>
+                <div class="credit-common-config-remark">用于管理新用户信用分的天数颜色</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label">新用户加人天数：</label>
+            <div class="col-sm-7">
+                <input type="number" class="form-control credit-common-config-num" id="credit-common-config-newUserJoinDays" min="0" step="1"/>
+                <div class="credit-common-config-remark">用于管理新用户多少天可以加入的天数</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label">新人建群天数：</label>
+            <div class="col-sm-7">
+                <input type="number" class="form-control credit-common-config-num" id="credit-common-config-newUserCreateGroupDays" min="0" step="1"/>
+                <div class="credit-common-config-remark">用于管理新用户多少天建群的限制</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label">新人建群人数：</label>
+            <div class="col-sm-7">
+                <input type="number" class="form-control credit-common-config-num" id="credit-common-config-newUserCreateGroupMemberCount" min="0" step="1"/>
+                <div class="credit-common-config-remark">用于管理新用户建群的人数限制</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label">建群数量：</label>
+            <div class="col-sm-7">
+                <input type="number" class="form-control credit-common-config-num" id="credit-common-config-createGroupCount" min="0" step="1"/>
+                <div class="credit-common-config-remark">用于管理新用户建群数量的限制</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label">加好友申请次数：</label>
+            <div class="col-sm-7">
+                <input type="number" class="form-control credit-common-config-num" id="credit-common-config-friendApplyCount" min="0" step="1"/>
+                <div class="credit-common-config-remark">用于管理新用户加好友申请次数的限制</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label">注册天数发送链接天数：</label>
+            <div class="col-sm-7">
+                <input type="number" class="form-control credit-common-config-num" id="credit-common-config-newUserDaysV2" min="0" step="1"/>
+                <div class="credit-common-config-remark">用于管理新用户发送链接的天数</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label">新入群天数：</label>
+            <div class="col-sm-7">
+                <input type="number" class="form-control credit-common-config-num" id="credit-common-config-newInGroupDays" min="0" step="1"/>
+                <div class="credit-common-config-remark">用于管理新人入群时间的颜色天数配置</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label">是否是靓号配置：</label>
+            <div class="col-sm-7">
+                <select class="form-control credit-common-config-flag" id="credit-common-config-isLianghao"></select>
+                <div class="credit-common-config-remark">是：靓号特权，开通靓号自动解除新人限制。否：关闭特权，所有用户按注册天数统一限制。</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label">是否是会员配置：</label>
+            <div class="col-sm-7">
+                <select class="form-control credit-common-config-flag" id="credit-common-config-isVip"></select>
+                <div class="credit-common-config-remark">是：会员特权，开通会员自动解除新人限制。否：关闭特权，所有用户按注册天数统一限制。</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label">登录二次验证至少通过几项：</label>
+            <div class="col-sm-7">
+                <select class="form-control" id="credit-common-config-loginSecondVerifyMinPass"></select>
+                <div class="credit-common-config-remark">登录二次验证至少通过几项：1=任选其一；0=全部验证</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label">创建时间：</label>
+            <div class="col-sm-7"><input type="text" class="form-control" id="credit-common-config-createTime" readonly/></div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label">更新时间：</label>
+            <div class="col-sm-7"><input type="text" class="form-control" id="credit-common-config-updateTime" readonly/></div>
+        </div>
+    </form>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js?v=20260605r}"></script>
+<script th:src="@{/web4x/js/im-credit-common.js?v=20260605r}"></script>
+<script th:src="@{/web4x/js/im-credit-common-config.js?v=20260605r}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imCreditCommonConfigInitTable(
+            [[${@permission.isPermitted('social:credit:common-configuration:view')}]],
+            [[${@permission.isPermitted('social:credit:common-configuration:edit')}]],
+            [[${@permission.isPermitted('social:credit:common-configuration:delete')}]]
+        );
+    });
+</script>
+</body>
+</html>

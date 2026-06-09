@@ -867,7 +867,7 @@ label {
 
 /** 表头标题与数据列对齐居中（bootstrap-table 表头/表体为双表结构） */
 .select-table .bootstrap-table .fixed-table-container table {
-	table-layout: auto !important;
+	table-layout: fixed !important;
 	width: max-content;
 	min-width: 100%;
 }
@@ -886,7 +886,7 @@ label {
 .select-table .bootstrap-table .fixed-table-container tbody td {
 	text-align: center !important;
 	vertical-align: middle !important;
-	padding: 8px !important;
+	padding: 10px 14px !important;
 }
 .select-table .bootstrap-table .fixed-table-container th .th-inner {
 	text-align: center !important;
@@ -906,20 +906,27 @@ label {
 	text-align: left !important;
 }
 
-/** 列表文本列全局省略（imApplyTableEllipsisColumns + imFormatText） */
+/** 列表文本列全局省略（imApplyTableEllipsisColumns / imApplyTableCellNowrap + imFormatText） */
+.select-table .bootstrap-table .fixed-table-container thead th.im-table-ellipsis-cell,
 .select-table .bootstrap-table .fixed-table-container tbody td.im-table-ellipsis-cell {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
-.select-table .bootstrap-table .fixed-table-container tbody td.im-table-ellipsis-cell .im-cell-ellipsis {
-	display: block;
+.select-table .bootstrap-table .fixed-table-container tbody td.im-table-ellipsis-cell .im-cell-ellipsis,
+.select-table .bootstrap-table .fixed-table-container tbody td.im-table-ellipsis-cell [class$="-ellipsis-inner"] {
+	display: inline-block;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	max-width: 100%;
+	vertical-align: bottom;
 }
 .select-table .bootstrap-table .fixed-table-container tbody td.im-table-no-ellipsis {
+	overflow: visible;
+	white-space: normal;
+}
+.select-table .bootstrap-table .fixed-table-container tbody td.im-table-media-cell {
 	overflow: visible;
 	white-space: normal;
 }
@@ -927,15 +934,16 @@ label {
 /** 操作列全局加宽，避免按钮换行 */
 .select-table .bootstrap-table .fixed-table-container th.im-table-operate-cell,
 .select-table .bootstrap-table .fixed-table-container td.im-table-operate-cell {
-	min-width: 280px;
+	min-width: 240px;
 	white-space: nowrap;
 }
 .select-table .bootstrap-table .fixed-table-container td.im-table-operate-cell .btn {
-	margin-bottom: 2px;
+	margin-bottom: 0;
 }
 /** 普通列最小宽度兜底（与 imApplyTableColumnWidths 配合） */
+.select-table .bootstrap-table .fixed-table-container thead th.im-table-ellipsis-cell,
 .select-table .bootstrap-table .fixed-table-container tbody td.im-table-ellipsis-cell {
-	min-width: 120px;
+	min-width: 140px;
 }
 
 .table-striped .table>thead>tr>th, .table-striped .table>tbody>tr>th {
