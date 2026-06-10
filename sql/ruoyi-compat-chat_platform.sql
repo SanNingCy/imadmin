@@ -1,8 +1,3 @@
--- =============================================================================
--- RuoYi + IM same DB (chat_platform_db) - safe install script
--- No DROP TABLE; does not modify IM tables (sys_config, sys_user, sys_menu, ...)
--- RuoYi uses: sys_param_config, sys_user_ry, sys_menu_ry, ... see RUOYI-COMPAT.md
--- =============================================================================
 USE chat_platform_db;
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
@@ -300,6 +295,375 @@ CREATE TABLE IF NOT EXISTS `sys_logininfor` (
 ) ENGINE=InnoDB AUTO_INCREMENT=109 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='系统访问记录';
 
 BEGIN;
+
+
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for sys_menu_ry
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_menu_ry`;
+CREATE TABLE `sys_menu_ry`  (
+  `menu_id` bigint NOT NULL AUTO_INCREMENT COMMENT '菜单ID',
+  `menu_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '菜单名称',
+  `parent_id` bigint NULL DEFAULT 0 COMMENT '父菜单ID',
+  `order_num` int NULL DEFAULT 0 COMMENT '显示顺序',
+  `url` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT '#' COMMENT '请求地址',
+  `target` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT '' COMMENT '打开方式（menuItem页签 menuBlank新窗口）',
+  `menu_type` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT '' COMMENT '菜单类型（M目录 C菜单 F按钮）',
+  `visible` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT '0' COMMENT '菜单状态（0显示 1隐藏）',
+  `is_refresh` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT '1' COMMENT '是否刷新（0刷新 1不刷新）',
+  `perms` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL COMMENT '权限标识',
+  `icon` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT '#' COMMENT '菜单图标',
+  `create_by` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
+  `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT '' COMMENT '备注',
+  PRIMARY KEY (`menu_id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 2256 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin COMMENT = '菜单权限表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of sys_menu_ry
+-- ----------------------------
+INSERT INTO `sys_menu_ry` VALUES (1, '系统管理', 0, 1, '#', '', 'M', '0', '1', '', 'fa fa-gear', 'admin', '2026-06-03 07:59:20', '', NULL, '系统管理目录');
+INSERT INTO `sys_menu_ry` VALUES (2, '系统监控', 0, 11, '#', 'menuItem', 'M', '0', '1', '', 'fa fa-video-camera', 'admin', '2026-06-03 07:59:20', 'admin', '2026-06-06 11:57:07', '系统监控目录');
+INSERT INTO `sys_menu_ry` VALUES (3, '系统工具', 0, 3, '#', 'menuItem', 'M', '1', '1', '', 'fa fa-bars', 'admin', '2026-06-03 07:59:20', 'admin', '2026-06-06 11:56:17', '系统工具目录');
+INSERT INTO `sys_menu_ry` VALUES (100, '用户管理', 1, 1, '/system/user', '', 'C', '0', '1', 'system:user:view', 'fa fa-user-o', 'admin', '2026-06-03 07:59:20', '', NULL, '用户管理菜单');
+INSERT INTO `sys_menu_ry` VALUES (101, '角色管理', 1, 2, '/system/role', '', 'C', '0', '1', 'system:role:view', 'fa fa-user-secret', 'admin', '2026-06-03 07:59:20', '', NULL, '角色管理菜单');
+INSERT INTO `sys_menu_ry` VALUES (102, '菜单管理', 1, 3, '/system/menu', '', 'C', '0', '1', 'system:menu:view', 'fa fa-th-list', 'admin', '2026-06-03 07:59:20', '', NULL, '菜单管理菜单');
+INSERT INTO `sys_menu_ry` VALUES (103, '部门管理', 1, 4, '/system/dept', '', 'C', '0', '1', 'system:dept:view', 'fa fa-outdent', 'admin', '2026-06-03 07:59:20', '', NULL, '部门管理菜单');
+INSERT INTO `sys_menu_ry` VALUES (104, '岗位管理', 1, 5, '/system/post', '', 'C', '0', '1', 'system:post:view', 'fa fa-address-card-o', 'admin', '2026-06-03 07:59:20', '', NULL, '岗位管理菜单');
+INSERT INTO `sys_menu_ry` VALUES (105, '字典管理', 1, 6, '/system/dict', '', 'C', '0', '1', 'system:dict:view', 'fa fa-bookmark-o', 'admin', '2026-06-03 07:59:20', '', NULL, '字典管理菜单');
+INSERT INTO `sys_menu_ry` VALUES (106, '参数设置', 1, 7, '/system/config', '', 'C', '0', '1', 'system:config:view', 'fa fa-sun-o', 'admin', '2026-06-03 07:59:20', '', NULL, '参数设置菜单');
+INSERT INTO `sys_menu_ry` VALUES (107, '通知公告', 1, 8, '/system/notice', '', 'C', '0', '1', 'system:notice:view', 'fa fa-bullhorn', 'admin', '2026-06-03 07:59:20', '', NULL, '通知公告菜单');
+INSERT INTO `sys_menu_ry` VALUES (108, '日志管理', 1, 9, '#', '', 'M', '0', '1', '', 'fa fa-pencil-square-o', 'admin', '2026-06-03 07:59:20', '', NULL, '日志管理菜单');
+INSERT INTO `sys_menu_ry` VALUES (109, '在线用户', 2, 1, '/monitor/online', '', 'C', '0', '1', 'monitor:online:view', 'fa fa-user-circle', 'admin', '2026-06-03 07:59:20', '', NULL, '在线用户菜单');
+INSERT INTO `sys_menu_ry` VALUES (110, '定时任务', 2, 2, '/monitor/job', '', 'C', '0', '1', 'monitor:job:view', 'fa fa-tasks', 'admin', '2026-06-03 07:59:20', '', NULL, '定时任务菜单');
+INSERT INTO `sys_menu_ry` VALUES (111, '数据监控', 2, 3, '/monitor/data', '', 'C', '0', '1', 'monitor:data:view', 'fa fa-bug', 'admin', '2026-06-03 07:59:20', '', NULL, '数据监控菜单');
+INSERT INTO `sys_menu_ry` VALUES (112, '服务监控', 2, 4, '/monitor/server', '', 'C', '0', '1', 'monitor:server:view', 'fa fa-server', 'admin', '2026-06-03 07:59:20', '', NULL, '服务监控菜单');
+INSERT INTO `sys_menu_ry` VALUES (113, '缓存监控', 2, 5, '/monitor/cache', '', 'C', '0', '1', 'monitor:cache:view', 'fa fa-cube', 'admin', '2026-06-03 07:59:20', '', NULL, '缓存监控菜单');
+INSERT INTO `sys_menu_ry` VALUES (114, '表单构建', 3, 1, '/tool/build', '', 'C', '0', '1', 'tool:build:view', 'fa fa-wpforms', 'admin', '2026-06-03 07:59:20', '', NULL, '表单构建菜单');
+INSERT INTO `sys_menu_ry` VALUES (115, '代码生成', 3, 2, '/tool/gen', '', 'C', '0', '1', 'tool:gen:view', 'fa fa-code', 'admin', '2026-06-03 07:59:20', '', NULL, '代码生成菜单');
+INSERT INTO `sys_menu_ry` VALUES (116, '系统接口', 3, 3, '/tool/swagger', '', 'C', '0', '1', 'tool:swagger:view', 'fa fa-gg', 'admin', '2026-06-03 07:59:20', '', NULL, '系统接口菜单');
+INSERT INTO `sys_menu_ry` VALUES (500, '操作日志', 108, 1, '/monitor/operlog', '', 'C', '0', '1', 'monitor:operlog:view', 'fa fa-address-book', 'admin', '2026-06-03 07:59:20', '', NULL, '操作日志菜单');
+INSERT INTO `sys_menu_ry` VALUES (501, '登录日志', 108, 2, '/monitor/logininfor', '', 'C', '0', '1', 'monitor:logininfor:view', 'fa fa-file-image-o', 'admin', '2026-06-03 07:59:20', '', NULL, '登录日志菜单');
+INSERT INTO `sys_menu_ry` VALUES (1000, '用户查询', 100, 1, '#', '', 'F', '0', '1', 'system:user:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1001, '用户新增', 100, 2, '#', '', 'F', '0', '1', 'system:user:add', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1002, '用户修改', 100, 3, '#', '', 'F', '0', '1', 'system:user:edit', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1003, '用户删除', 100, 4, '#', '', 'F', '0', '1', 'system:user:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1004, '用户导出', 100, 5, '#', '', 'F', '0', '1', 'system:user:export', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1005, '用户导入', 100, 6, '#', '', 'F', '0', '1', 'system:user:import', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1006, '重置密码', 100, 7, '#', '', 'F', '0', '1', 'system:user:resetPwd', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1007, '角色查询', 101, 1, '#', '', 'F', '0', '1', 'system:role:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1008, '角色新增', 101, 2, '#', '', 'F', '0', '1', 'system:role:add', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1009, '角色修改', 101, 3, '#', '', 'F', '0', '1', 'system:role:edit', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1010, '角色删除', 101, 4, '#', '', 'F', '0', '1', 'system:role:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1011, '角色导出', 101, 5, '#', '', 'F', '0', '1', 'system:role:export', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1012, '菜单查询', 102, 1, '#', '', 'F', '0', '1', 'system:menu:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1013, '菜单新增', 102, 2, '#', '', 'F', '0', '1', 'system:menu:add', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1014, '菜单修改', 102, 3, '#', '', 'F', '0', '1', 'system:menu:edit', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1015, '菜单删除', 102, 4, '#', '', 'F', '0', '1', 'system:menu:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1016, '部门查询', 103, 1, '#', '', 'F', '0', '1', 'system:dept:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1017, '部门新增', 103, 2, '#', '', 'F', '0', '1', 'system:dept:add', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1018, '部门修改', 103, 3, '#', '', 'F', '0', '1', 'system:dept:edit', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1019, '部门删除', 103, 4, '#', '', 'F', '0', '1', 'system:dept:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1020, '岗位查询', 104, 1, '#', '', 'F', '0', '1', 'system:post:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1021, '岗位新增', 104, 2, '#', '', 'F', '0', '1', 'system:post:add', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1022, '岗位修改', 104, 3, '#', '', 'F', '0', '1', 'system:post:edit', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1023, '岗位删除', 104, 4, '#', '', 'F', '0', '1', 'system:post:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1024, '岗位导出', 104, 5, '#', '', 'F', '0', '1', 'system:post:export', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1025, '字典查询', 105, 1, '#', '', 'F', '0', '1', 'system:dict:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1026, '字典新增', 105, 2, '#', '', 'F', '0', '1', 'system:dict:add', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1027, '字典修改', 105, 3, '#', '', 'F', '0', '1', 'system:dict:edit', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1028, '字典删除', 105, 4, '#', '', 'F', '0', '1', 'system:dict:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1029, '字典导出', 105, 5, '#', '', 'F', '0', '1', 'system:dict:export', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1030, '参数查询', 106, 1, '#', '', 'F', '0', '1', 'system:config:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1031, '参数新增', 106, 2, '#', '', 'F', '0', '1', 'system:config:add', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1032, '参数修改', 106, 3, '#', '', 'F', '0', '1', 'system:config:edit', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1033, '参数删除', 106, 4, '#', '', 'F', '0', '1', 'system:config:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1034, '参数导出', 106, 5, '#', '', 'F', '0', '1', 'system:config:export', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1035, '公告查询', 107, 1, '#', '', 'F', '0', '1', 'system:notice:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1036, '公告新增', 107, 2, '#', '', 'F', '0', '1', 'system:notice:add', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1037, '公告修改', 107, 3, '#', '', 'F', '0', '1', 'system:notice:edit', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1038, '公告删除', 107, 4, '#', '', 'F', '0', '1', 'system:notice:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1039, '操作查询', 500, 1, '#', '', 'F', '0', '1', 'monitor:operlog:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1040, '操作删除', 500, 2, '#', '', 'F', '0', '1', 'monitor:operlog:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1041, '详细信息', 500, 3, '#', '', 'F', '0', '1', 'monitor:operlog:detail', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1042, '日志导出', 500, 4, '#', '', 'F', '0', '1', 'monitor:operlog:export', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1043, '登录查询', 501, 1, '#', '', 'F', '0', '1', 'monitor:logininfor:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1044, '登录删除', 501, 2, '#', '', 'F', '0', '1', 'monitor:logininfor:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1045, '日志导出', 501, 3, '#', '', 'F', '0', '1', 'monitor:logininfor:export', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1046, '账户解锁', 501, 4, '#', '', 'F', '0', '1', 'monitor:logininfor:unlock', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1047, '在线查询', 109, 1, '#', '', 'F', '0', '1', 'monitor:online:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1048, '批量强退', 109, 2, '#', '', 'F', '0', '1', 'monitor:online:batchForceLogout', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1049, '单条强退', 109, 3, '#', '', 'F', '0', '1', 'monitor:online:forceLogout', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1050, '任务查询', 110, 1, '#', '', 'F', '0', '1', 'monitor:job:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1051, '任务新增', 110, 2, '#', '', 'F', '0', '1', 'monitor:job:add', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1052, '任务修改', 110, 3, '#', '', 'F', '0', '1', 'monitor:job:edit', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1053, '任务删除', 110, 4, '#', '', 'F', '0', '1', 'monitor:job:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1054, '状态修改', 110, 5, '#', '', 'F', '0', '1', 'monitor:job:changeStatus', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1055, '任务详细', 110, 6, '#', '', 'F', '0', '1', 'monitor:job:detail', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1056, '任务导出', 110, 7, '#', '', 'F', '0', '1', 'monitor:job:export', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1057, '生成查询', 115, 1, '#', '', 'F', '0', '1', 'tool:gen:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1058, '生成修改', 115, 2, '#', '', 'F', '0', '1', 'tool:gen:edit', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1059, '生成删除', 115, 3, '#', '', 'F', '0', '1', 'tool:gen:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1060, '预览代码', 115, 4, '#', '', 'F', '0', '1', 'tool:gen:preview', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (1061, '生成代码', 115, 5, '#', '', 'F', '0', '1', 'tool:gen:code', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2000, '用户与社交管理', 0, 6, '/social', 'menuItem', 'M', '0', '1', '', 'AppstoreAddOutlined', 'admin', '2026-06-06 10:53:01', 'admin', '2026-06-06 11:01:26', '');
+INSERT INTO `sys_menu_ry` VALUES (2001, '群组与会议管理', 0, 7, '/group', 'menuItem', 'M', '0', '1', '', 'ApartmentOutlined', 'admin', '2026-06-06 10:53:01', 'admin', '2026-06-06 11:01:30', '');
+INSERT INTO `sys_menu_ry` VALUES (2002, '用户管理', 2000, 30, '/user', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2004, '用户封禁管理', 2002, 60, '/ban', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2005, '用户注销申请', 2002, 90, '/cancel-apply', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2006, '好友关系管理', 2002, 120, '/friends', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2007, '默认好友配置', 2002, 30, '/default-friends', '', 'C', '1', '1', 'view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2008, '用户安全与行为', 2000, 60, '/security', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2009, '登录记录审计', 2008, 30, '/login-audit', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2010, '账户变更日志', 2008, 60, '/account-change-logs', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2011, '密保问题管理', 2008, 90, '/qa', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2012, '会员码管理', 2008, 120, '/vip-code', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2013, '内容与互动', 2000, 90, '/content', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2014, '表情包管理', 2013, 30, '/emojis', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2015, '朋友圈动态管理', 2013, 60, '/moments', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2016, '动态评论管理', 2013, 90, '/moment-comments', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2017, '群组管理', 2001, 30, '/manage', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2018, '群组信息列表', 2017, 30, '/info', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2019, '群成员管理', 2017, 60, '/member', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2020, '群投诉记录', 2017, 90, '/complaints', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2021, '群升级记录', 2017, 120, '/upgrade-logs', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2022, '群运营工具', 2017, 30, '/tools', '', 'C', '1', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2023, '群欢迎语配置', 2017, 180, '/welcome', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2024, '群定时消息管理', 2017, 210, '/scheduled-message', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2025, '会议管理', 2001, 60, '/meeting', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2026, '会议列表查看', 2025, 30, '/list', '', 'C', '1', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2027, '会议配置管理', 2025, 30, '/config', '', 'C', '1', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2028, '财务与资产中心', 0, 5, '/asset', 'menuItem', 'M', '0', '1', '', 'DollarCircleOutlined', 'admin', '2026-06-06 10:53:01', 'admin', '2026-06-06 11:01:21', '');
+INSERT INTO `sys_menu_ry` VALUES (2029, '资金管理', 2028, 30, '/fund', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2030, '用户余额明细', 2029, 30, '/balance', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2031, '充值记录查询', 2029, 60, '/deposit', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2032, '提现申请审批', 2029, 90, '/withdrawApply', '', 'C', '0', '1', 'asset:fund:withdraw:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2033, '链桥入金IM记录对账', 2029, 30, '/payment', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2034, '交易记录', 2028, 60, '/trade', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2035, '红包交易记录', 2034, 30, '/packet', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2036, '群红包领取明细', 2034, 60, '/claim-logs', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2037, '转账记录查询', 2034, 30, '/transfer', '', 'C', '1', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2038, 'IM出金交易记录', 2034, 30, '/streams', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2039, '费率配置', 2028, 90, '/rate', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2040, '平台费率设置', 2039, 30, '/platform', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2041, '签到奖励配置', 2039, 90, '/signin-reward', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2042, '平台运营与配置', 0, 4, '/ops', 'menuItem', 'M', '0', '1', '', 'DollarCircleOutlined', 'admin', '2026-06-06 10:53:01', 'admin', '2026-06-06 11:00:57', '');
+INSERT INTO `sys_menu_ry` VALUES (2043, '内容运营', 2042, 30, '/content', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2044, '公告管理配置', 2043, 30, '/announcement', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2045, '系统通知推送', 2043, 30, '/notify', '', 'C', '1', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2046, '版本更新管理', 2043, 30, '/version', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2047, '提现页标题设置', 2043, 30, '/withdraw-title', '', 'C', '1', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2048, '帮助与支持', 2042, 60, '/support', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2049, '平台协议管理', 2048, 30, '/agreement', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2050, '常见问题FAQ', 2048, 60, '/faq', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2051, '意见反馈处理', 2048, 90, '/feedback', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2052, '投诉原因配置', 2048, 120, '/complaint-reasons', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2053, '系统配置', 2042, 90, '/system', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2054, '基础平台配置', 2053, 30, '/base', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2055, '功能开关管理', 2053, 60, '/features', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2056, '安全与风控', 0, 8, '/risk', 'menuItem', 'M', '0', '1', '', 'SaveOutlined', 'admin', '2026-06-06 10:53:01', 'admin', '2026-06-06 11:01:35', '');
+INSERT INTO `sys_menu_ry` VALUES (2057, '安全管理', 2056, 30, '/security', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2058, '封禁记录查询', 2057, 30, '/ban-logs', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2059, '异常行为监控', 2057, 30, '/abnormal-monitor', '', 'C', '1', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2060, '敏感操作审计', 2057, 30, '/sensitive-audit', '', 'C', '1', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2061, '风控管理', 2056, 30, '/control', '', 'C', '1', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2062, '交易风控设置', 2061, 30, '/trade', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2063, '内容审核规则', 2061, 60, '/content', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2064, '防欺诈配置', 2061, 90, '/anti-fraud', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2065, '用户列表', 2002, 150, '/list', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2066, '签到记录', 2008, 150, '/sign-logs', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2067, '新增', 2044, 30, '#', '', 'F', '0', '1', 'ops:content:announcement:add', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2068, '查看', 2044, 30, '#', '', 'F', '0', '1', 'ops:content:announcement:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2069, '删除', 2044, 30, '#', '', 'F', '0', '1', 'ops:content:announcement:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2070, '修改', 2044, 60, '#', '', 'F', '0', '1', 'ops:content:announcement:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2071, '新增', 2045, 30, '#', '', 'F', '0', '1', 'ops:content:notify:add', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2072, '查看', 2045, 60, '#', '', 'F', '0', '1', 'ops:content:notify:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2073, '修改', 2045, 90, '#', '', 'F', '0', '1', 'ops:content:notify:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2074, '删除', 2045, 120, '#', '', 'F', '0', '1', 'ops:content:notify:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2075, '新增', 2046, 30, '#', '', 'F', '0', '1', 'ops:content:version:add', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2076, '查看', 2046, 60, '#', '', 'F', '0', '1', 'ops:content:version:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2077, '修改', 2046, 90, '#', '', 'F', '0', '1', 'ops:content:version:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2078, '删除', 2046, 120, '#', '', 'F', '0', '1', 'ops:content:version:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2079, '新增', 2047, 30, '#', '', 'F', '0', '1', 'ops:content:withdraw-title:add', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2080, '查看', 2047, 60, '#', '', 'F', '0', '1', 'ops:content:withdraw-title:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2081, '修改', 2047, 90, '#', '', 'F', '0', '1', 'ops:content:withdraw-title:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2082, '删除', 2047, 120, '#', '', 'F', '0', '1', 'ops:content:withdraw-title:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2083, '修改', 2049, 30, '#', '', 'F', '0', '1', 'ops:support:agreement:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2084, '查看', 2049, 30, '#', '', 'F', '0', '1', 'ops:support:agreement:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2085, '新增', 2050, 30, '#', '', 'F', '0', '1', 'ops:support:faq:add', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2086, '查看', 2050, 60, '#', '', 'F', '0', '1', 'ops:support:faq:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2087, '修改', 2050, 90, '#', '', 'F', '0', '1', 'ops:support:faq:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2088, '删除', 2050, 120, '#', '', 'F', '0', '1', 'ops:support:faq:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2089, '查看', 2051, 30, '#', '', 'F', '0', '1', 'ops:support:feedback:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2090, '删除', 2051, 60, '#', '', 'F', '0', '1', 'ops:support:feedback:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2091, '新增', 2052, 30, '#', '', 'F', '0', '1', 'ops:support:complaint-reasons:add', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2092, '查看', 2052, 60, '#', '', 'F', '0', '1', 'ops:support:complaint-reasons:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2093, '修改', 2052, 90, '#', '', 'F', '0', '1', 'ops:support:complaint-reasons:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2094, '删除', 2052, 120, '#', '', 'F', '0', '1', 'ops:support:complaint-reasons:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2095, '查看', 2054, 30, '#', '', 'F', '0', '1', 'ops:system:base:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2096, '修改', 2054, 30, '#', '', 'F', '0', '1', 'ops:system:base:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2097, '新增', 2055, 30, '#', '', 'F', '0', '1', 'ops:system:features:add', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2098, '查看', 2055, 30, '#', '', 'F', '0', '1', 'ops:system:features:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2099, '修改', 2055, 30, '#', '', 'F', '0', '1', 'ops:system:features:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2100, '删除', 2055, 30, '#', '', 'F', '0', '1', 'ops:system:features:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2101, '审核通过', 2031, 30, '#', '', 'F', '0', '1', 'asset:fund:deposit:approved', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2102, '驳回', 2031, 60, '#', '', 'F', '0', '1', 'asset:fund:deposit:reject', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2103, '锁定', 2031, 90, '#', '', 'F', '0', '1', 'asset:fund:deposit:lock', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2104, '查看', 2032, 30, '#', '', 'F', '0', '1', 'asset:fund:withdraw:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2105, '审核', 2032, 30, '#', '', 'F', '0', '1', 'asset:fund:withdraw:review', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2106, '封禁', 2004, 30, '#', '', 'F', '0', '1', 'social:user:ban:ban', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2107, '解禁', 2004, 60, '#', '', 'F', '0', '1', 'social:user:ban:unban', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2108, '审核通过', 2005, 30, '#', '', 'F', '0', '1', 'social:user:cancel-apply:approved', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2109, '驳回', 2005, 60, '#', '', 'F', '0', '1', 'social:user:cancel-apply:reject', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2110, '新增好友', 2006, 30, '#', '', 'F', '0', '1', 'social:user:friends:add', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2111, '删除好友', 2006, 60, '#', '', 'F', '0', '1', 'social:user:friends:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2112, '查看', 2065, 30, '#', '', 'F', '0', '1', 'social:user:list:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2113, '修改', 2065, 60, '#', '', 'F', '0', '1', 'social:user:list:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2114, '变更余额', 2065, 90, '#', '', 'F', '0', '1', 'social:user:list:ChangeBalance', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2115, '交易明细', 2065, 120, '#', '', 'F', '0', '1', 'social:user:list:transaction', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2116, '清除支付密码', 2065, 150, '#', '', 'F', '0', '1', 'social:user:list:clear', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2117, '删除', 2065, 180, '#', '', 'F', '0', '1', 'social:user:list:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2118, '查看', 2009, 30, '#', '', 'F', '0', '1', 'social:security:login-audit:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2119, '新增', 2011, 30, '#', '', 'F', '0', '1', 'social:security:qa:add', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2120, '查看', 2011, 60, '#', '', 'F', '0', '1', 'social:security:qa:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2121, '修改', 2011, 90, '#', '', 'F', '0', '1', 'social:security:qa:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2122, '删除', 2011, 120, '#', '', 'F', '0', '1', 'social:security:qa:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2123, '新增', 2012, 30, '#', '', 'F', '0', '1', 'social:security:vip-code:add', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2124, '查看', 2012, 60, '#', '', 'F', '0', '1', 'social:security:vip-code:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2125, '删除', 2012, 90, '#', '', 'F', '0', '1', 'social:security:vip-code:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2126, '批量生成', 2012, 120, '#', '', 'F', '0', '1', 'social:security:vip-code:batch', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2127, '编辑', 2012, 150, '#', '', 'F', '0', '1', 'social:security:vip-code:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2128, '会员码同步', 2012, 180, '#', '', 'F', '0', '1', 'social:security:vip-code:syncStatus', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2129, '评论列表', 2015, 30, '#', '', 'F', '0', '1', 'social:content:moments:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2130, '删除', 2015, 60, '#', '', 'F', '0', '1', 'social:content:moments:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2131, '封禁', 2058, 30, '#', '', 'F', '0', '1', 'risk:security:ban-logs:ban', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2132, '解禁', 2058, 60, '#', '', 'F', '0', '1', 'risk:security:ban-logs:unban', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2134, '用户谷歌安全验证', 2057, 60, '/google-verify', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2135, '用户密保问题', 2057, 30, '/security-question', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2136, '查看', 2033, 30, '#', '', 'F', '0', '1', 'asset:fund:payment:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2137, '查看', 2038, 30, '#', '', 'F', '0', '1', 'asset:trade:streams:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2138, '查看', 2040, 30, '#', '', 'F', '0', '1', 'asset:rate:platform:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2139, '编辑', 2040, 60, '#', '', 'F', '0', '1', 'asset:rate:platform:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2140, '新建', 2040, 90, '#', '', 'F', '0', '1', 'asset:rate:platform:add', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2141, '查看', 2041, 30, '#', '', 'F', '0', '1', 'asset:rate:signin-reward:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2142, '编辑', 2041, 60, '#', '', 'F', '0', '1', 'asset:rate:signin-reward:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2143, '评论列表', 2016, 30, '#', '', 'F', '0', '1', 'social:content:moment-comments:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2144, '删除', 2016, 60, '#', '', 'F', '0', '1', 'social:content:moment-comments:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2145, '查看', 2018, 30, '#', '', 'F', '0', '1', 'group:manage:info:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2146, '编辑', 2018, 60, '#', '', 'F', '0', '1', 'group:manage:info:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2147, '删除', 2018, 90, '#', '', 'F', '0', '1', 'group:manage:info:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2148, '群成员', 2018, 120, '#', '', 'F', '0', '1', 'group:manage:info:member', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2149, '查看', 2020, 30, '#', '', 'F', '0', '1', 'group:manage:complaints:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2150, '查看', 2135, 30, '#', '', 'F', '0', '1', 'risk:security:security-question:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2151, '编辑', 2135, 60, '#', '', 'F', '0', '1', 'risk:security:security-question:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2152, '重置密保', 2135, 90, '#', '', 'F', '0', '1', 'risk:security:security-question:reset', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2153, '重置谷歌验证码', 2134, 30, '#', '', 'F', '0', '1', 'risk:security:google-verify:reset', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2154, '解除禁言', 2019, 30, '#', '', 'F', '0', '1', 'group:manage:member:reset', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2160, 'IM内部转账交易记录', 2034, 30, '/im-streams', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2161, '查看', 2160, 30, '#', '', 'F', '0', '1', 'asset:trade:im-streams:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2162, '提现配置', 2053, 30, '/withdrawConfig', '', 'C', '0', '1', 'ops:system:withdraw:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2163, '查看', 2162, 30, '#', '', 'F', '0', '1', 'ops:system:withdraw:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2164, '编辑', 2162, 90, '#', '', 'F', '0', '1', 'ops:system:withdraw:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2165, '会议室时长配置', 2025, 90, '/duration', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2166, '会议室人员配置', 2025, 120, '/personnel', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2167, '会议室订单', 2025, 150, '/order', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2168, '会议代币系数配置', 2025, 180, '/token-config', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2169, '会议室价格配置', 2025, 210, '/price', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2170, '解散会议室', 2026, 30, '#', '', 'F', '0', '1', 'group:meeting:list:dismiss', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2171, '新增', 2165, 30, '#', '', 'F', '0', '1', 'group:meeting:duration:add', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2172, '删除', 2165, 60, '#', '', 'F', '0', '1', 'group:meeting:duration:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2173, '编辑', 2165, 90, '#', '', 'F', '0', '1', 'group:meeting:duration:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2174, '查看', 2165, 120, '#', '', 'F', '0', '1', 'group:meeting:duration:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2175, '新增', 2166, 30, '#', '', 'F', '0', '1', 'group:meeting:personnel:add', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2176, '编辑', 2166, 60, '#', '', 'F', '0', '1', 'group:meeting:personnel:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2177, '删除', 2166, 90, '#', '', 'F', '0', '1', 'group:meeting:personnel:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2178, '查看', 2166, 120, '#', '', 'F', '0', '1', 'group:meeting:personnel:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2179, '新增', 2169, 30, '#', '', 'F', '0', '1', 'group:meeting:price:add', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2180, '编辑', 2169, 60, '#', '', 'F', '0', '1', 'group:meeting:price:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2181, '删除', 2169, 90, '#', '', 'F', '0', '1', 'group:meeting:price:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2182, '查看', 2169, 120, '#', '', 'F', '0', '1', 'group:meeting:price:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2183, '用户信用分', 2000, 30, '/credit', '', 'M', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2184, '信用分基础配置', 2183, 30, '/configuration', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2185, '信用分类型配置', 2183, 60, '/type', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2186, '信用分明细记录', 2183, 90, '/detailed-records', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2187, '用户信用分管理', 2183, 120, '/management', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2188, '公共配置', 2183, 30, '/common-configuration', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2189, '新增', 2184, 30, '#', '', 'F', '0', '1', 'social:credit:configuration:add', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2190, '删除', 2184, 60, '#', '', 'F', '0', '1', 'social:credit:configuration:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2191, '编辑', 2184, 90, '#', '', 'F', '0', '1', 'social:credit:configuration:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2192, '查看', 2184, 120, '#', '', 'F', '0', '1', 'social:credit:configuration:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2193, '查看', 2185, 30, '#', '', 'F', '0', '1', 'social:credit:type:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2194, '删除', 2185, 60, '#', '', 'F', '0', '1', 'social:credit:type:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2195, '编辑', 2185, 90, '#', '', 'F', '0', '1', 'social:credit:type:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2196, '新增', 2185, 120, '#', '', 'F', '0', '1', 'social:credit:type:add', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2197, '查看', 2186, 30, '#', '', 'F', '0', '1', 'social:credit:detailed-records:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2198, '新增', 2187, 30, '#', '', 'F', '0', '1', 'social:credit:management:add', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2199, '查看', 2187, 60, '#', '', 'F', '0', '1', 'social:credit:management:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2200, '修改', 2187, 90, '#', '', 'F', '0', '1', 'social:credit:management:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2201, '删除', 2187, 120, '#', '', 'F', '0', '1', 'social:credit:management:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2202, '查看', 2188, 30, '#', '', 'F', '0', '1', 'social:credit:common-configuration:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2203, '修改', 2188, 60, '#', '', 'F', '0', '1', 'social:credit:common-configuration:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2204, '全局敏感词', 2057, 90, '/sensitive-word', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2205, '修改', 2204, 30, '#', '', 'F', '0', '1', 'risk:security:sensitive-word:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2206, '删除', 2204, 60, '#', '', 'F', '0', '1', 'risk:security:sensitive-word:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2207, '添加', 2204, 90, '#', '', 'F', '0', '1', 'risk:security:sensitive-word:add', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2208, '广场朋友圈管理', 0, 9, '/piamom', 'menuItem', 'M', '0', '1', '', 'AppstoreOutlined', 'admin', '2026-06-06 10:53:01', 'admin', '2026-06-06 11:01:39', '');
+INSERT INTO `sys_menu_ry` VALUES (2209, '朋友圈管理', 2208, 10, '/piamom/moment', '', 'M', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2210, '朋友圈列表', 2209, 10, '/piamom/moment/list', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2211, '查看', 2210, 10, '#', '', 'F', '0', '1', 'piamom:moment:list:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2212, '编辑', 2210, 20, '#', '', 'F', '0', '1', 'piamom:moment:list:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2213, '删除', 2210, 30, '#', '', 'F', '0', '1', 'piamom:moment:list:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2214, '朋友圈评论列表', 2209, 20, '/piamom/moment/comment', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2215, '查看', 2214, 10, '#', '', 'F', '0', '1', 'piamom:moment:comment:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2216, '删除', 2214, 20, '#', '', 'F', '0', '1', 'piamom:moment:comment:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2217, '朋友圈点赞列表', 2209, 30, '/piamom/moment/like', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2218, '查看', 2217, 10, '#', '', 'F', '0', '1', 'piamom:moment:like:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2219, '删除', 2217, 20, '#', '', 'F', '0', '1', 'piamom:moment:like:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2220, '广场管理', 2208, 20, '/piamom/square', '', 'M', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2221, '广场列表', 2220, 10, '/piamom/square/list', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2222, '查看', 2221, 10, '#', '', 'F', '0', '1', 'piamom:square:list:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2223, '编辑', 2221, 20, '#', '', 'F', '0', '1', 'piamom:square:list:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2224, '删除', 2221, 30, '#', '', 'F', '0', '1', 'piamom:square:list:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2225, '广场评论列表', 2220, 20, '/piamom/square/comment', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2226, '查看', 2225, 10, '#', '', 'F', '0', '1', 'piamom:square:comment:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2227, '删除', 2225, 20, '#', '', 'F', '0', '1', 'piamom:square:comment:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2228, '广场点赞列表', 2220, 30, '/piamom/square/like', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2229, '查看', 2228, 10, '#', '', 'F', '0', '1', 'piamom:square:like:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2230, '删除', 2228, 20, '#', '', 'F', '0', '1', 'piamom:square:like:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2231, '广场热门配置', 2220, 40, '/piamom/square/hot-config', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2232, '查看', 2231, 10, '#', '', 'F', '0', '1', 'piamom:square:hot-config:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2233, '新增', 2231, 20, '#', '', 'F', '0', '1', 'piamom:square:hot-config:add', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2234, '编辑', 2231, 30, '#', '', 'F', '0', '1', 'piamom:square:hot-config:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2235, '删除', 2231, 40, '#', '', 'F', '0', '1', 'piamom:square:hot-config:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2236, '广场发帖信用分额度', 2220, 50, '/piamom/square/publish-quota', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2237, '查看', 2236, 10, '#', '', 'F', '0', '1', 'piamom:square:publish-quota:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2238, '新增', 2236, 20, '#', '', 'F', '0', '1', 'piamom:square:publish-quota:add', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2239, '编辑', 2236, 30, '#', '', 'F', '0', '1', 'piamom:square:publish-quota:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2240, '删除', 2236, 40, '#', '', 'F', '0', '1', 'piamom:square:publish-quota:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2241, '举报管理', 2208, 30, '/piamom/report', '', 'M', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2242, '举报类型配置', 2241, 10, '/piamom/report/config', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2243, '查看', 2242, 10, '#', '', 'F', '0', '1', 'piamom:report:config:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2244, '新增', 2242, 20, '#', '', 'F', '0', '1', 'piamom:report:config:add', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2245, '编辑', 2242, 30, '#', '', 'F', '0', '1', 'piamom:report:config:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2246, '删除', 2242, 40, '#', '', 'F', '0', '1', 'piamom:report:config:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2247, '举报记录审核', 2241, 20, '/piamom/report/record', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2248, '查看', 2247, 10, '#', '', 'F', '0', '1', 'piamom:report:record:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2249, '审核', 2247, 20, '#', '', 'F', '0', '1', 'piamom:report:record:edit', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2250, '互动消息', 2208, 40, '/piamom/interact', '', 'M', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2251, '互动消息', 2250, 10, '/piamom/notify/list', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2252, '查看', 2251, 10, '#', '', 'F', '0', '1', 'piamom:notify:list:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2253, '用户主页统计', 2250, 20, '/piamom/profile/stat', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2254, '查看', 2253, 10, '#', '', 'F', '0', '1', 'piamom:profile:stat:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2255, '删除', 2253, 20, '#', '', 'F', '0', '1', 'piamom:profile:stat:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+
+SET FOREIGN_KEY_CHECKS = 1;
+
 INSERT IGNORE INTO `sys_logininfor` (`info_id`, `login_name`, `ipaddr`, `login_location`, `browser`, `os`, `status`, `msg`, `login_time`) VALUES (100, 'admin', '127.0.0.1', '内网IP', 'Chrome 148', 'Mac OS >=10.15.7', '0', '登录成功', '2026-06-03 08:34:15');
 INSERT IGNORE INTO `sys_logininfor` (`info_id`, `login_name`, `ipaddr`, `login_location`, `browser`, `os`, `status`, `msg`, `login_time`) VALUES (101, 'admin', '127.0.0.1', '内网IP', 'Chrome 148', 'Mac OS >=10.15.7', '0', '退出成功', '2026-06-03 08:37:17');
 INSERT IGNORE INTO `sys_logininfor` (`info_id`, `login_name`, `ipaddr`, `login_location`, `browser`, `os`, `status`, `msg`, `login_time`) VALUES (102, 'admin', '127.0.0.1', '内网IP', 'Chrome 148', 'Mac OS >=10.15.7', '1', '验证码错误', '2026-06-03 08:39:30');
@@ -310,113 +674,7 @@ INSERT IGNORE INTO `sys_logininfor` (`info_id`, `login_name`, `ipaddr`, `login_l
 INSERT IGNORE INTO `sys_logininfor` (`info_id`, `login_name`, `ipaddr`, `login_location`, `browser`, `os`, `status`, `msg`, `login_time`) VALUES (107, 'admin', '127.0.0.1', '内网IP', 'Chrome 148', 'Mac OS >=10.15.7', '0', '登录成功', '2026-06-03 08:48:16');
 INSERT IGNORE INTO `sys_logininfor` (`info_id`, `login_name`, `ipaddr`, `login_location`, `browser`, `os`, `status`, `msg`, `login_time`) VALUES (108, 'admin', '127.0.0.1', '内网IP', 'Chrome 148', 'Mac OS >=10.15.7', '0', '退出成功', '2026-06-03 08:48:43');
 COMMIT;
--- skip DROP protect IM `sys_menu` ruoyi=`sys_menu_ry`
-CREATE TABLE IF NOT EXISTS `sys_menu_ry` (
-  `menu_id` bigint NOT NULL AUTO_INCREMENT COMMENT '菜单ID',
-  `menu_name` varchar(50) COLLATE utf8mb4_bin NOT NULL COMMENT '菜单名称',
-  `parent_id` bigint DEFAULT '0' COMMENT '父菜单ID',
-  `order_num` int DEFAULT '0' COMMENT '显示顺序',
-  `url` varchar(200) COLLATE utf8mb4_bin DEFAULT '#' COMMENT '请求地址',
-  `target` varchar(20) COLLATE utf8mb4_bin DEFAULT '' COMMENT '打开方式（menuItem页签 menuBlank新窗口）',
-  `menu_type` char(1) COLLATE utf8mb4_bin DEFAULT '' COMMENT '菜单类型（M目录 C菜单 F按钮）',
-  `visible` char(1) COLLATE utf8mb4_bin DEFAULT '0' COMMENT '菜单状态（0显示 1隐藏）',
-  `is_refresh` char(1) COLLATE utf8mb4_bin DEFAULT '1' COMMENT '是否刷新（0刷新 1不刷新）',
-  `perms` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL COMMENT '权限标识',
-  `icon` varchar(100) COLLATE utf8mb4_bin DEFAULT '#' COMMENT '菜单图标',
-  `create_by` varchar(64) COLLATE utf8mb4_bin DEFAULT '' COMMENT '创建者',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_by` varchar(64) COLLATE utf8mb4_bin DEFAULT '' COMMENT '更新者',
-  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-  `remark` varchar(500) COLLATE utf8mb4_bin DEFAULT '' COMMENT '备注',
-  PRIMARY KEY (`menu_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2000 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='菜单权限表';
 
-BEGIN;
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1, '系统管理', 0, 1, '#', '', 'M', '0', '1', '', 'fa fa-gear', 'admin', '2026-06-03 07:59:20', '', NULL, '系统管理目录');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (2, '系统监控', 0, 2, '#', '', 'M', '0', '1', '', 'fa fa-video-camera', 'admin', '2026-06-03 07:59:20', '', NULL, '系统监控目录');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (3, '系统工具', 0, 3, '#', '', 'M', '0', '1', '', 'fa fa-bars', 'admin', '2026-06-03 07:59:20', '', NULL, '系统工具目录');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (100, '用户管理', 1, 1, '/system/user', '', 'C', '0', '1', 'system:user:view', 'fa fa-user-o', 'admin', '2026-06-03 07:59:20', '', NULL, '用户管理菜单');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (101, '角色管理', 1, 2, '/system/role', '', 'C', '0', '1', 'system:role:view', 'fa fa-user-secret', 'admin', '2026-06-03 07:59:20', '', NULL, '角色管理菜单');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (102, '菜单管理', 1, 3, '/system/menu', '', 'C', '0', '1', 'system:menu:view', 'fa fa-th-list', 'admin', '2026-06-03 07:59:20', '', NULL, '菜单管理菜单');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (103, '部门管理', 1, 4, '/system/dept', '', 'C', '0', '1', 'system:dept:view', 'fa fa-outdent', 'admin', '2026-06-03 07:59:20', '', NULL, '部门管理菜单');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (104, '岗位管理', 1, 5, '/system/post', '', 'C', '0', '1', 'system:post:view', 'fa fa-address-card-o', 'admin', '2026-06-03 07:59:20', '', NULL, '岗位管理菜单');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (105, '字典管理', 1, 6, '/system/dict', '', 'C', '0', '1', 'system:dict:view', 'fa fa-bookmark-o', 'admin', '2026-06-03 07:59:20', '', NULL, '字典管理菜单');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (106, '参数设置', 1, 7, '/system/config', '', 'C', '0', '1', 'system:config:view', 'fa fa-sun-o', 'admin', '2026-06-03 07:59:20', '', NULL, '参数设置菜单');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (107, '通知公告', 1, 8, '/system/notice', '', 'C', '0', '1', 'system:notice:view', 'fa fa-bullhorn', 'admin', '2026-06-03 07:59:20', '', NULL, '通知公告菜单');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (108, '日志管理', 1, 9, '#', '', 'M', '0', '1', '', 'fa fa-pencil-square-o', 'admin', '2026-06-03 07:59:20', '', NULL, '日志管理菜单');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (109, '在线用户', 2, 1, '/monitor/online', '', 'C', '0', '1', 'monitor:online:view', 'fa fa-user-circle', 'admin', '2026-06-03 07:59:20', '', NULL, '在线用户菜单');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (110, '定时任务', 2, 2, '/monitor/job', '', 'C', '0', '1', 'monitor:job:view', 'fa fa-tasks', 'admin', '2026-06-03 07:59:20', '', NULL, '定时任务菜单');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (111, '数据监控', 2, 3, '/monitor/data', '', 'C', '0', '1', 'monitor:data:view', 'fa fa-bug', 'admin', '2026-06-03 07:59:20', '', NULL, '数据监控菜单');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (112, '服务监控', 2, 4, '/monitor/server', '', 'C', '0', '1', 'monitor:server:view', 'fa fa-server', 'admin', '2026-06-03 07:59:20', '', NULL, '服务监控菜单');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (113, '缓存监控', 2, 5, '/monitor/cache', '', 'C', '0', '1', 'monitor:cache:view', 'fa fa-cube', 'admin', '2026-06-03 07:59:20', '', NULL, '缓存监控菜单');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (114, '表单构建', 3, 1, '/tool/build', '', 'C', '0', '1', 'tool:build:view', 'fa fa-wpforms', 'admin', '2026-06-03 07:59:20', '', NULL, '表单构建菜单');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (115, '代码生成', 3, 2, '/tool/gen', '', 'C', '0', '1', 'tool:gen:view', 'fa fa-code', 'admin', '2026-06-03 07:59:20', '', NULL, '代码生成菜单');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (116, '系统接口', 3, 3, '/tool/swagger', '', 'C', '0', '1', 'tool:swagger:view', 'fa fa-gg', 'admin', '2026-06-03 07:59:20', '', NULL, '系统接口菜单');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (500, '操作日志', 108, 1, '/monitor/operlog', '', 'C', '0', '1', 'monitor:operlog:view', 'fa fa-address-book', 'admin', '2026-06-03 07:59:20', '', NULL, '操作日志菜单');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (501, '登录日志', 108, 2, '/monitor/logininfor', '', 'C', '0', '1', 'monitor:logininfor:view', 'fa fa-file-image-o', 'admin', '2026-06-03 07:59:20', '', NULL, '登录日志菜单');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1000, '用户查询', 100, 1, '#', '', 'F', '0', '1', 'system:user:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1001, '用户新增', 100, 2, '#', '', 'F', '0', '1', 'system:user:add', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1002, '用户修改', 100, 3, '#', '', 'F', '0', '1', 'system:user:edit', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1003, '用户删除', 100, 4, '#', '', 'F', '0', '1', 'system:user:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1004, '用户导出', 100, 5, '#', '', 'F', '0', '1', 'system:user:export', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1005, '用户导入', 100, 6, '#', '', 'F', '0', '1', 'system:user:import', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1006, '重置密码', 100, 7, '#', '', 'F', '0', '1', 'system:user:resetPwd', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1007, '角色查询', 101, 1, '#', '', 'F', '0', '1', 'system:role:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1008, '角色新增', 101, 2, '#', '', 'F', '0', '1', 'system:role:add', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1009, '角色修改', 101, 3, '#', '', 'F', '0', '1', 'system:role:edit', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1010, '角色删除', 101, 4, '#', '', 'F', '0', '1', 'system:role:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1011, '角色导出', 101, 5, '#', '', 'F', '0', '1', 'system:role:export', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1012, '菜单查询', 102, 1, '#', '', 'F', '0', '1', 'system:menu:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1013, '菜单新增', 102, 2, '#', '', 'F', '0', '1', 'system:menu:add', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1014, '菜单修改', 102, 3, '#', '', 'F', '0', '1', 'system:menu:edit', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1015, '菜单删除', 102, 4, '#', '', 'F', '0', '1', 'system:menu:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1016, '部门查询', 103, 1, '#', '', 'F', '0', '1', 'system:dept:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1017, '部门新增', 103, 2, '#', '', 'F', '0', '1', 'system:dept:add', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1018, '部门修改', 103, 3, '#', '', 'F', '0', '1', 'system:dept:edit', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1019, '部门删除', 103, 4, '#', '', 'F', '0', '1', 'system:dept:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1020, '岗位查询', 104, 1, '#', '', 'F', '0', '1', 'system:post:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1021, '岗位新增', 104, 2, '#', '', 'F', '0', '1', 'system:post:add', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1022, '岗位修改', 104, 3, '#', '', 'F', '0', '1', 'system:post:edit', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1023, '岗位删除', 104, 4, '#', '', 'F', '0', '1', 'system:post:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1024, '岗位导出', 104, 5, '#', '', 'F', '0', '1', 'system:post:export', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1025, '字典查询', 105, 1, '#', '', 'F', '0', '1', 'system:dict:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1026, '字典新增', 105, 2, '#', '', 'F', '0', '1', 'system:dict:add', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1027, '字典修改', 105, 3, '#', '', 'F', '0', '1', 'system:dict:edit', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1028, '字典删除', 105, 4, '#', '', 'F', '0', '1', 'system:dict:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1029, '字典导出', 105, 5, '#', '', 'F', '0', '1', 'system:dict:export', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1030, '参数查询', 106, 1, '#', '', 'F', '0', '1', 'system:config:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1031, '参数新增', 106, 2, '#', '', 'F', '0', '1', 'system:config:add', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1032, '参数修改', 106, 3, '#', '', 'F', '0', '1', 'system:config:edit', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1033, '参数删除', 106, 4, '#', '', 'F', '0', '1', 'system:config:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1034, '参数导出', 106, 5, '#', '', 'F', '0', '1', 'system:config:export', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1035, '公告查询', 107, 1, '#', '', 'F', '0', '1', 'system:notice:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1036, '公告新增', 107, 2, '#', '', 'F', '0', '1', 'system:notice:add', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1037, '公告修改', 107, 3, '#', '', 'F', '0', '1', 'system:notice:edit', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1038, '公告删除', 107, 4, '#', '', 'F', '0', '1', 'system:notice:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1039, '操作查询', 500, 1, '#', '', 'F', '0', '1', 'monitor:operlog:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1040, '操作删除', 500, 2, '#', '', 'F', '0', '1', 'monitor:operlog:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1041, '详细信息', 500, 3, '#', '', 'F', '0', '1', 'monitor:operlog:detail', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1042, '日志导出', 500, 4, '#', '', 'F', '0', '1', 'monitor:operlog:export', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1043, '登录查询', 501, 1, '#', '', 'F', '0', '1', 'monitor:logininfor:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1044, '登录删除', 501, 2, '#', '', 'F', '0', '1', 'monitor:logininfor:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1045, '日志导出', 501, 3, '#', '', 'F', '0', '1', 'monitor:logininfor:export', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1046, '账户解锁', 501, 4, '#', '', 'F', '0', '1', 'monitor:logininfor:unlock', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1047, '在线查询', 109, 1, '#', '', 'F', '0', '1', 'monitor:online:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1048, '批量强退', 109, 2, '#', '', 'F', '0', '1', 'monitor:online:batchForceLogout', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1049, '单条强退', 109, 3, '#', '', 'F', '0', '1', 'monitor:online:forceLogout', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1050, '任务查询', 110, 1, '#', '', 'F', '0', '1', 'monitor:job:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1051, '任务新增', 110, 2, '#', '', 'F', '0', '1', 'monitor:job:add', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1052, '任务修改', 110, 3, '#', '', 'F', '0', '1', 'monitor:job:edit', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1053, '任务删除', 110, 4, '#', '', 'F', '0', '1', 'monitor:job:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1054, '状态修改', 110, 5, '#', '', 'F', '0', '1', 'monitor:job:changeStatus', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1055, '任务详细', 110, 6, '#', '', 'F', '0', '1', 'monitor:job:detail', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1056, '任务导出', 110, 7, '#', '', 'F', '0', '1', 'monitor:job:export', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1057, '生成查询', 115, 1, '#', '', 'F', '0', '1', 'tool:gen:list', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1058, '生成修改', 115, 2, '#', '', 'F', '0', '1', 'tool:gen:edit', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1059, '生成删除', 115, 3, '#', '', 'F', '0', '1', 'tool:gen:remove', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1060, '预览代码', 115, 4, '#', '', 'F', '0', '1', 'tool:gen:preview', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-INSERT IGNORE INTO `sys_menu_ry` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `url`, `target`, `menu_type`, `visible`, `is_refresh`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1061, '生成代码', 115, 5, '#', '', 'F', '0', '1', 'tool:gen:code', '#', 'admin', '2026-06-03 07:59:20', '', NULL, '');
-COMMIT;
 -- skip DROP `sys_notice`
 CREATE TABLE IF NOT EXISTS `sys_notice` (
   `notice_id` int NOT NULL AUTO_INCREMENT COMMENT '公告ID',
@@ -513,8 +771,9 @@ CREATE TABLE IF NOT EXISTS `sys_role_ry` (
 ) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='角色信息表';
 
 BEGIN;
-INSERT IGNORE INTO `sys_role_ry` (`role_id`, `role_name`, `role_key`, `role_sort`, `data_scope`, `status`, `del_flag`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1, '超级管理员', 'admin', 1, '1', '0', '0', 'admin', '2026-06-03 07:59:20', '', NULL, '超级管理员');
-INSERT IGNORE INTO `sys_role_ry` (`role_id`, `role_name`, `role_key`, `role_sort`, `data_scope`, `status`, `del_flag`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (2, '普通角色', 'common', 2, '2', '0', '0', 'admin', '2026-06-03 07:59:20', '', NULL, '普通角色');
+INSERT INTO `sys_role_ry` (`role_id`, `role_name`, `role_key`, `role_sort`, `data_scope`, `status`, `del_flag`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1, '超级管理员', 'admin', 1, '1', '0', '0', 'admin', '2026-06-03 07:59:20', '', NULL, '超级管理员');
+INSERT INTO `sys_role_ry` (`role_id`, `role_name`, `role_key`, `role_sort`, `data_scope`, `status`, `del_flag`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (2, '客服', 'common', 2, '2', '0', '0', 'admin', '2026-06-03 07:59:20', 'admin', '2026-06-10 11:01:17', '客服');
+
 COMMIT;
 -- skip DROP `sys_role_dept`
 CREATE TABLE IF NOT EXISTS `sys_role_dept` (
@@ -649,8 +908,12 @@ CREATE TABLE IF NOT EXISTS `sys_user_ry` (
 ) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='用户信息表';
 
 BEGIN;
-INSERT IGNORE INTO `sys_user_ry` (`user_id`, `dept_id`, `login_name`, `user_name`, `user_type`, `email`, `phonenumber`, `sex`, `avatar`, `password`, `salt`, `status`, `del_flag`, `login_ip`, `login_date`, `pwd_update_date`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1, 103, 'admin', '若依', '00', 'ry@163.com', '15888888888', '1', '', '29c67a30398638269fe600f73a054934', '111111', '0', '0', '127.0.0.1', '2026-06-03 16:48:16', NULL, 'admin', '2026-06-03 07:59:20', '', NULL, '管理员');
-INSERT IGNORE INTO `sys_user_ry` (`user_id`, `dept_id`, `login_name`, `user_name`, `user_type`, `email`, `phonenumber`, `sex`, `avatar`, `password`, `salt`, `status`, `del_flag`, `login_ip`, `login_date`, `pwd_update_date`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (2, 105, 'ry', '若依', '00', 'ry@qq.com', '15666666666', '1', '', '8e6d98b90472783cc73c17047ddccf36', '222222', '0', '0', '127.0.0.1', NULL, NULL, 'admin', '2026-06-03 07:59:20', '', NULL, '测试员');
+INSERT INTO `sys_user_ry` (`user_id`, `dept_id`, `login_name`, `user_name`, `user_type`, `email`, `phonenumber`, `sex`, `avatar`, `password`, `salt`, `status`, `del_flag`, `login_ip`, `login_date`, `pwd_update_date`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1, 103, 'admin', '超级管理员', '00', 'ry@163.com', '15888888888', '0', '/profile/avatar/2026/06/09/c285b4ad769f41e58e40f1bdfbfc43c6.png', '56f1dc69414e231e3fc11eb8ce0925e5', 'b72763', '0', '0', '127.0.0.1', '2026-06-10 11:07:30', '2026-06-10 10:56:12', 'admin', '2026-06-03 07:59:20', '', '2026-06-10 10:56:12', '管理员');
+INSERT INTO `sys_user_ry` (`user_id`, `dept_id`, `login_name`, `user_name`, `user_type`, `email`, `phonenumber`, `sex`, `avatar`, `password`, `salt`, `status`, `del_flag`, `login_ip`, `login_date`, `pwd_update_date`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (2, 105, 'ry', '若依', '00', 'ry@qq.com', '15666666666', '1', '', '8e6d98b90472783cc73c17047ddccf36', '222222', '0', '0', '127.0.0.1', NULL, NULL, 'admin', '2026-06-03 07:59:20', '', NULL, '测试员');
+INSERT INTO `sys_user_ry` (`user_id`, `dept_id`, `login_name`, `user_name`, `user_type`, `email`, `phonenumber`, `sex`, `avatar`, `password`, `salt`, `status`, `del_flag`, `login_ip`, `login_date`, `pwd_update_date`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (100, 101, 'android', 'android', '00', 'liangboai2@outlook.com', '15888854561', '0', '/profile/avatar/2026/06/10/ccf81d733b704841b4e062b7b3069d71.png', 'c28d8f0bca4dcfdb20e0b99a80fc2be2', 'a97ff8', '0', '0', '127.0.0.1', '2026-06-10 11:00:08', '2026-06-10 10:59:02', 'admin', '2026-06-10 10:59:02', '', '2026-06-10 11:02:32', NULL);
+INSERT INTO `sys_user_ry` (`user_id`, `dept_id`, `login_name`, `user_name`, `user_type`, `email`, `phonenumber`, `sex`, `avatar`, `password`, `salt`, `status`, `del_flag`, `login_ip`, `login_date`, `pwd_update_date`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (101, 101, 'iosadmin', 'iosadmin', '00', 'liangboai@outlook.com', '15345621258', '0', '', 'a45543af6adeccb7429a57dfc1549454', '9dbf58', '0', '0', '', NULL, '2026-06-10 11:04:21', 'admin', '2026-06-10 11:04:21', '', NULL, NULL);
+INSERT INTO `sys_user_ry` (`user_id`, `dept_id`, `login_name`, `user_name`, `user_type`, `email`, `phonenumber`, `sex`, `avatar`, `password`, `salt`, `status`, `del_flag`, `login_ip`, `login_date`, `pwd_update_date`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (102, 107, 'web4x', 'web4x', '00', 'longtaiyou@seekweb4.com', '15789545454', '0', '/profile/avatar/2026/06/10/a033db6964e24501be67530833be03b5.png', 'ff1fcff477e6f1fafbeeff7509ad7f07', '07202c', '0', '0', '127.0.0.1', '2026-06-10 11:06:13', '2026-06-10 11:05:49', 'admin', '2026-06-10 11:05:49', '', NULL, NULL);
+
 COMMIT;
 -- skip DROP `sys_user_online`
 CREATE TABLE IF NOT EXISTS `sys_user_online` (
@@ -690,9 +953,12 @@ CREATE TABLE IF NOT EXISTS `sys_user_role_ry` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='用户和角色关联表';
 
 BEGIN;
-INSERT IGNORE INTO `sys_user_role_ry` (`user_id`, `role_id`) VALUES (1, 1);
-INSERT IGNORE INTO `sys_user_role_ry` (`user_id`, `role_id`) VALUES (2, 2);
+INSERT INTO `sys_user_role_ry` (`user_id`, `role_id`) VALUES (1, 1);
+INSERT INTO `sys_user_role_ry` (`user_id`, `role_id`) VALUES (2, 2);
+INSERT INTO `sys_user_role_ry` (`user_id`, `role_id`) VALUES (100, 2);
+INSERT INTO `sys_user_role_ry` (`user_id`, `role_id`) VALUES (101, 2);
+INSERT INTO `sys_user_role_ry` (`user_id`, `role_id`) VALUES (102, 2);
+
 COMMIT;
 SET FOREIGN_KEY_CHECKS = 1;
 
--- done: ruoyi login uses sys_user_ry (default admin)

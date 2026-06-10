@@ -12,7 +12,7 @@ var imFeaturesApi = ctx + "buttonConfig/buttonConfig";
 function imFeaturesQueryParams(params) {
     var pageSize = params.limit;
     var pageNo = params.offset / params.limit + 1;
-    var query = imBuildPageQuery(pageNo, pageSize, params.sort, params.order);
+    var query = imBuildPageQuery(pageNo, pageSize);
     var formValues = $.common.formToJSON("features-form");
     return $.extend(query, imOmitEmptyParams(formValues));
 }
@@ -211,9 +211,9 @@ function imFeaturesInitTable(canView, canEdit, canDelete) {
         modalName: "功能开关",
         columns: [
             { checkbox: true },
-            { field: "buttonName", title: "按钮名称", sortable: true },
-            { field: "buttonKey", title: "权限标识", sortable: true },
-            { field: "buttonStatus", title: "开关", sortable: true, formatter: imFeaturesFormatStatus },
+            { field: "buttonName", title: "按钮名称" },
+            { field: "buttonKey", title: "权限标识" },
+            { field: "buttonStatus", title: "开关", formatter: imFeaturesFormatStatus },
             {
                 title: "操作",
                 align: "center",
