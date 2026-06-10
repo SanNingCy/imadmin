@@ -57,8 +57,8 @@ function imPaymentRecordInitTable() {
         columns: [
             { field: "id", title: "ID", sortable: true },
             { field: "userId", title: "用户ID", sortable: false },
-            { field: "idno", title: "ID号", sortable: true },
-            { field: "nickname", title: "用户昵称", sortable: true },
+            { field: "idno", title: "ID号", sortable: false },
+            { field: "nickname", title: "用户昵称", sortable: false },
             {
                 field: "transactionNumber",
                 title: "交易流水号",

@@ -144,31 +144,13 @@ public class VipCodeController extends BaseController {
 	@PostMapping(value = "syncFromIm", produces = MediaType.APPLICATION_JSON_VALUE)
 	public AjaxJson syncFromIm(@RequestBody(required = false) String body) {
 		SyncFromImRequestDTO request;
-		if (body == null || body.trim().isEmpty()) {
-			// 无参数：使用未同步且已填类型的会员码
-			request = vipCodeService.buildSyncRequestFromUnsynced();
-			if (request.getData() == null || request.getData().isEmpty()) {
-				return AjaxJson.error("没有可同步的会员码，请先批量生成或添加会员码并填写类型");
-			}
-		} else {
-			try {
-				String trimmed = body.trim();
-				if (trimmed.startsWith("[")) {
-					List<SyncFromImItemDTO> list = JSON_MAPPER.readValue(body, new TypeReference<List<SyncFromImItemDTO>>() {});
-					request = new SyncFromImRequestDTO();
-					request.setData(list != null ? list : Lists.newArrayList());
-				} else {
-					request = JSON_MAPPER.readValue(body, SyncFromImRequestDTO.class);
-					if (request != null && request.getData() == null) {
-						request.setData(Lists.newArrayList());
-					}
-				}
-				if (request.getData() == null || request.getData().isEmpty()) {
-					return AjaxJson.error("请求体 data 为空");
-				}
-			} catch (Exception e) {
-				return AjaxJson.error("请求体格式错误，需要 {\"data\": [...]} 或 [...]");
-			}
+		try {
+			request = resolveSyncRequest(body);
+		} catch (Exception e) {
+			return AjaxJson.error("请求体格式错误，需要 {\"data\": [...]} 或 [...]");
+		}
+		if (request.getData() == null || request.getData().isEmpty()) {
+			return AjaxJson.error("没有可同步的会员码，请先批量生成或添加会员码并填写类型");
 		}
 		if (request.getData() != null && request.getData().size() > MAX_SYNC_BATCH_SIZE) {
 			return AjaxJson.error("单次最多同步" + MAX_SYNC_BATCH_SIZE + "条数据，请分批同步");
@@ -180,6 +162,31 @@ public class VipCodeController extends BaseController {
 			return AjaxJson.success(msg).put("data", result.getData());
 		}
 		return AjaxJson.error(result.getErrorMessage());
+	}
+
+	/**
+	 * 无请求体、空数组或 data 为空时，自动拉取未同步且已填类型的会员码；否则使用请求体中的 data。
+	 */
+	private SyncFromImRequestDTO resolveSyncRequest(String body) throws Exception {
+		if (body == null || body.trim().isEmpty()) {
+			return vipCodeService.buildSyncRequestFromUnsynced();
+		}
+		String trimmed = body.trim();
+		SyncFromImRequestDTO request;
+		if (trimmed.startsWith("[")) {
+			List<SyncFromImItemDTO> list = JSON_MAPPER.readValue(body, new TypeReference<List<SyncFromImItemDTO>>() {});
+			request = new SyncFromImRequestDTO();
+			request.setData(list != null ? list : Lists.newArrayList());
+		} else {
+			request = JSON_MAPPER.readValue(body, SyncFromImRequestDTO.class);
+			if (request != null && request.getData() == null) {
+				request.setData(Lists.newArrayList());
+			}
+		}
+		if (request == null || request.getData() == null || request.getData().isEmpty()) {
+			return vipCodeService.buildSyncRequestFromUnsynced();
+		}
+		return request;
 	}
 
 	/**

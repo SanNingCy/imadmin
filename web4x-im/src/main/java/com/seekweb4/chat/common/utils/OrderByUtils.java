@@ -2,6 +2,7 @@ package com.seekweb4.chat.common.utils;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -41,6 +42,43 @@ public final class OrderByUtils {
             result.append(underscoreField);
             if (fieldAndOrder.length > 1) {
                 result.append(" ").append(fieldAndOrder[1].trim());
+            }
+        }
+        return result.toString();
+    }
+
+    /**
+     * 仅保留允许排序的数据库列（驼峰会先转下划线），非法字段丢弃。
+     */
+    public static String sanitizeOrderBy(String orderBy, Set<String> allowedUnderscoreColumns) {
+        if (StringUtils.isBlank(orderBy) || allowedUnderscoreColumns == null || allowedUnderscoreColumns.isEmpty()) {
+            return "";
+        }
+        String converted = toUnderscoreColumn(orderBy);
+        if (StringUtils.isBlank(converted)) {
+            return "";
+        }
+        String[] parts = converted.split(",");
+        StringBuilder result = new StringBuilder();
+        for (String p : parts) {
+            String part = p == null ? "" : p.trim();
+            if (StringUtils.isBlank(part)) {
+                continue;
+            }
+            String[] fieldAndOrder = part.split("\\s+");
+            String column = fieldAndOrder[0].trim().toLowerCase(Locale.ROOT);
+            if (!allowedUnderscoreColumns.contains(column)) {
+                continue;
+            }
+            if (result.length() > 0) {
+                result.append(", ");
+            }
+            result.append(column);
+            if (fieldAndOrder.length > 1) {
+                String direction = fieldAndOrder[1].trim().toLowerCase(Locale.ROOT);
+                if ("asc".equals(direction) || "desc".equals(direction)) {
+                    result.append(" ").append(direction);
+                }
             }
         }
         return result.toString();

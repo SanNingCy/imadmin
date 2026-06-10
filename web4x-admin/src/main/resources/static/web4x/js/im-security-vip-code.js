@@ -290,8 +290,6 @@ function imSecurityVipCodeSyncFromIm() {
         $.ajax({
             url: imSecurityVipCodeApi + "/syncFromIm",
             type: "POST",
-            contentType: "application/json;charset=UTF-8",
-            data: JSON.stringify([]),
             dataType: "json",
             beforeSend: imTableBeforeSend,
             success: function (res) {

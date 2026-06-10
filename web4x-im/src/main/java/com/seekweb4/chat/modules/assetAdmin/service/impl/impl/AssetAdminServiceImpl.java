@@ -5,6 +5,7 @@ import com.seekweb4.chat.api.config.WithdrawalConfig;
 import com.seekweb4.chat.api.constant.WithdrawalRequestConstant;
 import com.seekweb4.chat.api.utils.HttpUtil;
 import com.seekweb4.chat.api.utils.sign.SignUtil;
+import com.seekweb4.chat.common.utils.OrderByUtils;
 import com.seekweb4.chat.common.utils.StringUtils;
 import com.seekweb4.chat.core.persistence.Page;
 import com.seekweb4.chat.dto.request.WithdrawAudioRequestVO;
@@ -41,6 +42,12 @@ import java.util.*;
 @Service
 @Transactional
 public class AssetAdminServiceImpl implements AssetAdminService {
+
+    /** t_payment_record 表真实列，不含关联会员后填充的 idno、nickname */
+    private static final Set<String> PAYMENT_RECORD_ORDER_COLUMNS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+            "id", "user_id", "transaction_number", "partner_number", "amount",
+            "payment_address", "receiving_address", "payment_status", "create_time", "update_time"
+    )));
 
     @Autowired
     private PaymentRateConfigMapper paymentRateConfigMapper;
@@ -223,12 +230,10 @@ public class AssetAdminServiceImpl implements AssetAdminService {
         // 设置分页参数
         queryDto.setPageNo((queryDto.getPageNo() - 1) * queryDto.getPageSize());
 
-        // 转换orderBy字段：将驼峰命名转换为下划线命名（数据库列名）
         if (StringUtils.isNotBlank(queryDto.getOrderBy())) {
-            String convertedOrderBy = convertOrderByToUnderscore(queryDto.getOrderBy());
-            queryDto.setOrderBy(convertedOrderBy);
+            queryDto.setOrderBy(OrderByUtils.sanitizeOrderBy(queryDto.getOrderBy(), PAYMENT_RECORD_ORDER_COLUMNS));
         }
-        
+
         // 查询总数
         Long count = paymentRecordMapper.selectAdminCount(queryDto);
         page.setCount(count);
