@@ -52,6 +52,13 @@
            th:name="${endName}" data-type="datetime" data-format="yyyy-MM-dd HH:mm:ss"/>
 </li>
 
+<!-- 列表搜索：若依标准单日（laydate，name 对接后端查询字段） -->
+<li th:fragment="im-search-date(label, name)">
+    <span th:text="${label}">日期：</span>
+    <input type="text" class="time-input" th:name="${name}" placeholder="yyyy-MM-dd"
+           data-type="date" data-format="yyyy-MM-dd"/>
+</li>
+
 <!-- ztree树插件 -->
 <div th:fragment="ztree-css">
     <link th:href="@{/ajax/libs/jquery-ztree/3.5/css/metro/zTreeStyle.css}" rel="stylesheet"/>
