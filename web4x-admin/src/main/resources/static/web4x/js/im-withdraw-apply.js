@@ -25,10 +25,8 @@ var IM_WITHDRAW_STATUS = {
 
 var imWithdrawApplyNeedGoogle = false;
 
-function imWithdrawApplySetWithdrawFnLabel(enabled) {
-    $("#withdraw-fn-label")
-        .text(enabled ? "开启" : "关闭")
-        .toggleClass("is-on", !!enabled);
+function imWithdrawApplyResetSearch() {
+    imButtonFnResetSearch("withdraw-apply-form", "#withdraw-fn-toggle", "#withdraw-fn-label");
 }
 
 function imWithdrawApplyQueryParams(params) {
@@ -122,62 +120,6 @@ function imWithdrawApplyLoadAuditMode() {
                 imWithdrawApplyNeedGoogle = Number(cfg.buttonStatus) === 1;
             }
         }
-    });
-}
-
-function imWithdrawApplyLoadWithdrawFn(canEditFn) {
-    if (!canEditFn) {
-        return;
-    }
-    $.ajax({
-        url: imButtonConfigApi + "/queryByButtonKey",
-        type: "GET",
-        data: { buttonKey: IM_WITHDRAW_FN_KEY },
-        dataType: "json",
-        beforeSend: imTableBeforeSend,
-        success: function (res) {
-            if (res && (res.success === true || res.code === 200)) {
-                var cfg = imWithdrawApplyResolveEntity(res, "buttonConfig");
-                var enabled = Number(cfg.buttonStatus) === 1;
-                $("#withdraw-fn-toggle").prop("checked", enabled);
-                imWithdrawApplySetWithdrawFnLabel(enabled);
-            }
-        }
-    });
-}
-
-function imWithdrawApplyBindWithdrawFn(canEditFn) {
-    if (!canEditFn) {
-        return;
-    }
-    $("#withdraw-fn-toggle").on("change", function () {
-        var checked = $(this).is(":checked");
-        var self = this;
-        $.ajax({
-            url: imButtonConfigApi + "/updateKey",
-            type: "POST",
-            contentType: "application/json;charset=UTF-8",
-            data: JSON.stringify({
-                buttonKey: IM_WITHDRAW_FN_KEY,
-                buttonName: "提现功能",
-                buttonStatus: checked ? "1" : "0"
-            }),
-            dataType: "json",
-            beforeSend: imTableBeforeSend,
-            success: function (res) {
-                if (res && (res.success === true || res.code === 200)) {
-                    imWithdrawApplySetWithdrawFnLabel(checked);
-                    $.modal.msgSuccess(res.msg || (checked ? "开启成功" : "关闭成功"));
-                } else {
-                    $(self).prop("checked", !checked);
-                    $.modal.alertWarning((res && res.msg) ? res.msg : "操作失败");
-                }
-            },
-            error: function () {
-                $(self).prop("checked", !checked);
-                $.modal.alertWarning("操作失败");
-            }
-        });
     });
 }
 
@@ -495,7 +437,6 @@ function imWithdrawApplyInitTable(canView, canReview) {
 
 function imWithdrawApplyInitPage(canView, canReview, canEditFn) {
     imWithdrawApplyLoadAuditMode();
-    imWithdrawApplyLoadWithdrawFn(canEditFn);
-    imWithdrawApplyBindWithdrawFn(canEditFn);
+    imButtonFnInitPage(canEditFn, IM_WITHDRAW_FN_KEY, "提现功能", "#withdraw-fn-toggle", "#withdraw-fn-label");
     imWithdrawApplyInitTable(canView, canReview);
 }

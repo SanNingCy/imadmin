@@ -9,18 +9,13 @@ function imGroupWelcomeQueryParams(params) {
 }
 
 function imGroupWelcomeInitTable() {
-    imPiamomInitMediaEvents();
-    imInitTable({
+    imInitTable(imApplyListMediaTableOptions({
         url: imGroupWelcomeApi + "/list",
         formId: "group-welcome-form",
         modalName: "群欢迎语",
         sortName: "createDate",
         sortOrder: "desc",
         queryParams: imGroupWelcomeQueryParams,
-        escape: false,
-        onPostBody: function () {
-            imPiamomBindMediaImagesIn($("#bootstrap-table"));
-        },
         columns: [
             {
                 field: "group.idno",
@@ -44,18 +39,7 @@ function imGroupWelcomeInitTable() {
                     return imFormatText(value, 20);
                 }
             },
-            {
-                field: "imgs",
-                title: "图片",
-                width: 300,
-                escape: false,
-                cellStyle: function () {
-                    return { css: { "text-align": "left", "vertical-align": "middle" } };
-                },
-                formatter: function (value, row) {
-                    return imPiamomFormatMedia(value, "group-welcome-" + row.id);
-                }
-            },
+            imBuildListMediaColumn("imgs", { title: "图片", cachePrefix: "group-welcome" }),
             {
                 field: "video",
                 title: "视频",
@@ -94,7 +78,7 @@ function imGroupWelcomeInitTable() {
                 }
             }
         ]
-    });
+    }));
 }
 
 $(function () {

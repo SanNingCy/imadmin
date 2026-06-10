@@ -2,40 +2,7 @@
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
     <th:block th:include="include :: header('提现申请审核')" />
-    <style>
-        .withdraw-fn-switch {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            margin-left: 8px;
-            padding: 4px 14px;
-            background: #f8f9fb;
-            border: 1px solid #e7eaec;
-            border-radius: 4px;
-            vertical-align: middle;
-            line-height: 32px;
-        }
-        .withdraw-fn-switch .withdraw-fn-text {
-            color: #676a6c;
-            font-weight: normal;
-            white-space: nowrap;
-            margin: 0;
-        }
-        .withdraw-fn-switch .toggle-switch {
-            padding-top: 0;
-            margin-bottom: 0;
-        }
-        .withdraw-fn-switch .withdraw-fn-status {
-            display: inline-block;
-            min-width: 36px;
-            font-size: 12px;
-            color: #999;
-        }
-        .withdraw-fn-switch .withdraw-fn-status.is-on {
-            color: #1ab394;
-            font-weight: 600;
-        }
-    </style>
+    <th:block th:include="include :: im-transfer-fn-switch-css" />
 </head>
 <body class="gray-bg">
 <div class="container-div">
@@ -68,7 +35,7 @@
                         </li>
                         <li>
                             <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
-                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="imWithdrawApplyResetSearch()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
                         </li>
                         <li class="withdraw-fn-switch" shiro:hasPermission="ops:system:features:edit">
                             <span class="withdraw-fn-text">提现功能</span>
@@ -134,7 +101,8 @@
 
 <th:block th:include="include :: footer" />
 <script th:src="@{/web4x/js/im-table.js?v=20260605w}"></script>
-<script th:src="@{/web4x/js/im-withdraw-apply.js?v=20260606w6}"></script>
+<script th:src="@{/web4x/js/im-transfer-fn.js?v=20260610}"></script>
+<script th:src="@{/web4x/js/im-withdraw-apply.js?v=20260610w}"></script>
 <script th:inline="javascript">
     var imWithdrawApplyListUrl = ctx + "admin/asset/withdrawApply/page";
     $(function () {

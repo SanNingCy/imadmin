@@ -2,10 +2,11 @@
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
     <th:block th:include="include :: header('信用分基础配置')" />
+    <th:block th:include="include :: summernote-css" />
     <style>
         #credit-config-modal .form-group { margin-bottom: 10px; }
         .credit-config-table-wrap { overflow-x: auto; }
-        #credit-config-scoreInfo { min-height: 200px; font-family: monospace; }
+        #credit-config-scoreInfo-editor { min-height: 220px; }
     </style>
 </head>
 <body class="gray-bg">
@@ -67,16 +68,17 @@
         <div class="form-group">
             <label class="col-sm-3 control-label">信用分说明：</label>
             <div class="col-sm-8">
-                <textarea class="form-control" id="credit-config-scoreInfo" rows="10" placeholder="支持 HTML 内容"></textarea>
+                <div id="credit-config-scoreInfo-editor"></div>
             </div>
         </div>
     </form>
 </div>
 
 <th:block th:include="include :: footer" />
+<th:block th:include="include :: summernote-js" />
 <script th:src="@{/web4x/js/im-table.js?v=20260605r}"></script>
 <script th:src="@{/web4x/js/im-credit-common.js?v=20260605r}"></script>
-<script th:src="@{/web4x/js/im-credit-configuration.js?v=20260605r}"></script>
+<script th:src="@{/web4x/js/im-credit-configuration.js?v=20260613}"></script>
 <script th:inline="javascript">
     $(function () {
         imCreditConfigurationInitTable(

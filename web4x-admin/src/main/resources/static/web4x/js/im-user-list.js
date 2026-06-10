@@ -184,6 +184,18 @@ function imUserListCopyText(text) {
 
 
 
+function imUserListInitMemberDatetime() {
+    var $input = $("#ul-viptime");
+    if ($input.data("datetimepicker")) {
+        $input.datetimepicker("remove");
+    }
+    $input.datetimepicker({
+        format: "yyyy-mm-dd hh:ii:ss",
+        autoclose: true,
+        todayBtn: true
+    });
+}
+
 function imUserListSetMemberReadOnly(readOnly) {
 
     $("#user-list-member-form input:not(#ul-idno):not(#ul-icon):not(#ul-qrcode), #user-list-member-form select, #user-list-member-form textarea").each(function () {
@@ -503,6 +515,12 @@ function imUserListOpenMember(id, mode) {
                 content: $("#user-list-member-modal"),
 
                 btn: buttons,
+
+                success: function () {
+                    if (imUserListMemberMode !== "view") {
+                        imUserListInitMemberDatetime();
+                    }
+                },
 
                 yes: function (index) {
 

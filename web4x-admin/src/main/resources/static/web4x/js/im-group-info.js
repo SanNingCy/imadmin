@@ -319,18 +319,13 @@ function imGroupInfoMemberReset() {
 }
 
 function imGroupInfoInitTable(canView, canEdit, canDelete, canMember) {
-    imPiamomInitMediaEvents();
-    imInitTable({
+    imInitTable(imApplyListMediaTableOptions({
         url: imGroupInfoApi + "/list",
         formId: "group-info-form",
         modalName: "群组信息",
         sortName: "createDate",
         sortOrder: "desc",
         queryParams: imGroupInfoQueryParams,
-        escape: false,
-        onPostBody: function () {
-            imPiamomBindMediaImagesIn($("#bootstrap-table"));
-        },
         columns: [
             {
                 field: "u.id",
@@ -354,18 +349,15 @@ function imGroupInfoInitTable(canView, canEdit, canDelete, canMember) {
                     return imFormatText(value, 16);
                 }
             },
-            {
-                field: "icon",
+            imBuildListMediaColumn("icon", {
                 title: "群头像",
                 width: 80,
-                escape: false,
-                cellStyle: function () {
-                    return { css: { "text-align": "left", "vertical-align": "middle" } };
-                },
-                formatter: function (value, row) {
-                    return imPiamomFormatMedia(row.icon != null ? row.icon : value, "group-info-icon-" + row.id);
+                max: 1,
+                cachePrefix: "group-info-icon",
+                format: function (v, row, cacheKey, max) {
+                    return imFormatListMedia(row.icon != null ? row.icon : v, cacheKey, max);
                 }
-            },
+            }),
             {
                 field: "name",
                 title: "群组名称",
@@ -382,18 +374,15 @@ function imGroupInfoInitTable(canView, canEdit, canDelete, canMember) {
                     return imFormatText(value, 12);
                 }
             },
-            {
-                field: "qrcode",
+            imBuildListMediaColumn("qrcode", {
                 title: "群名片二维码",
                 width: 80,
-                escape: false,
-                cellStyle: function () {
-                    return { css: { "text-align": "left", "vertical-align": "middle" } };
-                },
-                formatter: function (value, row) {
-                    return imPiamomFormatMedia(row.qrcode != null ? row.qrcode : value, "group-info-qrcode-" + row.id);
+                max: 1,
+                cachePrefix: "group-info-qrcode",
+                format: function (v, row, cacheKey, max) {
+                    return imFormatListMedia(row.qrcode != null ? row.qrcode : v, cacheKey, max);
                 }
-            },
+            }),
             {
                 field: "gonggao",
                 title: "群公告",
@@ -452,5 +441,5 @@ function imGroupInfoInitTable(canView, canEdit, canDelete, canMember) {
                 }
             }
         ]
-    });
+    }));
 }

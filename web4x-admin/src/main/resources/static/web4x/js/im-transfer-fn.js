@@ -1,10 +1,10 @@
 /**
- * IM 转账功能开关（出金/内部转账交易记录页共用）
+ * IM 功能开关（buttonConfig）- 列表页搜索区共用
  */
 var imButtonConfigApi = ctx + "buttonConfig/buttonConfig";
 var IM_TRANSFER_FN_KEY = "transfer";
 
-function imTransferFnResolveEntity(res, key) {
+function imButtonFnResolveEntity(res, key) {
     if (!res) {
         return {};
     }
@@ -17,34 +17,34 @@ function imTransferFnResolveEntity(res, key) {
     return {};
 }
 
-function imTransferFnSetLabel(labelSelector, enabled) {
+function imButtonFnSetLabel(labelSelector, enabled) {
     $(labelSelector)
         .text(enabled ? "开启" : "关闭")
         .toggleClass("is-on", enabled);
 }
 
-function imTransferFnLoad(canEditFn, toggleSelector, labelSelector) {
+function imButtonFnLoad(canEditFn, buttonKey, toggleSelector, labelSelector) {
     if (!canEditFn) {
         return;
     }
     $.ajax({
         url: imButtonConfigApi + "/queryByButtonKey",
         type: "GET",
-        data: { buttonKey: IM_TRANSFER_FN_KEY },
+        data: { buttonKey: buttonKey },
         dataType: "json",
         beforeSend: imTableBeforeSend,
         success: function (res) {
             if (res && (res.success === true || res.code === 200)) {
-                var cfg = imTransferFnResolveEntity(res, "buttonConfig");
+                var cfg = imButtonFnResolveEntity(res, "buttonConfig");
                 var enabled = Number(cfg.buttonStatus) === 1;
                 $(toggleSelector).prop("checked", enabled);
-                imTransferFnSetLabel(labelSelector, enabled);
+                imButtonFnSetLabel(labelSelector, enabled);
             }
         }
     });
 }
 
-function imTransferFnBind(canEditFn, toggleSelector, labelSelector) {
+function imButtonFnBind(canEditFn, buttonKey, buttonName, toggleSelector, labelSelector) {
     if (!canEditFn) {
         return;
     }
@@ -56,15 +56,15 @@ function imTransferFnBind(canEditFn, toggleSelector, labelSelector) {
             type: "POST",
             contentType: "application/json;charset=UTF-8",
             data: JSON.stringify({
-                buttonKey: IM_TRANSFER_FN_KEY,
-                buttonName: "转账功能",
+                buttonKey: buttonKey,
+                buttonName: buttonName,
                 buttonStatus: checked ? "1" : "0"
             }),
             dataType: "json",
             beforeSend: imTableBeforeSend,
             success: function (res) {
                 if (res && (res.success === true || res.code === 200)) {
-                    imTransferFnSetLabel(labelSelector, checked);
+                    imButtonFnSetLabel(labelSelector, checked);
                     $.modal.msgSuccess(res.msg || (checked ? "开启成功" : "关闭成功"));
                 } else {
                     $(self).prop("checked", !checked);
@@ -79,17 +79,25 @@ function imTransferFnBind(canEditFn, toggleSelector, labelSelector) {
     });
 }
 
-function imTransferFnResetSearch(formId, toggleSelector, labelSelector) {
+function imButtonFnResetSearch(formId, toggleSelector, labelSelector) {
     var $toggle = $(toggleSelector);
     var enabled = $toggle.length ? $toggle.is(":checked") : false;
     $.form.reset(formId);
     if ($toggle.length) {
         $toggle.prop("checked", enabled);
-        imTransferFnSetLabel(labelSelector, enabled);
+        imButtonFnSetLabel(labelSelector, enabled);
     }
 }
 
+function imButtonFnInitPage(canEditFn, buttonKey, buttonName, toggleSelector, labelSelector) {
+    imButtonFnLoad(canEditFn, buttonKey, toggleSelector, labelSelector);
+    imButtonFnBind(canEditFn, buttonKey, buttonName, toggleSelector, labelSelector);
+}
+
+function imTransferFnResetSearch(formId, toggleSelector, labelSelector) {
+    imButtonFnResetSearch(formId, toggleSelector, labelSelector);
+}
+
 function imTransferFnInitPage(canEditFn, toggleSelector, labelSelector) {
-    imTransferFnLoad(canEditFn, toggleSelector, labelSelector);
-    imTransferFnBind(canEditFn, toggleSelector, labelSelector);
+    imButtonFnInitPage(canEditFn, IM_TRANSFER_FN_KEY, "转账功能", toggleSelector, labelSelector);
 }

@@ -7,14 +7,74 @@
  */
 
 var imCreditConfigurationApi = ctx + "admin/creditScore/config";
+var imCreditConfigurationEditorReady = false;
+var imCreditConfigurationPendingScoreInfo = "";
 
 function imCreditConfigurationQueryParams(params) {
     return imCreditQueryParams("credit-config-form", params);
 }
 
+function imCreditConfigurationInitEditor(readOnly) {
+    if (!imCreditConfigurationEditorReady) {
+        $("#credit-config-scoreInfo-editor").summernote({
+            height: 220,
+            lang: "zh-CN",
+            placeholder: "请输入信用分说明",
+            followingToolbar: false,
+            dialogsInBody: true,
+            callbacks: {
+                onImageUpload: function (files) {
+                    imCreditConfigurationSendSummernoteFile(files[0], this);
+                }
+            }
+        });
+        imCreditConfigurationEditorReady = true;
+    }
+    if (readOnly) {
+        $("#credit-config-scoreInfo-editor").summernote("disable");
+    } else {
+        $("#credit-config-scoreInfo-editor").summernote("enable");
+    }
+}
+
+function imCreditConfigurationSendSummernoteFile(file, editor) {
+    var data = new FormData();
+    data.append("file", file);
+    $.ajax({
+        type: "POST",
+        url: ctx + "common/upload",
+        data: data,
+        cache: false,
+        contentType: false,
+        processData: false,
+        dataType: "json",
+        success: function (result) {
+            if (result.code === web_status.SUCCESS || result.code === 200) {
+                $(editor).summernote("insertImage", result.url, result.fileName || "image");
+            } else {
+                $.modal.alertError(result.msg || "图片上传失败");
+            }
+        },
+        error: function () {
+            $.modal.alertWarning("图片上传失败");
+        }
+    });
+}
+
+function imCreditConfigurationGetScoreInfo() {
+    if (imCreditConfigurationEditorReady) {
+        return $("#credit-config-scoreInfo-editor").summernote("code") || "";
+    }
+    return imCreditConfigurationPendingScoreInfo || "";
+}
+
 function imCreditConfigurationResetModal() {
     $("#credit-config-id").val("");
     $("#credit-config-modal-form :input").not("[type=hidden]").val("");
+    imCreditConfigurationPendingScoreInfo = "";
+    if (imCreditConfigurationEditorReady) {
+        $("#credit-config-scoreInfo-editor").summernote("code", "");
+    }
 }
 
 function imCreditConfigurationFillModal(info) {
@@ -24,7 +84,11 @@ function imCreditConfigurationFillModal(info) {
     $("#credit-config-vipBonusRate").val(info.vipBonusRate != null ? info.vipBonusRate : "");
     $("#credit-config-lianghaoBonusRate").val(info.lianghaoBonusRate != null ? info.lianghaoBonusRate : "");
     $("#credit-config-price").val(info.price != null ? info.price : "");
-    $("#credit-config-scoreInfo").val(info.scoreInfo || "");
+    imCreditConfigurationPendingScoreInfo = info.scoreInfo || "";
+    if (imCreditConfigurationEditorReady) {
+        $("#credit-config-scoreInfo-editor").summernote("code", imCreditConfigurationPendingScoreInfo);
+        imCreditConfigurationPendingScoreInfo = "";
+    }
 }
 
 function imCreditConfigurationSetReadOnly(readOnly) {
@@ -39,6 +103,13 @@ function imCreditConfigurationShowModal(mode, readOnly) {
         shadeClose: true,
         content: $("#credit-config-modal"),
         btn: readOnly ? ["关闭"] : ["保存", "取消"],
+        success: function () {
+            imCreditConfigurationInitEditor(readOnly);
+            if (imCreditConfigurationPendingScoreInfo && imCreditConfigurationEditorReady) {
+                $("#credit-config-scoreInfo-editor").summernote("code", imCreditConfigurationPendingScoreInfo);
+                imCreditConfigurationPendingScoreInfo = "";
+            }
+        },
         yes: function (index) {
             if (readOnly) {
                 layer.close(index);
@@ -115,7 +186,7 @@ function imCreditConfigurationSave(layerIndex) {
         vipBonusRate: parseFloat($("#credit-config-vipBonusRate").val()),
         lianghaoBonusRate: parseFloat($("#credit-config-lianghaoBonusRate").val()),
         price: parseFloat($("#credit-config-price").val()),
-        scoreInfo: $("#credit-config-scoreInfo").val()
+        scoreInfo: imCreditConfigurationGetScoreInfo()
     };
 
     imCreditAjax({

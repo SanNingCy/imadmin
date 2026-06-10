@@ -277,37 +277,26 @@ function imPiamomReportRecordOpenInteractionDrawer(targetType, targetId) {
 
 function imPiamomReportRecordInitTable(canView, canAudit) {
     imPiamomReportRecordCanAudit = !!canAudit;
-    imPiamomInitMediaEvents();
-    imInitTable({
+    imInitTable(imApplyListMediaTableOptions({
         url: imPiamomApi + "/reportRecord/page",
         formId: "piamom-report-record-form",
         queryParams: imPiamomReportRecordQueryParams,
         responseHandler: imPageResponse,
         modalName: "举报记录",
-        escape: false,
-        onPostBody: function () {
-            imPiamomBindMediaImagesIn($("#bootstrap-table"));
-        },
         columns: [
             { field: "id", title: "ID", sortable: true, width: 70 },
             { field: "reporterIdno", title: "举报人IDNO", width: 110 },
             { field: "reporterNickname", title: "举报人昵称", width: 120, formatter: function (v) { return imFormatText(v, 16); } },
             { field: "reportTypeName", title: "举报类型", width: 160, formatter: function (v) { return imFormatText(v, 20); } },
             { field: "reason", title: "原因", formatter: function (v) { return imFormatText(v, 30); } },
-            {
-                field: "imageUrls",
+            imBuildListMediaColumn("imageUrls", {
                 title: "举证图",
-                width: 200,
-                escape: false,
-                cellStyle: function () {
-                    return { css: { "text-align": "left", "vertical-align": "middle" } };
-                },
-                formatter: function (v, row) {
+                cachePrefix: "report-list",
+                format: function (v, row, cacheKey, max) {
                     var urls = row.imageUrlList && row.imageUrlList.length ? row.imageUrlList : v;
-                    var max = typeof IM_LIST_MEDIA_COMPACT_MAX !== "undefined" ? IM_LIST_MEDIA_COMPACT_MAX : 4;
-                    return imPiamomFormatMedia(urls, "report-list-" + row.id, max);
+                    return imFormatListMediaCompact(urls, cacheKey, max);
                 }
-            },
+            }),
             { field: "targetType", title: "对象类型", width: 90, formatter: imPiamomFormatTargetType },
             { field: "targetId", title: "对象ID", width: 90 },
             { field: "auditStatus", title: "审核状态", width: 100, formatter: imPiamomFormatAuditStatus, escape: false },
@@ -344,5 +333,5 @@ function imPiamomReportRecordInitTable(canView, canAudit) {
                 }
             }
         ]
-    });
+    }));
 }

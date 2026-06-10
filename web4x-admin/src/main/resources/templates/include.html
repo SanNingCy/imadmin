@@ -14,6 +14,7 @@
 	<link th:href="@{/css/animate.min.css?v=20210831}" rel="stylesheet"/>
 	<link th:href="@{/css/style.min.css?v=20250731}" rel="stylesheet"/>
 	<link th:href="@{/web4x/css/ry-ui.css?v=20260610}" rel="stylesheet"/>
+	<link th:href="@{/web4x/css/im-list-media-compact.css?v=20260614}" rel="stylesheet"/>
 </head>
 
 <!-- 通用JS -->
@@ -90,6 +91,11 @@
 </div>
 <div th:fragment="layout-latest-js">
     <script th:src="@{/ajax/libs/jquery-layout/jquery.layout-latest.js?v=1.4.4}"></script>
+</div>
+
+<!-- IM 列表媒体列紧凑展示（与朋友圈列表一致） -->
+<div th:fragment="im-list-media-compact-css">
+    <link th:href="@{/web4x/css/im-list-media-compact.css?v=20260614}" rel="stylesheet"/>
 </div>
 
 <!-- IM 转账功能开关样式 -->

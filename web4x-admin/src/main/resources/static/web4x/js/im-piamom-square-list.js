@@ -200,17 +200,12 @@ function imPiamomSquareListOpenInteractionDrawer(squareId) {
 }
 
 function imPiamomSquareListInitTable(canView, canEdit, canDelete) {
-    imPiamomInitMediaEvents();
-    imInitTable({
+    imInitTable(imApplyListMediaTableOptions({
         url: imPiamomApi + "/square/page",
         formId: "piamom-square-list-form",
         queryParams: imPiamomSquareListQueryParams,
         responseHandler: imPageResponse,
         modalName: "广场帖子",
-        escape: false,
-        onPostBody: function () {
-            imPiamomBindMediaImagesIn($("#bootstrap-table"));
-        },
         columns: [
             { field: "id", title: "ID", sortable: true, width: 70 },
             { field: "userIdno", title: "IDNO", sortable: true, width: 110 },
@@ -229,19 +224,14 @@ function imPiamomSquareListInitTable(canView, canEdit, canDelete) {
                     return '<a href="javascript:void(0)" onclick="imPiamomSquareListOpenDetail(\'' + row.id + '\')" title="' + safe + '">' + short + "</a>";
                 }
             },
-            {
-                field: "imageUrls",
+            imBuildListMediaColumn("imageUrls", {
                 title: "媒体",
                 width: 220,
-                escape: false,
-                cellStyle: function () {
-                    return { css: { "text-align": "left", "vertical-align": "middle" } };
-                },
-                formatter: function (v, row) {
-                    var max = typeof IM_LIST_MEDIA_COMPACT_MAX !== "undefined" ? IM_LIST_MEDIA_COMPACT_MAX : 4;
-                    return imPiamomFormatSquareMedia(v, row.video, "square-" + row.id, max);
+                cachePrefix: "square",
+                format: function (v, row, cacheKey, max) {
+                    return imPiamomFormatSquareMedia(v, row.video, cacheKey, max);
                 }
-            },
+            }),
             { field: "type", title: "类型", sortable: true, width: 80, formatter: imPiamomFormatSquareType },
             { field: "odicStake", title: "质押ODIC", sortable: true, width: 100 },
             { field: "odicStakeStatus", title: "质押状态", sortable: true, width: 100, formatter: imPiamomFormatOdicStakeStatus, escape: false },
@@ -273,5 +263,5 @@ function imPiamomSquareListInitTable(canView, canEdit, canDelete) {
                 }
             }
         ]
-    });
+    }));
 }

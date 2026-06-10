@@ -95,18 +95,13 @@ function imContentMomentsRemove(id) {
 }
 
 function imContentMomentsInitTable(canView, canDelete) {
-    imInitListMediaPreview();
     imContentMomentsInitVideoEvents();
-    imInitTable({
+    imInitTable(imApplyListMediaTableOptions({
         url: imContentMomentsApi + "/list",
         formId: "moments-form",
         queryParams: imContentMomentsQueryParams,
         responseHandler: imPageResponse,
         modalName: "朋友圈动态",
-        escape: false,
-        onPostBody: function () {
-            imBindListMediaPreview($("#bootstrap-table"));
-        },
         columns: [
             {
                 field: "u.idno",
@@ -141,27 +136,12 @@ function imContentMomentsInitTable(canView, canDelete) {
                 class: "moment-ellipsis",
                 formatter: function (v) { return imContentMomentsFormatEllipsis(v); }
             },
-            {
-                field: "imgs",
-                title: "图片",
-                width: 200,
-                escape: false,
-                cellStyle: function () {
-                    return { css: { "text-align": "left", "vertical-align": "middle" } };
-                },
-                formatter: function (v, row) {
-                    var max = typeof IM_LIST_MEDIA_COMPACT_MAX !== "undefined" ? IM_LIST_MEDIA_COMPACT_MAX : 4;
-                    return imFormatListMedia(v, "moments-imgs-" + row.id, max);
-                }
-            },
-            {
-                field: "vimg",
+            imBuildListMediaColumn("imgs", { title: "图片", cachePrefix: "moments-imgs" }),
+            imBuildListMediaColumn("vimg", {
                 title: "视频封面",
-                escape: false,
-                formatter: function (v, row) {
-                    return imFormatListMedia(v, "moments-vimg-" + row.id);
-                }
-            },
+                max: 1,
+                cachePrefix: "moments-vimg"
+            }),
             {
                 field: "video",
                 title: "视频",
@@ -188,5 +168,5 @@ function imContentMomentsInitTable(canView, canDelete) {
                 }
             }
         ]
-    });
+    }));
 }

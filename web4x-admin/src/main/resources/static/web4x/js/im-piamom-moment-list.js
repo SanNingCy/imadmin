@@ -179,17 +179,12 @@ function imPiamomMomentListOpenInteractionDrawer(momentId) {
 }
 
 function imPiamomMomentListInitTable(canView, canEdit, canDelete) {
-    imPiamomInitMediaEvents();
-    imInitTable({
+    imInitTable(imApplyListMediaTableOptions({
         url: imPiamomApi + "/moment/page",
         formId: "piamom-moment-list-form",
         queryParams: imPiamomMomentListQueryParams,
         responseHandler: imPageResponse,
         modalName: "朋友圈动态",
-        escape: false,
-        onPostBody: function () {
-            imPiamomBindMediaImagesIn($("#bootstrap-table"));
-        },
         columns: [
             { field: "id", title: "ID", sortable: true, width: 70 },
             { field: "userIdno", title: "IDNO", sortable: true, width: 110 },
@@ -208,19 +203,7 @@ function imPiamomMomentListInitTable(canView, canEdit, canDelete) {
                     return '<a href="javascript:void(0)" onclick="imPiamomMomentListOpenDetail(\'' + row.id + '\')" title="' + safe + '">' + short + "</a>";
                 }
             },
-            {
-                field: "imageUrls",
-                title: "图片",
-                width: 200,
-                escape: false,
-                cellStyle: function () {
-                    return { css: { "text-align": "left", "vertical-align": "middle" } };
-                },
-                formatter: function (v, row) {
-                    var max = typeof IM_LIST_MEDIA_COMPACT_MAX !== "undefined" ? IM_LIST_MEDIA_COMPACT_MAX : 4;
-                    return imPiamomFormatMedia(v, "moment-" + row.id, max);
-                }
-            },
+            imBuildListMediaColumn("imageUrls", { title: "图片", cachePrefix: "moment" }),
             { field: "viewCount", title: "浏览", sortable: true, width: 70 },
             { field: "likeCount", title: "点赞", sortable: true, width: 70 },
             { field: "commentCount", title: "评论", sortable: true, width: 70 },
@@ -246,5 +229,5 @@ function imPiamomMomentListInitTable(canView, canEdit, canDelete) {
                 }
             }
         ]
-    });
+    }));
 }

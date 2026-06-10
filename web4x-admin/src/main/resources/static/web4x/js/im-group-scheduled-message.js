@@ -9,18 +9,13 @@ function imGroupScheduledQueryParams(params) {
 }
 
 function imGroupScheduledInitTable() {
-    imPiamomInitMediaEvents();
-    imInitTable({
+    imInitTable(imApplyListMediaTableOptions({
         url: imGroupScheduledApi + "/list",
         formId: "group-scheduled-form",
         modalName: "群定时消息",
         sortName: "createDate",
         sortOrder: "desc",
         queryParams: imGroupScheduledQueryParams,
-        escape: false,
-        onPostBody: function () {
-            imPiamomBindMediaImagesIn($("#bootstrap-table"));
-        },
         columns: [
             {
                 field: "group.idno",
@@ -44,18 +39,7 @@ function imGroupScheduledInitTable() {
                     return imFormatText(value, 20);
                 }
             },
-            {
-                field: "imgs",
-                title: "图片",
-                width: 300,
-                escape: false,
-                cellStyle: function () {
-                    return { css: { "text-align": "left", "vertical-align": "middle" } };
-                },
-                formatter: function (value, row) {
-                    return imPiamomFormatMedia(value, "group-scheduled-" + row.id);
-                }
-            },
+            imBuildListMediaColumn("imgs", { title: "图片", cachePrefix: "group-scheduled" }),
             {
                 field: "video",
                 title: "视频",
@@ -110,7 +94,7 @@ function imGroupScheduledInitTable() {
                 }
             }
         ]
-    });
+    }));
 }
 
 $(function () {

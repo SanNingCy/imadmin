@@ -744,6 +744,68 @@ function imFormatListMedia(value, cacheKey, max) {
     return value ? imEscapeHtml(String(value)) : "-";
 }
 
+/** 列表媒体列默认宽度 */
+var IM_LIST_MEDIA_COLUMN_WIDTH = 200;
+
+/** 列表媒体列紧凑格式化（默认最多 IM_LIST_MEDIA_COMPACT_MAX 张，固定行高） */
+function imFormatListMediaCompact(value, cacheKey, max) {
+    if (max == null) {
+        max = (typeof IM_LIST_MEDIA_COMPACT_MAX !== "undefined") ? IM_LIST_MEDIA_COMPACT_MAX : 4;
+    }
+    return imFormatListMedia(value, cacheKey, max);
+}
+
+/** 列表媒体列 cellStyle */
+function imListMediaCellStyle() {
+    return { css: { "text-align": "left", "vertical-align": "middle" } };
+}
+
+/**
+ * 构建列表媒体列配置
+ * options: { title, width, max, cachePrefix, cacheKey(row,value), format(value,row,cacheKey) }
+ */
+function imBuildListMediaColumn(field, options) {
+    options = options || {};
+    var cachePrefix = options.cachePrefix || field;
+    return {
+        field: field,
+        title: options.title || "图片",
+        width: options.width != null ? options.width : IM_LIST_MEDIA_COLUMN_WIDTH,
+        escape: false,
+        cellStyle: imListMediaCellStyle,
+        formatter: function (value, row) {
+            var cacheKey = typeof options.cacheKey === "function"
+                ? options.cacheKey(row, value)
+                : (cachePrefix + "-" + row.id);
+            var max = options.max != null
+                ? options.max
+                : ((typeof IM_LIST_MEDIA_COMPACT_MAX !== "undefined") ? IM_LIST_MEDIA_COMPACT_MAX : 4);
+            if (typeof options.format === "function") {
+                return options.format(value, row, cacheKey, max);
+            }
+            return imFormatListMediaCompact(value, cacheKey, max);
+        }
+    };
+}
+
+/** 为 imInitTable 选项注入媒体列预览绑定（escape:false + onPostBody） */
+function imApplyListMediaTableOptions(options) {
+    options = options || {};
+    if (options.escape !== true) {
+        options.escape = false;
+    }
+    imInitListMediaPreview();
+    var tableId = options.id || "bootstrap-table";
+    var userOnPostBody = options.onPostBody;
+    options.onPostBody = function () {
+        imBindListMediaPreview($("#" + tableId));
+        if (typeof userOnPostBody === "function") {
+            userOnPostBody.apply(this, arguments);
+        }
+    };
+    return options;
+}
+
 (function imTableBootstrapPatch() {
     if (typeof jQuery === 'undefined' || !jQuery.table) {
         return;
