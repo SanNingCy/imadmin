@@ -53,7 +53,7 @@ public class UserConstants
      * 密码长度限制
      */
     public static final int PASSWORD_MIN_LENGTH = 5;
-    public static final int PASSWORD_MAX_LENGTH = 20;
+    public static final int PASSWORD_MAX_LENGTH = 100;
 
     /**
      * 用户类型
