@@ -16,7 +16,22 @@ function imBalanceLogQueryParams(params) {
     var pageNo = params.offset / params.limit + 1;
     var query = imBuildPageQuery(pageNo, pageSize, params.sort, params.order);
     var formValues = $.common.formToJSON("balance-log-form");
+    if (formValues.uid) {
+        query["u.id"] = formValues.uid;
+        delete formValues.uid;
+    }
     return $.extend(query, imOmitEmptyParams(formValues));
+}
+
+function imBalanceLogApplyUrlUserFilter() {
+    var uid = typeof imDictGetUrlParam === "function" ? imDictGetUrlParam("uid") : "";
+    var idno = typeof imDictGetUrlParam === "function" ? imDictGetUrlParam("idno") : "";
+    if (uid) {
+        $("#balance-log-form input[name='uid']").val(uid);
+    }
+    if (idno) {
+        $("#balance-log-form input[name='idno']").val(idno);
+    }
 }
 
 function imBalanceLogMemberField(row, field) {
@@ -202,7 +217,13 @@ function imBalanceLogInitPage() {
     imBalanceLogLoadTypeDict(function (values) {
         imBalanceLogBuildTypeLabelMap(values);
         imBalanceLogFillTypeSelect(values);
+        imBalanceLogApplyUrlUserFilter();
         imBalanceLogInitTable();
+        if ($("#balance-log-form input[name='uid']").val()) {
+            setTimeout(function () {
+                $.table.search();
+            }, 0);
+        }
     });
 }
 

@@ -3,6 +3,10 @@
 <head>
     <th:block th:include="include :: header('平台协议管理')" />
     <th:block th:include="include :: datetimepicker-css" />
+    <th:block th:include="include :: summernote-css" />
+    <style>
+        #agreement-content-editor { min-height: 280px; }
+    </style>
 </head>
 <body class="gray-bg">
 <div class="container-div">
@@ -40,7 +44,7 @@
         </div>
         <div class="form-group">
             <label class="col-sm-3 control-label">内容：</label>
-            <div class="col-sm-8"><textarea class="form-control" id="agreement-content" rows="10"></textarea></div>
+            <div class="col-sm-8"><div id="agreement-content-editor"></div></div>
         </div>
         <div class="form-group">
             <label class="col-sm-3 control-label">更新时间：</label>
@@ -51,8 +55,9 @@
 
 <th:block th:include="include :: footer" />
 <th:block th:include="include :: datetimepicker-js" />
+<th:block th:include="include :: summernote-js" />
 <script th:src="@{/web4x/js/im-table.js?v=20260605j}"></script>
-<script th:src="@{/web4x/js/im-agreement.js?v=20260605j}"></script>
+<script th:src="@{/web4x/js/im-agreement.js?v=20260613}"></script>
 <script th:inline="javascript">
     $(function () {
         imAgreementInitTable(

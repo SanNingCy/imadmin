@@ -8,6 +8,7 @@
     <div class="row">
         <div class="col-sm-12 search-collapse">
             <form id="balance-log-form">
+                <input type="hidden" name="uid"/>
                 <div class="select-list">
                     <ul>
                         <li>ID号：<input type="text" name="idno" placeholder="用户ID号"/></li>
@@ -48,6 +49,6 @@
 <th:block th:include="include :: footer" />
 <script th:src="@{/web4x/js/im-table.js}"></script>
 <script th:src="@{/web4x/js/im-dict.js}"></script>
-<script th:src="@{/web4x/js/im-balancelog.js}"></script>
+<script th:src="@{/web4x/js/im-balancelog.js?v=20260613}"></script>
 </body>
 </html>

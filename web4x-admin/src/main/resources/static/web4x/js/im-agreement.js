@@ -6,6 +6,8 @@
  */
 
 var imAgreementApi = ctx + "agreement/agreement";
+var imAgreementEditorReady = false;
+var imAgreementPendingContent = "";
 
 function imAgreementQueryParams(params) {
     var pageSize = params.limit;
@@ -13,6 +15,11 @@ function imAgreementQueryParams(params) {
     var query = imBuildPageQuery(pageNo, pageSize, params.sort, params.order);
     var formValues = $.common.formToJSON("agreement-form");
     return $.extend(query, imOmitEmptyParams(formValues));
+}
+
+function imAgreementPlainText(html) {
+    if (!html) return "";
+    return $("<div>").html(html).text();
 }
 
 function imAgreementEllipsis(val, max) {
@@ -38,22 +45,90 @@ function imAgreementInitModalDatetime() {
     });
 }
 
+function imAgreementInitEditor(readOnly) {
+    if (!imAgreementEditorReady) {
+        $("#agreement-content-editor").summernote({
+            height: 280,
+            lang: "zh-CN",
+            placeholder: "请输入协议内容",
+            followingToolbar: false,
+            dialogsInBody: true,
+            callbacks: {
+                onImageUpload: function (files) {
+                    imAgreementSendSummernoteFile(files[0], this);
+                }
+            }
+        });
+        imAgreementEditorReady = true;
+    }
+    if (readOnly) {
+        $("#agreement-content-editor").summernote("disable");
+    } else {
+        $("#agreement-content-editor").summernote("enable");
+    }
+}
+
+function imAgreementSendSummernoteFile(file, editor) {
+    var data = new FormData();
+    data.append("file", file);
+    $.ajax({
+        type: "POST",
+        url: ctx + "common/upload",
+        data: data,
+        cache: false,
+        contentType: false,
+        processData: false,
+        dataType: "json",
+        success: function (result) {
+            if (result.code === web_status.SUCCESS || result.code === 200) {
+                $(editor).summernote("insertImage", result.url, result.fileName || "image");
+            } else {
+                $.modal.alertError(result.msg || "图片上传失败");
+            }
+        },
+        error: function () {
+            $.modal.alertWarning("图片上传失败");
+        }
+    });
+}
+
+function imAgreementGetContent() {
+    if (imAgreementEditorReady) {
+        return $("#agreement-content-editor").summernote("code") || "";
+    }
+    return imAgreementPendingContent || "";
+}
+
 function imAgreementResetModalForm() {
     $("#agreement-id").val("");
     $("#agreement-title").val("");
-    $("#agreement-content").val("");
+    imAgreementPendingContent = "";
+    if (imAgreementEditorReady) {
+        $("#agreement-content-editor").summernote("code", "");
+    }
     $("#agreement-updateDate").val("");
 }
 
 function imAgreementFillModal(info) {
     $("#agreement-id").val(info.id || "");
     $("#agreement-title").val(info.title || "");
-    $("#agreement-content").val(info.content || "");
+    imAgreementPendingContent = info.content || "";
+    if (imAgreementEditorReady) {
+        $("#agreement-content-editor").summernote("code", imAgreementPendingContent);
+        imAgreementPendingContent = "";
+    }
     $("#agreement-updateDate").val(info.updateDate || "");
 }
 
 function imAgreementSetModalReadOnly(readOnly) {
     $("#agreement-modal-form :input").prop("disabled", readOnly);
+    if (imAgreementEditorReady) {
+        if (readOnly) {
+            $("#agreement-content-editor").summernote("disable");
+        } else {
+            $("#agreement-content-editor").summernote("enable");
+        }
+    }
 }
 
 function imAgreementShowLayerModal(mode, readOnly) {
@@ -61,12 +136,17 @@ function imAgreementShowLayerModal(mode, readOnly) {
     layer.open({
         type: 1,
         title: titles[mode] || "平台协议",
-        area: ["560px", "520px"],
+        area: ["760px", "90%"],
         shadeClose: true,
         content: $("#agreement-modal"),
         btn: readOnly ? ["关闭"] : ["保存", "取消"],
         success: function () {
             imAgreementInitModalDatetime();
+            imAgreementInitEditor(readOnly);
+            if (imAgreementPendingContent && imAgreementEditorReady) {
+                $("#agreement-content-editor").summernote("code", imAgreementPendingContent);
+                imAgreementPendingContent = "";
+            }
         },
         yes: function (index) {
             if (readOnly) {
@@ -119,7 +199,7 @@ function imAgreementSave(layerIndex) {
     var payload = {
         id: id,
         title: title,
-        content: $("#agreement-content").val(),
+        content: imAgreementGetContent(),
         updateDate: $.trim($("#agreement-updateDate").val()) || undefined
     };
 
@@ -174,7 +254,9 @@ function imAgreementInitTable(canView, canEdit) {
             {
                 field: "content",
                 title: "内容",
-                formatter: function (v) { return imAgreementEllipsis(v, 60); }
+                formatter: function (v) {
+                    return imAgreementEllipsis(imAgreementPlainText(v), 60);
+                }
             },
             { field: "updateDate", title: "更新时间", sortable: true },
             {

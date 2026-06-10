@@ -880,15 +880,34 @@ function imUserListBatchDelete() {
 
 
 
-function imUserListOpenTransaction() {
+function imUserListOpenTransaction(userId, idno) {
+    var queryParams = null;
+    if (userId) {
+        queryParams = { uid: userId };
+        if (idno) {
+            queryParams.idno = idno;
+        }
+    }
     var menuUrls = [
         ctx + "balancelog/balanceLog",
         ctx + "balance"
     ];
-    if (typeof openMenuPage === "function" && openMenuPage(menuUrls)) {
+    if (typeof openMenuPage === "function" && openMenuPage(menuUrls, queryParams)) {
         return;
     }
-    window.open(ctx + "balancelog/balanceLog", "_blank");
+    var url = ctx + "balancelog/balanceLog";
+    if (queryParams) {
+        var parts = [];
+        $.each(queryParams, function (key, val) {
+            if (val != null && val !== "") {
+                parts.push(encodeURIComponent(key) + "=" + encodeURIComponent(val));
+            }
+        });
+        if (parts.length) {
+            url += "?" + parts.join("&");
+        }
+    }
+    window.open(url, "_blank");
 }
 
 
@@ -910,6 +929,14 @@ function imUserListInitTable(canView, canEdit, canDelete, canChangeBalance, canT
         modalName: "用户",
 
         escape: false,
+
+        fixedColumns: true,
+
+        fixedRightNumber: 1,
+
+        operateWidth: 450,
+
+        operateMinWidth: 450,
 
         onPostBody: function () {
             imBindListMediaPreview($("#bootstrap-table"));
@@ -1007,9 +1034,13 @@ function imUserListInitTable(canView, canEdit, canDelete, canChangeBalance, canT
 
             {
 
+                field: "operate",
+
                 title: "操作",
 
                 align: "center",
+
+                width: 450,
 
                 formatter: function (value, row) {
 
@@ -1035,7 +1066,7 @@ function imUserListInitTable(canView, canEdit, canDelete, canChangeBalance, canT
 
                     if (canTransaction) {
 
-                        actions.push('<a class="btn btn-default btn-xs" href="javascript:void(0)" onclick="imUserListOpenTransaction()"><i class="fa fa-list"></i>交易明细</a>');
+                        actions.push('<a class="btn btn-default btn-xs" href="javascript:void(0)" onclick="imUserListOpenTransaction(\'' + row.id + '\',\'' + String(row.idno || "").replace(/'/g, "\\'") + '\')"><i class="fa fa-list"></i>交易明细</a>');
 
                     }
 

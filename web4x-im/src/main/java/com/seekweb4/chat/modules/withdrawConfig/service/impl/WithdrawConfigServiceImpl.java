@@ -1,5 +1,7 @@
 package com.seekweb4.chat.modules.withdrawConfig.service.impl;
 
+import com.seekweb4.chat.common.utils.OrderByUtils;
+import com.seekweb4.chat.common.utils.StringUtils;
 import com.seekweb4.chat.core.persistence.Page;
 import com.seekweb4.chat.modules.withdrawConfig.dto.WithdrawConfigQueryDto;
 import com.seekweb4.chat.modules.withdrawConfig.entity.WithdrawConfig;
@@ -24,6 +26,9 @@ public class WithdrawConfigServiceImpl implements WithdrawConfigService {
     @Override
     public Page<WithdrawConfig> page(WithdrawConfigQueryDto queryDto) {
         Page<WithdrawConfig> page = new Page<>(queryDto.getPageNo(), queryDto.getPageSize());
+        if (StringUtils.isNotBlank(queryDto.getOrderBy())) {
+            queryDto.setOrderBy(OrderByUtils.toUnderscoreColumn(queryDto.getOrderBy()));
+        }
         queryDto.setPageNo((queryDto.getPageNo() - 1) * queryDto.getPageSize());
         Long count = withdrawConfigMapper.selectAdminCount(queryDto);
         page.setCount(count);

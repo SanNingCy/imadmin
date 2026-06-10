@@ -57,6 +57,16 @@
         .ul-image-add.disabled { cursor: not-allowed; opacity: 0.6; }
         .ul-image-add input { display: none; }
 
+        /* 操作列固定右侧、单行展示（对齐 im-admin-web 用户列表） */
+        .user-list-table-wrap .bootstrap-table .fixed-table-container td.im-table-operate-cell,
+        .user-list-table-wrap .bootstrap-table .fixed-table-container th.im-table-operate-cell {
+            min-width: 450px;
+            white-space: nowrap;
+        }
+        .user-list-table-wrap .bootstrap-table .fixed-table-container td.im-table-operate-cell .btn {
+            margin: 0 4px 0 0;
+        }
+
     </style>
 
 </head>
@@ -457,9 +467,11 @@
 
 <th:block th:include="include :: footer" />
 
+<th:block th:include="include :: bootstrap-table-fixed-columns-js" />
+
 <script th:src="@{/web4x/js/im-table.js?v=20260605q}"></script>
 <script th:src="@{/web4x/js/im-piamom-common.js?v=20260611}"></script>
-<script th:src="@{/web4x/js/im-user-list.js?v=20260610}"></script>
+<script th:src="@{/web4x/js/im-user-list.js?v=20260613}"></script>
 <script th:inline="javascript">
     window.imFilePath = /*[[${@environment.getProperty('filePath', '')}]]*/ '';
     $(function () {
