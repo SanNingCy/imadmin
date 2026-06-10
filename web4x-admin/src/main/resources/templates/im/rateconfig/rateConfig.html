@@ -11,7 +11,7 @@
                 <div class="select-list">
                     <ul>
                         <li>id：<input type="text" name="id" placeholder="id号"/></li>
-                        <li>费率：<input type="text" name="rate" placeholder="费率"/></li>
+                        <li>费率：<input type="text" class="im-amount-input" name="rate" placeholder="费率"/></li>
                         <li>
                             费率类型：
                             <select name="paymentType">
@@ -22,7 +22,7 @@
                             </select>
                         </li>
                         <li>
-                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="imTableSearch('rate-config-form')"><i class="fa fa-search"></i>&nbsp;查询</a>
                             <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
                         </li>
                     </ul>

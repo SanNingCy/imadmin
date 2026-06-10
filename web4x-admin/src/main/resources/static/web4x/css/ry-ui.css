@@ -608,8 +608,10 @@ div.ztree-border {
 
 .select-time .time-input {
 	display: block;
-	width: 100%;
+	width: 175px;
+	min-width: 175px;
 	padding-left: 10px;
+	box-sizing: border-box;
 }
 
 label {
@@ -774,7 +776,9 @@ label {
 }
 
 .select-list .select-time input {
-	width: 93px;
+	width: 175px;
+	min-width: 175px;
+	box-sizing: border-box;
 }
 
 .select-time label,.select-time span,.select-time input {
@@ -786,7 +790,8 @@ label {
 	    float: none;
     }
     .select-list .select-time input {
-	    width: 200px;
+	    width: 175px;
+	    min-width: 175px;
     }
 }
 

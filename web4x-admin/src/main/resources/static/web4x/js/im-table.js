@@ -16,6 +16,75 @@ function imOmitEmptyParams(obj) {
     return result;
 }
 
+/** 金额/小数输入：仅保留数字与一个小数点 */
+function imSanitizeDecimalInput(value) {
+    if (value == null) {
+        return "";
+    }
+    var text = String(value).replace(/[^\d.]/g, "");
+    var dotIndex = text.indexOf(".");
+    if (dotIndex === -1) {
+        return text;
+    }
+    return text.slice(0, dotIndex + 1) + text.slice(dotIndex + 1).replace(/\./g, "");
+}
+
+/** 校验金额查询条件是否为合法小数 */
+function imIsValidDecimalInput(value) {
+    var text = $.trim(value == null ? "" : String(value));
+    if (text === "") {
+        return true;
+    }
+    return /^(\d+\.?\d*|\.\d+)$/.test(text);
+}
+
+/** 绑定金额搜索框：输入时过滤非法字符 */
+function imBindAmountInputs(container) {
+    var $scope = container ? $(container) : $(document);
+    $scope.find(".im-amount-input").each(function () {
+        var $input = $(this);
+        if ($input.data("imAmountBound")) {
+            return;
+        }
+        $input.data("imAmountBound", true);
+        $input.attr("inputmode", "decimal");
+        $input.on("input", function () {
+            var sanitized = imSanitizeDecimalInput(this.value);
+            if (sanitized !== this.value) {
+                this.value = sanitized;
+            }
+        });
+    });
+}
+
+/** 提交前校验表单内金额搜索框 */
+function imValidateAmountInputs(formId) {
+    if (!formId || !$("#" + formId).length) {
+        return true;
+    }
+    var invalid = [];
+    $("#" + formId + " .im-amount-input").each(function () {
+        if (!imIsValidDecimalInput($(this).val())) {
+            invalid.push(this);
+        }
+    });
+    if (invalid.length) {
+        $.modal.alertWarning("金额查询条件只能输入数字");
+        invalid[0].focus();
+        return false;
+    }
+    return true;
+}
+
+/** 带金额校验的列表查询 */
+function imTableSearch(formId, tableId, pageNumber, pageSize) {
+    formId = $.common.isEmpty(formId) ? $("form").attr("id") : formId;
+    if (!imValidateAmountInputs(formId)) {
+        return;
+    }
+    $.table.search(formId, tableId, pageNumber, pageSize);
+}
+
 /** HTML 转义，用于 title 属性 */
 function imEscapeHtml(text) {
     return String(text)
@@ -535,6 +604,9 @@ function imInitTable(options) {
         options.responseHandler = imPageResponse;
     }
     $.table.init(options);
+    if (options.formId) {
+        imBindAmountInputs("#" + options.formId);
+    }
 }
 
 /** IM 接口导出为 GET 直出文件流，与若依 POST+common/download 不同 */

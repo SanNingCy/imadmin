@@ -2,40 +2,7 @@
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
     <th:block th:include="include :: header('IM出金交易记录')" />
-    <style>
-        .transfer-fn-switch {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            margin-left: 8px;
-            padding: 4px 14px;
-            background: #f8f9fb;
-            border: 1px solid #e7eaec;
-            border-radius: 4px;
-            vertical-align: middle;
-            line-height: 32px;
-        }
-        .transfer-fn-switch .transfer-fn-text {
-            color: #676a6c;
-            font-weight: normal;
-            white-space: nowrap;
-            margin: 0;
-        }
-        .transfer-fn-switch .toggle-switch {
-            padding-top: 0;
-            margin-bottom: 0;
-        }
-        .transfer-fn-switch .transfer-fn-status {
-            display: inline-block;
-            min-width: 36px;
-            font-size: 12px;
-            color: #999;
-        }
-        .transfer-fn-switch .transfer-fn-status.is-on {
-            color: #1ab394;
-            font-weight: 600;
-        }
-    </style>
+    <th:block th:include="include :: im-transfer-fn-switch-css" />
 </head>
 <body class="gray-bg">
 <div class="container-div">
@@ -46,9 +13,9 @@
                     <ul>
                         <li>ID号：<input type="text" name="idno" placeholder="ID号"/></li>
                         <li>交易流水号：<input type="text" name="transactionNumber" placeholder="交易流水号"/></li>
-                        <li>实际到账金额：<input type="text" name="actualAmount" placeholder="实际到账金额"/></li>
-                        <li>转账金额：<input type="text" name="amount" placeholder="转账金额"/></li>
-                        <li>手续费金额：<input type="text" name="rateAmount" placeholder="手续费金额"/></li>
+                        <li>实际到账金额：<input type="text" class="im-amount-input" name="actualAmount" placeholder="实际到账金额"/></li>
+                        <li>转账金额：<input type="text" class="im-amount-input" name="amount" placeholder="转账金额"/></li>
+                        <li>手续费金额：<input type="text" class="im-amount-input" name="rateAmount" placeholder="手续费金额"/></li>
                         <li>
                             交易状态：
                             <select name="paymentStatus">
@@ -58,8 +25,8 @@
                             </select>
                         </li>
                         <li>
-                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
-                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="imTableSearch('payment-transaction-form')"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="imPaymentTransactionResetSearch()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
                         </li>
                         <li class="transfer-fn-switch" shiro:hasPermission="ops:system:features:edit">
                             <span class="transfer-fn-text">转账功能</span>
@@ -80,6 +47,7 @@
 </div>
 <th:block th:include="include :: footer" />
 <script th:src="@{/web4x/js/im-table.js}"></script>
+<script th:src="@{/web4x/js/im-transfer-fn.js}"></script>
 <script th:src="@{/web4x/js/im-payment-transaction.js}"></script>
 <script th:inline="javascript">
     $(function () {

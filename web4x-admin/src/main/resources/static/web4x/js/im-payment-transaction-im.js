@@ -2,8 +2,6 @@
  * IM 内部转账交易记录（接口：/admin/asset/paymentTransactionIm/*）
  */
 var imPaymentTransactionImApi = ctx + "admin/asset/paymentTransactionIm";
-var imButtonConfigApi = ctx + "buttonConfig/buttonConfig";
-var IM_TRANSFER_FN_KEY = "transfer";
 
 var IM_PAYMENT_TX_IM_STATUS = {
     "1": { text: "成功", cls: "success" },
@@ -16,19 +14,6 @@ function imPaymentTransactionImQueryParams(params) {
     var query = imBuildPageQuery(pageNo, pageSize, params.sort, params.order);
     var formValues = $.common.formToJSON("payment-transaction-im-form");
     return $.extend(query, imOmitEmptyParams(formValues));
-}
-
-function imPaymentTransactionImResolveEntity(res, key) {
-    if (!res) {
-        return {};
-    }
-    if (res[key]) {
-        return res[key];
-    }
-    if (res.data && res.data[key]) {
-        return res.data[key];
-    }
-    return {};
 }
 
 function imPaymentTransactionImFormatStatus(value) {
@@ -47,66 +32,8 @@ function imPaymentTransactionImFormatMoney(value) {
     return isNaN(num) ? value : num.toFixed(2);
 }
 
-function imPaymentTransactionImSetTransferFnLabel(enabled) {
-    $("#transfer-im-fn-label")
-        .text(enabled ? "开启" : "关闭")
-        .toggleClass("is-on", enabled);
-}
-
-function imPaymentTransactionImLoadTransferFn(canEditFn) {
-    if (!canEditFn) {
-        return;
-    }
-    $.ajax({
-        url: imButtonConfigApi + "/queryByButtonKey",
-        type: "GET",
-        data: { buttonKey: IM_TRANSFER_FN_KEY },
-        dataType: "json",
-        beforeSend: imTableBeforeSend,
-        success: function (res) {
-            if (res && (res.success === true || res.code === 200)) {
-                var cfg = imPaymentTransactionImResolveEntity(res, "buttonConfig");
-                var enabled = Number(cfg.buttonStatus) === 1;
-                $("#transfer-im-fn-toggle").prop("checked", enabled);
-                imPaymentTransactionImSetTransferFnLabel(enabled);
-            }
-        }
-    });
-}
-
-function imPaymentTransactionImBindTransferFn(canEditFn) {
-    if (!canEditFn) {
-        return;
-    }
-    $("#transfer-im-fn-toggle").on("change", function () {
-        var checked = $(this).is(":checked");
-        var self = this;
-        $.ajax({
-            url: imButtonConfigApi + "/updateKey",
-            type: "POST",
-            contentType: "application/json;charset=UTF-8",
-            data: JSON.stringify({
-                buttonKey: IM_TRANSFER_FN_KEY,
-                buttonName: "转账功能",
-                buttonStatus: checked ? "1" : "0"
-            }),
-            dataType: "json",
-            beforeSend: imTableBeforeSend,
-            success: function (res) {
-                if (res && (res.success === true || res.code === 200)) {
-                    imPaymentTransactionImSetTransferFnLabel(checked);
-                    $.modal.msgSuccess(res.msg || (checked ? "开启成功" : "关闭成功"));
-                } else {
-                    $(self).prop("checked", !checked);
-                    $.modal.alertWarning((res && res.msg) ? res.msg : "操作失败");
-                }
-            },
-            error: function () {
-                $(self).prop("checked", !checked);
-                $.modal.alertWarning("操作失败");
-            }
-        });
-    });
+function imPaymentTransactionImResetSearch() {
+    imTransferFnResetSearch("payment-transaction-im-form", "#transfer-im-fn-toggle", "#transfer-im-fn-label");
 }
 
 function imPaymentTransactionImInitTable() {
@@ -161,6 +88,5 @@ function imPaymentTransactionImInitTable() {
 }
 
 function imPaymentTransactionImInitPage(canEditFn) {
-    imPaymentTransactionImLoadTransferFn(canEditFn);
-    imPaymentTransactionImBindTransferFn(canEditFn);
+    imTransferFnInitPage(canEditFn, "#transfer-im-fn-toggle", "#transfer-im-fn-label");
 }
