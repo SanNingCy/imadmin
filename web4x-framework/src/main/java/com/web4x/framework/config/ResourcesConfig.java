@@ -45,6 +45,9 @@ public class ResourcesConfig implements WebMvcConfigurer
 
         /** swagger配置 */
         registry.addResourceHandler("/swagger-ui/**").addResourceLocations("classpath:/META-INF/resources/webjars/springfox-swagger-ui/");
+
+        /** 兼容误用 /libs/** 的静态资源路径（正确路径为 /ajax/libs/**） */
+        registry.addResourceHandler("/libs/**").addResourceLocations("classpath:/static/ajax/libs/");
     }
 
     /**

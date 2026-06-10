@@ -132,6 +132,7 @@ public class ImShiroConfig {
         filterRuleMap.put("/css/**", "anon");
         filterRuleMap.put("/js/**", "anon");
         filterRuleMap.put("/ajax/**", "anon");
+        filterRuleMap.put("/libs/**", "anon");
         filterRuleMap.put("/fonts/**", "anon");
         filterRuleMap.put("/img/**", "anon");
         filterRuleMap.put("/ruoyi/**", "anon");

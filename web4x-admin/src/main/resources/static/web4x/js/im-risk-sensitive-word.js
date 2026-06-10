@@ -172,6 +172,14 @@ function imRiskSensitiveWordSave(layerIndex, mode) {
     });
 }
 
+function imRiskSensitiveWordRemoveById(id) {
+    var row = imRiskSensitiveWordFindRow(id);
+    if (!row || !row.word) {
+        return $.modal.alertWarning("未找到记录");
+    }
+    imRiskSensitiveWordRemove(row.word);
+}
+
 function imRiskSensitiveWordRemove(word) {
     $.modal.confirm("确定删除该敏感词吗？", function () {
         $.ajax({
@@ -219,8 +227,8 @@ function imRiskSensitiveWordInitTable(canView, canEdit, canDelete) {
                     if (canEdit) {
                         actions.push('<a class="btn btn-success btn-xs" href="javascript:void(0)" onclick="imRiskSensitiveWordOpenById(\'edit\',\'' + row.id + '\')"><i class="fa fa-edit"></i>修改</a> ');
                     }
-                    if (canDelete && row.word) {
-                        actions.push('<a class="btn btn-danger btn-xs" href="javascript:void(0)" onclick="imRiskSensitiveWordRemove(' + JSON.stringify(String(row.word)) + ')"><i class="fa fa-remove"></i>删除</a>');
+                    if (canDelete && row.id) {
+                        actions.push('<a class="btn btn-danger btn-xs" href="javascript:void(0)" onclick="imRiskSensitiveWordRemoveById(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
                     }
                     return actions.length ? actions.join("") : "-";
                 }

@@ -93,11 +93,7 @@ function imAnnounceClearTargetUsers() {
 }
 
 function imAnnounceInitModalDatetime() {
-    $("#announce-modal .announce-datetime").datetimepicker({
-        format: "yyyy-mm-dd hh:ii:ss",
-        autoclose: true,
-        todayBtn: true
-    });
+    imBindLaydate("#announce-modal");
 }
 
 function imAnnounceInitEditor(readOnly) {

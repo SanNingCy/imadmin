@@ -594,6 +594,37 @@ function imResolveTableId(ctx) {
 }
 
 /**
+ * 弹窗内日期时间：若依 laydate（与列表搜索 time-input 一致，在 layer 打开后调用）
+ */
+function imBindLaydate(container) {
+    var $scope = container ? $(container) : $(document);
+    if (!$scope.length || typeof layui === 'undefined') {
+        return;
+    }
+    layui.use('laydate', function () {
+        var laydate = layui.laydate;
+        $scope.find('.time-input.im-modal-laydate').each(function () {
+            var $item = $(this);
+            if ($item.attr('data-laydate-bound') === '1') {
+                return;
+            }
+            $item.attr('data-laydate-bound', '1');
+            var type = $item.attr('data-type') || 'date';
+            var format = $item.attr('data-format')
+                || (type === 'datetime' ? 'yyyy-MM-dd HH:mm:ss' : 'yyyy-MM-dd');
+            laydate.render({
+                elem: this,
+                theme: 'molv',
+                trigger: 'click',
+                type: type,
+                format: format,
+                btns: ['clear', 'now', 'confirm']
+            });
+        });
+    });
+}
+
+/**
  * IM 列表页统一初始化（GET + AjaxJson 分页 + JWT 头）
  */
 function imInitTable(options) {

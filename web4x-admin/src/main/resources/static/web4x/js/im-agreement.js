@@ -38,11 +38,7 @@ function imAgreementResolveEntity(res, key) {
 }
 
 function imAgreementInitModalDatetime() {
-    $("#agreement-modal .agreement-datetime").datetimepicker({
-        format: "yyyy-mm-dd hh:ii:ss",
-        autoclose: true,
-        todayBtn: true
-    });
+    imBindLaydate("#agreement-modal");
 }
 
 function imAgreementInitEditor(readOnly) {

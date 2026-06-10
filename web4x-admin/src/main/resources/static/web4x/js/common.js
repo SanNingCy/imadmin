@@ -104,6 +104,9 @@ $(function() {
             var com = layui.laydate;
             $(".time-input").each(function (index, item) {
                 var time = $(item);
+                if (time.hasClass("im-modal-laydate") || time.attr("data-laydate-bound") === "1") {
+                    return;
+                }
                 if (time.attr("id") === "startTime" || time.attr("id") === "endTime") {
                     if ($(".select-time").length > 0) {
                         return;
