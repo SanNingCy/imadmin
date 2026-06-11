@@ -134,7 +134,7 @@ function imBaseShowModal(mode, readOnly) {
     layer.open({
         type: 1,
         title: mode === "edit" ? "修改基础配置" : "查看基础配置",
-        area: ["960px", "90%"],
+        area: ["780px", "auto"],
         shadeClose: true,
         content: $("#base-modal"),
         btn: readOnly ? ["关闭"] : ["保存", "取消"],

@@ -3,7 +3,25 @@
 <head>
     <th:block th:include="include :: header('基础平台配置')" />
     <style>
-        #base-modal .form-group { margin-bottom: 8px; }
+        #base-modal-form {
+            padding: 12px 18px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        #base-modal-form > .row {
+            margin-left: 0;
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+        #base-modal-form > .row > [class*="col-"] {
+            padding-left: 6px;
+            padding-right: 6px;
+        }
+        #base-modal-form .base-form-label {
+            padding-top: 7px;
+            text-align: right;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body class="gray-bg">
@@ -28,93 +46,69 @@
 </div>
 
 <div id="base-modal" style="display:none;">
-    <form id="base-modal-form" class="form-horizontal" style="padding:15px 20px;max-height:70vh;overflow-y:auto;">
+    <form id="base-modal-form">
         <input type="hidden" id="base-id"/>
         <div class="row">
+            <label class="col-sm-2 base-form-label control-label">登录方式：</label>
             <div class="col-sm-4">
-                <div class="form-group">
-                    <label class="col-sm-5 control-label">登录方式：</label>
-                    <div class="col-sm-7">
-                        <select class="form-control" id="base-loginType">
-                            <option value="">请选择</option>
-                            <option value="1">设备号登录</option>
-                            <option value="2">用户名密码登录</option>
-                            <option value="3">手机号密码登录</option>
-                            <option value="4">手机号、用户名密码登录</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-5 control-label">密保问题：</label>
-                    <div class="col-sm-7"><select class="form-control base-yesno" id="base-openMibao"></select></div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-5 control-label">红包功能：</label>
-                    <div class="col-sm-7"><select class="form-control base-yesno" id="base-openhb"></select></div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-5 control-label">转账功能：</label>
-                    <div class="col-sm-7"><select class="form-control base-yesno" id="base-openzz"></select></div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-5 control-label">语音通话：</label>
-                    <div class="col-sm-7"><select class="form-control base-yesno" id="base-tonghua"></select></div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-5 control-label">昵称敏感词：</label>
-                    <div class="col-sm-7"><input type="text" class="form-control" id="base-namemgc"/></div>
-                </div>
+                <select class="form-control" id="base-loginType">
+                    <option value="">请选择</option>
+                    <option value="1">设备号登录</option>
+                    <option value="2">用户名密码登录</option>
+                    <option value="3">手机号密码登录</option>
+                    <option value="4">手机号、用户名密码登录</option>
+                </select>
             </div>
+            <label class="col-sm-2 base-form-label control-label">签到方式：</label>
             <div class="col-sm-4">
-                <div class="form-group">
-                    <label class="col-sm-5 control-label">签到红包：</label>
-                    <div class="col-sm-7"><select class="form-control base-yesno" id="base-showsign"></select></div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-5 control-label">我的钱包：</label>
-                    <div class="col-sm-7"><select class="form-control base-yesno" id="base-showqianbao"></select></div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-5 control-label">设备注册数：</label>
-                    <div class="col-sm-7"><input type="number" class="form-control" id="base-eqcount" min="0"/></div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-5 control-label">智能客服key：</label>
-                    <div class="col-sm-7"><input type="text" class="form-control" id="base-aikey"/></div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-5 control-label">文件类型：</label>
-                    <div class="col-sm-7"><input type="text" class="form-control" id="base-filetype" placeholder="多种用|隔开"/></div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-5 control-label">签到方式：</label>
-                    <div class="col-sm-7">
-                        <select class="form-control" id="base-signtype">
-                            <option value="">请选择</option>
-                            <option value="1">随机发放</option>
-                            <option value="2">连签发放</option>
-                        </select>
-                    </div>
-                </div>
+                <select class="form-control" id="base-signtype">
+                    <option value="">请选择</option>
+                    <option value="1">随机发放</option>
+                    <option value="2">连签发放</option>
+                </select>
             </div>
-            <div class="col-sm-4">
-                <div class="form-group">
-                    <label class="col-sm-5 control-label">是否上线：</label>
-                    <div class="col-sm-7"><select class="form-control base-yesno" id="base-line"></select></div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-5 control-label">最多可加人：</label>
-                    <div class="col-sm-7"><input type="number" class="form-control" id="base-maxadd" min="0"/></div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-5 control-label">添加时间：</label>
-                    <div class="col-sm-7"><input type="text" class="form-control" id="base-createDate" readonly/></div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-5 control-label">更新时间：</label>
-                    <div class="col-sm-7"><input type="text" class="form-control" id="base-updateDate" readonly/></div>
-                </div>
-            </div>
+        </div>
+        <div class="row">
+            <label class="col-sm-2 base-form-label control-label">密保问题：</label>
+            <div class="col-sm-4"><select class="form-control base-yesno" id="base-openMibao"></select></div>
+            <label class="col-sm-2 base-form-label control-label">签到红包：</label>
+            <div class="col-sm-4"><select class="form-control base-yesno" id="base-showsign"></select></div>
+        </div>
+        <div class="row">
+            <label class="col-sm-2 base-form-label control-label">红包功能：</label>
+            <div class="col-sm-4"><select class="form-control base-yesno" id="base-openhb"></select></div>
+            <label class="col-sm-2 base-form-label control-label">我的钱包：</label>
+            <div class="col-sm-4"><select class="form-control base-yesno" id="base-showqianbao"></select></div>
+        </div>
+        <div class="row">
+            <label class="col-sm-2 base-form-label control-label">转账功能：</label>
+            <div class="col-sm-4"><select class="form-control base-yesno" id="base-openzz"></select></div>
+            <label class="col-sm-2 base-form-label control-label">设备注册数：</label>
+            <div class="col-sm-4"><input type="number" class="form-control" id="base-eqcount" min="0"/></div>
+        </div>
+        <div class="row">
+            <label class="col-sm-2 base-form-label control-label">语音通话：</label>
+            <div class="col-sm-4"><select class="form-control base-yesno" id="base-tonghua"></select></div>
+            <label class="col-sm-2 base-form-label control-label">智能客服key：</label>
+            <div class="col-sm-4"><input type="text" class="form-control" id="base-aikey"/></div>
+        </div>
+        <div class="row">
+            <label class="col-sm-2 base-form-label control-label">昵称敏感词：</label>
+            <div class="col-sm-4"><input type="text" class="form-control" id="base-namemgc"/></div>
+            <label class="col-sm-2 base-form-label control-label">文件类型：</label>
+            <div class="col-sm-4"><input type="text" class="form-control" id="base-filetype" placeholder="多种用|隔开"/></div>
+        </div>
+        <div class="row">
+            <label class="col-sm-2 base-form-label control-label">是否上线：</label>
+            <div class="col-sm-4"><select class="form-control base-yesno" id="base-line"></select></div>
+            <label class="col-sm-2 base-form-label control-label">最多可加人：</label>
+            <div class="col-sm-4"><input type="number" class="form-control" id="base-maxadd" min="0"/></div>
+        </div>
+        <div class="row">
+            <label class="col-sm-2 base-form-label control-label">添加时间：</label>
+            <div class="col-sm-4"><input type="text" class="form-control" id="base-createDate" readonly/></div>
+            <label class="col-sm-2 base-form-label control-label">更新时间：</label>
+            <div class="col-sm-4"><input type="text" class="form-control" id="base-updateDate" readonly/></div>
         </div>
     </form>
 </div>
