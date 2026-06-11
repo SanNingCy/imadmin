@@ -249,7 +249,7 @@ function imAgreementInitTable(canView, canEdit) {
                     if (!plain) return "-";
                     var truncated = plain.length > 60 ? plain.substring(0, 60) + "..." : plain;
                     var escaped = imEscapeHtml(truncated);
-                    var titleAttr = plain.length > 60 ? ' title="' + imEscapeHtml(plain.substring(0, 200)) + '"' : "";
+                    var titleAttr = plain.length > 60 ? ' title="' + imEscapeHtml(plain) + '"' : "";
                     return '<span' + titleAttr + '>' + escaped + '</span>';
                 }
             },
