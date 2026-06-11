@@ -4,9 +4,9 @@
     <th:block th:include="include :: header('广场热门配置')" />
     <th:block th:include="include :: summernote-css" />
     <style>
-        .piamom-table-wrap { overflow-x: auto; }
         #hot-config-modal .form-group { margin-bottom: 10px; }
-        #hot-config-complaintNotice-editor { min-height: 180px; }
+        #hot-config-complaintNotice-editor { min-height: 120px; }
+        #hot-config-modal .note-editor { margin-bottom: 0; }
     </style>
 </head>
 <body class="gray-bg">
@@ -26,7 +26,7 @@
     </div>
 </div>
 
-<div id="hot-config-modal" style="display:none;padding:15px 20px;max-height:560px;overflow-y:auto;">
+<div id="hot-config-modal" style="display:none;padding:15px 20px;">
     <form id="hot-config-modal-form">
         <input type="hidden" id="hot-config-id"/>
         <div class="form-group">
@@ -84,10 +84,11 @@
 </div>
 
 <th:block th:include="include :: footer" />
+<th:block th:include="include :: bootstrap-table-fixed-columns-js" />
 <th:block th:include="include :: summernote-js" />
 <script th:src="@{/web4x/js/im-table.js?v=20260605s}"></script>
-<script th:src="@{/web4x/js/im-piamom-common.js?v=20260605s}"></script>
-<script th:src="@{/web4x/js/im-piamom-square-hot-config.js?v=20260609}"></script>
+<script th:src="@{/web4x/js/im-piamom-common.js?v=20260619}"></script>
+<script th:src="@{/web4x/js/im-piamom-square-hot-config.js?v=20260618}"></script>
 <script th:inline="javascript">
     $(function () {
         imPiamomHotConfigInitTable(

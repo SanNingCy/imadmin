@@ -162,7 +162,7 @@ function imPiamomPublishQuotaRemove(id) {
 }
 
 function imPiamomPublishQuotaInitTable(canView, canEdit, canDelete) {
-    imInitTable({
+    imPiamomInitTable({
         url: imPiamomApi + "/squarePublishQuota/list",
         showSearch: false,
         pagination: false,

@@ -63,7 +63,7 @@ function imPiamomNotifyListOpenDetail(id) {
 }
 
 function imPiamomNotifyListInitTable(canView) {
-    imInitTable({
+    imPiamomInitTable({
         url: imPiamomApi + "/notify/page",
         formId: "piamom-notify-list-form",
         queryParams: imPiamomNotifyListQueryParams,

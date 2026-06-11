@@ -11,6 +11,7 @@ public class PiamomNotifyQueryDto extends PiamomAdminPageQueryDto {
     private String receiverId;
     private String receiverIdno;
     private String fromUserId;
+    private String fromUserIdno;
     private String msgType;
     private String targetType;
     private Integer isRead;

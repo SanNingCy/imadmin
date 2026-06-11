@@ -115,7 +115,7 @@ function imPiamomMomentListInitDrawerTables() {
     }
     imPiamomMomentListDrawerInited = true;
 
-    imInitTable({
+    imPiamomInitTable({
         id: "piamom-drawer-comment-table",
         url: imPiamomApi + "/moment/comment/page",
         showSearch: false,
@@ -136,7 +136,7 @@ function imPiamomMomentListInitDrawerTables() {
         ]
     });
 
-    imInitTable({
+    imPiamomInitTable({
         id: "piamom-drawer-like-table",
         url: imPiamomApi + "/moment/like/page",
         showSearch: false,
@@ -179,7 +179,7 @@ function imPiamomMomentListOpenInteractionDrawer(momentId) {
 }
 
 function imPiamomMomentListInitTable(canView, canEdit, canDelete) {
-    imInitTable(imApplyListMediaTableOptions({
+    imPiamomInitTable(imApplyListMediaTableOptions({
         url: imPiamomApi + "/moment/page",
         formId: "piamom-moment-list-form",
         queryParams: imPiamomMomentListQueryParams,

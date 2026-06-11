@@ -36,7 +36,7 @@ function imPiamomMomentCommentRemove(id) {
 }
 
 function imPiamomMomentCommentInitTable(canDelete) {
-    imInitTable({
+    imPiamomInitTable({
         url: imPiamomApi + "/moment/comment/page",
         formId: "piamom-moment-comment-form",
         queryParams: imPiamomMomentCommentQueryParams,

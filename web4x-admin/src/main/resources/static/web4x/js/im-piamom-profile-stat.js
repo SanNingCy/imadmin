@@ -125,7 +125,7 @@ function imPiamomProfileStatInitDrawerTables() {
     }
     imPiamomProfileStatDrawerInited = true;
 
-    imInitTable({
+    imPiamomInitTable({
         id: "pps-following-table",
         url: imPiamomApi + "/follow/page",
         showSearch: false,
@@ -155,7 +155,7 @@ function imPiamomProfileStatInitDrawerTables() {
         ]
     });
 
-    imInitTable({
+    imPiamomInitTable({
         id: "pps-follower-table",
         url: imPiamomApi + "/follow/page",
         showSearch: false,
@@ -185,7 +185,7 @@ function imPiamomProfileStatInitDrawerTables() {
         ]
     });
 
-    imInitTable({
+    imPiamomInitTable({
         id: "pps-blacklist-table",
         url: imPiamomApi + "/blacklist/page",
         showSearch: false,
@@ -215,7 +215,7 @@ function imPiamomProfileStatInitDrawerTables() {
         ]
     });
 
-    imInitTable({
+    imPiamomInitTable({
         id: "pps-like-table",
         url: imPiamomApi + "/user/likeRecord/page",
         showSearch: false,
@@ -283,7 +283,7 @@ function imPiamomProfileStatOpenDrawer(userId) {
 
 function imPiamomProfileStatInitTable(canView, canDelete) {
     imPiamomProfileStatCanDelete = !!canDelete;
-    imInitTable({
+    imPiamomInitTable({
         url: imPiamomApi + "/profileStat/page",
         formId: "piamom-profile-stat-form",
         queryParams: imPiamomProfileStatQueryParams,

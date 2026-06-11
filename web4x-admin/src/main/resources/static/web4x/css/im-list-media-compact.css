@@ -1,8 +1,9 @@
 /* 列表媒体列紧凑展示（固定行高，全局作用于 bootstrap-table） */
+/* 横向滚动交给 bootstrap-table .fixed-table-body，避免外层滚动导致操作列冻结失效 */
 .piamom-table-wrap,
 .moment-table-wrap,
 .group-info-table-wrap {
-    overflow-x: auto;
+    overflow-x: visible;
 }
 
 .bootstrap-table .piamom-media-cell--compact {
@@ -52,6 +53,7 @@
     padding: 0 4px;
     color: #337ab7;
     white-space: nowrap;
+    cursor: pointer;
 }
 
 .bootstrap-table .piamom-media-fallback {
@@ -84,4 +86,5 @@
     line-height: 72px;
     padding: 0 6px;
     color: #337ab7;
+    cursor: pointer;
 }

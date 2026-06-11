@@ -202,7 +202,7 @@ function imPiamomReportRecordInitDrawerTables() {
     }
     imPiamomReportRecordDrawerInited = true;
 
-    imInitTable({
+    imPiamomInitTable({
         id: "report-record-drawer-comment-table",
         url: imPiamomApi + "/moment/comment/page",
         showSearch: false,
@@ -221,7 +221,7 @@ function imPiamomReportRecordInitDrawerTables() {
         ]
     });
 
-    imInitTable({
+    imPiamomInitTable({
         id: "report-record-drawer-like-table",
         url: imPiamomApi + "/moment/like/page",
         showSearch: false,
@@ -277,7 +277,7 @@ function imPiamomReportRecordOpenInteractionDrawer(targetType, targetId) {
 
 function imPiamomReportRecordInitTable(canView, canAudit) {
     imPiamomReportRecordCanAudit = !!canAudit;
-    imInitTable(imApplyListMediaTableOptions({
+    imPiamomInitTable(imApplyListMediaTableOptions({
         url: imPiamomApi + "/reportRecord/page",
         formId: "piamom-report-record-form",
         queryParams: imPiamomReportRecordQueryParams,
