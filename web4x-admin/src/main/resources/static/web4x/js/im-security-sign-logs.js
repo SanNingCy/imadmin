@@ -32,7 +32,7 @@ function imSecuritySignLogsInitTable() {
         columns: [
             {
                 field: "u.idno",
-                title: "用户IDNO",
+                title: "用户ID号",
                 sortable: true,
                 formatter: function (value, row) {
                     if (row.u && row.u.idno) return row.u.idno;

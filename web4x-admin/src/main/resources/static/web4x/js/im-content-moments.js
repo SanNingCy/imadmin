@@ -105,7 +105,7 @@ function imContentMomentsInitTable(canView, canDelete) {
         columns: [
             {
                 field: "u.idno",
-                title: "用户IDNO",
+                title: "用户ID号",
                 sortable: true,
                 class: "moment-ellipsis",
                 formatter: function (value, row) {

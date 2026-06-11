@@ -965,7 +965,7 @@ function imUserListInitTable(canView, canEdit, canDelete, canChangeBalance, canT
 
                 field: "idno",
 
-                title: "idno",
+                title: "ID号",
 
                 sortable: true,
 

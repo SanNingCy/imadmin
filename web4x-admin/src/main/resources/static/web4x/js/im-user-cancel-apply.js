@@ -115,7 +115,7 @@ function imCancelApplyInitTable(canApprove, canReject) {
         columns: [
             { field: "eqid", title: "设备号", sortable: true },
             { field: "acc", title: "账号名", sortable: true },
-            { field: "idno", title: "id号", sortable: true },
+            { field: "idno", title: "ID号", sortable: true },
             { field: "state", title: "审核状态", sortable: true, formatter: imCancelApplyFormatState },
             { field: "reason", title: "驳回原因", sortable: true, formatter: function (v) { return imCancelApplyEllipsis(v); } },
             { field: "createDate", title: "申请时间", sortable: true },

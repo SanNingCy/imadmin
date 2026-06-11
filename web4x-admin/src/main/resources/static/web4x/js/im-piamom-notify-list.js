@@ -72,9 +72,9 @@ function imPiamomNotifyListInitTable(canView) {
         escape: false,
         columns: [
             { field: "id", title: "ID", sortable: true, width: 70 },
-            { field: "receiverIdno", title: "接收人IDNO", width: 110 },
+            { field: "receiverIdno", title: "接收人ID号", width: 110 },
             { field: "receiverNickname", title: "接收人昵称", width: 120, formatter: function (v) { return imFormatText(v, 16); } },
-            { field: "fromUserIdno", title: "触发人IDNO", width: 110 },
+            { field: "fromUserIdno", title: "触发人ID号", width: 110 },
             { field: "fromUserNickname", title: "触发人昵称", width: 120, formatter: function (v) { return imFormatText(v, 16); } },
             { field: "msgType", title: "消息类型", width: 140, formatter: imPiamomFormatNotifyMsgType },
             { field: "targetType", title: "对象类型", width: 90, formatter: imPiamomFormatNotifyTargetType },

@@ -46,7 +46,7 @@ function imPiamomSquareLikeInitTable(canDelete) {
             { field: "id", title: "ID", sortable: true, width: 80 },
             { field: "squareId", title: "帖子ID", sortable: true, width: 90 },
             { field: "userId", title: "用户ID", sortable: true, width: 160, formatter: function (v) { return imFormatText(v, 24); } },
-            { field: "userIdno", title: "IDNO", sortable: true, width: 110 },
+            { field: "userIdno", title: "ID号", sortable: true, width: 110 },
             { field: "userNickname", title: "昵称", sortable: true, width: 120 },
             { field: "createdAt", title: "时间", sortable: true, width: 160 },
             {

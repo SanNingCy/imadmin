@@ -233,7 +233,7 @@ function imCreditMgmtInitTable(canView, canEdit) {
         escape: false,
         modalName: "用户信用分",
         columns: [
-            { field: "idno", title: "idno", sortable: true, formatter: imCreditMgmtSafeFormat(function (v) { return imCreditEllipsis(v, 20); }) },
+            { field: "idno", title: "ID号", sortable: true, formatter: imCreditMgmtSafeFormat(function (v) { return imCreditEllipsis(v, 20); }) },
             { field: "lianghao", title: "靓号", sortable: true, formatter: imCreditMgmtSafeFormat(function (v) { return imCreditEllipsis(v, 20); }) },
             { field: "totalCreditScore", title: "总信用分", sortable: true, formatter: imCreditMgmtSafeFormat(imCreditFormatScore) },
             { field: "creditStatus", title: "信用分状态", sortable: true, formatter: imCreditMgmtSafeFormat(imCreditMgmtFormatCreditStatus) },

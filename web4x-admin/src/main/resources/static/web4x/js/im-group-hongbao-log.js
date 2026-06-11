@@ -112,7 +112,7 @@ function imGroupHongbaoLogInitTable() {
             },
             {
                 field: "group.idno",
-                title: "群组idno",
+                title: "群组ID号",
                 cellStyle: imGroupHongbaoLogEllipsisCell(100),
                 formatter: function (value, row) {
                     return imGroupHongbaoLogFormatNestedText(row, "group", "idno", 12);

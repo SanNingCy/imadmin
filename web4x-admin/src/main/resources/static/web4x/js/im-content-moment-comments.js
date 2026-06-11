@@ -75,7 +75,7 @@ function imContentMomentCommentsInitTable(canDelete) {
         columns: [
             {
                 field: "u.idno",
-                title: "用户IDNO",
+                title: "用户ID号",
                 sortable: true,
                 class: "comment-ellipsis",
                 formatter: function (value, row) {

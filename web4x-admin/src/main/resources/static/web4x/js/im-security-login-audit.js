@@ -75,7 +75,7 @@ function imSecurityLoginAuditInitTable(canView) {
         columns: [
             {
                 field: "u.idno",
-                title: "idno",
+                title: "ID号",
                 sortable: true,
                 formatter: function (value, row) {
                     return imSecurityLoginAuditNested(row, "idno");

@@ -19,7 +19,7 @@ function imGroupUpgradeLogsInitTable() {
         columns: [
             {
                 field: "u.idno",
-                title: "用户idno",
+                title: "用户ID号",
                 sortable: true,
                 formatter: function (value, row) {
                     return imGroupFormatNestedText(row, "u", "idno", 12);
@@ -41,7 +41,7 @@ function imGroupUpgradeLogsInitTable() {
             },
             {
                 field: "group.idno",
-                title: "群组idno",
+                title: "群组ID号",
                 sortable: true,
                 formatter: function (value, row) {
                     return imGroupFormatNestedText(row, "group", "idno", 12);

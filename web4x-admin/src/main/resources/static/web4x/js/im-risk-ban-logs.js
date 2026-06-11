@@ -107,7 +107,7 @@ function imRiskBanLogsInitTable(canBan, canUnban) {
         columns: [
             { checkbox: true },
             { field: "eqno", title: "设备号", sortable: true, class: "ban-log-ellipsis", formatter: imRiskBanLogsEllipsis },
-            { field: "idno", title: "id号", sortable: true, class: "ban-log-ellipsis", formatter: imRiskBanLogsEllipsis },
+            { field: "idno", title: "ID号", sortable: true, class: "ban-log-ellipsis", formatter: imRiskBanLogsEllipsis },
             { field: "nickname", title: "昵称", sortable: true },
             {
                 field: "icon",

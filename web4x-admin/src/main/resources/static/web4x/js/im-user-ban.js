@@ -118,7 +118,7 @@ function imUserBanInitTable(canBan, canUnban) {
             { field: "eqno", title: "设备号", sortable: true, width: 160, class: "ban-ellipsis", formatter: imUserBanFormatEllipsis },
             { field: "city", title: "地区", sortable: true, width: 100, class: "ban-ellipsis", formatter: imUserBanFormatEllipsis },
             { field: "acount", title: "账号", sortable: true, width: 120, class: "ban-ellipsis", formatter: imUserBanFormatEllipsis },
-            { field: "idno", title: "idno", sortable: true, width: 120, class: "ban-ellipsis", formatter: imUserBanFormatEllipsis },
+            { field: "idno", title: "ID号", sortable: true, width: 120, class: "ban-ellipsis", formatter: imUserBanFormatEllipsis },
             { field: "nickname", title: "昵称", sortable: true },
             {
                 field: "icon",

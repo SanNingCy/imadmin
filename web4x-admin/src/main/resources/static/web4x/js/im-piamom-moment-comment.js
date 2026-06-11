@@ -45,7 +45,7 @@ function imPiamomMomentCommentInitTable(canDelete) {
         columns: [
             { field: "id", title: "ID", sortable: true, width: 80 },
             { field: "momentId", title: "动态ID", sortable: true, width: 90 },
-            { field: "userIdno", title: "IDNO", sortable: true, width: 110 },
+            { field: "userIdno", title: "ID号", sortable: true, width: 110 },
             { field: "userNickname", title: "昵称", sortable: true, width: 120 },
             { field: "parentId", title: "父评论ID", sortable: true, width: 100 },
             { field: "content", title: "内容", sortable: true, cellStyle: imEllipsisCell(260), formatter: function (v) { return imFormatText(v, 50); } },

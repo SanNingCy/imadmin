@@ -138,9 +138,9 @@ function imPiamomProfileStatInitDrawerTables() {
         responseHandler: imPageResponse,
         columns: [
             { field: "id", title: "ID", width: 70 },
-            { field: "userIdno", title: "被关注者IDNO", width: 120 },
+            { field: "userIdno", title: "被关注者ID号", width: 120 },
             { field: "userNickname", title: "被关注者昵称", width: 120, formatter: function (v) { return imFormatText(v, 16); } },
-            { field: "followerIdno", title: "粉丝IDNO", width: 120 },
+            { field: "followerIdno", title: "粉丝ID号", width: 120 },
             { field: "createdAt", title: "时间", width: 150 },
             {
                 title: "操作",
@@ -168,8 +168,8 @@ function imPiamomProfileStatInitDrawerTables() {
         responseHandler: imPageResponse,
         columns: [
             { field: "id", title: "ID", width: 70 },
-            { field: "userIdno", title: "被关注者IDNO", width: 120 },
-            { field: "followerIdno", title: "粉丝IDNO", width: 120 },
+            { field: "userIdno", title: "被关注者ID号", width: 120 },
+            { field: "followerIdno", title: "粉丝ID号", width: 120 },
             { field: "followerNickname", title: "粉丝昵称", width: 120, formatter: function (v) { return imFormatText(v, 16); } },
             { field: "createdAt", title: "时间", width: 150 },
             {
@@ -198,8 +198,8 @@ function imPiamomProfileStatInitDrawerTables() {
         responseHandler: imPageResponse,
         columns: [
             { field: "id", title: "ID", width: 70 },
-            { field: "userIdno", title: "拉黑方IDNO", width: 120 },
-            { field: "blackUserIdno", title: "被拉黑IDNO", width: 120 },
+            { field: "userIdno", title: "拉黑方ID号", width: 120 },
+            { field: "blackUserIdno", title: "被拉黑ID号", width: 120 },
             { field: "blackUserNickname", title: "被拉黑昵称", width: 120, formatter: function (v) { return imFormatText(v, 16); } },
             { field: "createdAt", title: "时间", width: 150 },
             {
@@ -228,7 +228,7 @@ function imPiamomProfileStatInitDrawerTables() {
         responseHandler: imPageResponse,
         columns: [
             { field: "id", title: "ID", width: 70 },
-            { field: "fromUserIdno", title: "来源IDNO", width: 120 },
+            { field: "fromUserIdno", title: "来源ID号", width: 120 },
             { field: "fromUserNickname", title: "来源昵称", width: 120, formatter: function (v) { return imFormatText(v, 16); } },
             { field: "targetType", title: "对象类型", width: 100, formatter: imPiamomFormatTargetType },
             { field: "targetId", title: "对象ID", width: 90 },
@@ -292,7 +292,7 @@ function imPiamomProfileStatInitTable(canView, canDelete) {
         columns: [
             { field: "id", title: "ID", sortable: true, width: 80 },
             { field: "userId", title: "用户ID", sortable: true, width: 200, formatter: function (v) { return imFormatText(v, 24); } },
-            { field: "userIdno", title: "IDNO", width: 110 },
+            { field: "userIdno", title: "ID号", width: 110 },
             { field: "userNickname", title: "昵称", width: 120, formatter: function (v) { return imFormatText(v, 16); } },
             { field: "followerCount", title: "粉丝数", sortable: true, width: 90 },
             { field: "followingCount", title: "关注数", sortable: true, width: 90 },

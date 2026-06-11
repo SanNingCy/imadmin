@@ -19,7 +19,7 @@ function imGroupScheduledInitTable() {
         columns: [
             {
                 field: "group.idno",
-                title: "群组IDNO",
+                title: "群组ID号",
                 sortable: true,
                 formatter: function (value, row) {
                     return imGroupFormatNestedText(row, "group", "idno", 12);

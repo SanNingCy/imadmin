@@ -36,7 +36,7 @@ function imSecurityAccountChangeInitTable() {
         columns: [
             {
                 field: "u.idno",
-                title: "用户id号",
+                title: "用户ID号",
                 sortable: true,
                 formatter: function (value, row) {
                     return row.u && row.u.idno ? row.u.idno : "-";

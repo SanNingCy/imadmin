@@ -149,7 +149,7 @@ function imPiamomSquareListInitDrawerTables() {
         responseHandler: imPageResponse,
         columns: [
             { field: "id", title: "ID", width: 70 },
-            { field: "userIdno", title: "IDNO", width: 100 },
+            { field: "userIdno", title: "ID号", width: 100 },
             { field: "userNickname", title: "昵称", width: 100 },
             { field: "parentId", title: "父评论ID", width: 90 },
             { field: "content", title: "内容", formatter: function (v) { return imFormatText(v, 40); } },
@@ -171,7 +171,7 @@ function imPiamomSquareListInitDrawerTables() {
         columns: [
             { field: "id", title: "ID", width: 70 },
             { field: "userId", title: "用户ID", width: 160, formatter: function (v) { return imFormatText(v, 24); } },
-            { field: "userIdno", title: "IDNO", width: 100 },
+            { field: "userIdno", title: "ID号", width: 100 },
             { field: "userNickname", title: "昵称", width: 100 },
             { field: "createdAt", title: "时间", width: 150 }
         ]
@@ -208,7 +208,7 @@ function imPiamomSquareListInitTable(canView, canEdit, canDelete) {
         modalName: "广场帖子",
         columns: [
             { field: "id", title: "ID", sortable: true, width: 70 },
-            { field: "userIdno", title: "IDNO", sortable: true, width: 110 },
+            { field: "userIdno", title: "ID号", sortable: true, width: 110 },
             { field: "userNickname", title: "昵称", sortable: true, width: 120, formatter: function (v) { return imFormatText(v, 16); } },
             {
                 field: "content",

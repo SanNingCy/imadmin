@@ -36,7 +36,7 @@ function imMemberPickerOpen(title, onConfirm) {
                     responseHandler: imPageResponse,
                     columns: [
                         { radio: true },
-                        { field: "idno", title: "id号" },
+                        { field: "idno", title: "ID号" },
                         { field: "nickname", title: "昵称" },
                         { field: "lianghao", title: "靓号" }
                     ],

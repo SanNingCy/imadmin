@@ -173,7 +173,7 @@ function imUserFriendsInitTable(canDelete) {
         columns: [
             {
                 field: "u.idno",
-                title: "idno",
+                title: "ID号",
                 sortable: true,
                 formatter: function (val, row) {
                     return imUserFriendsFormatCopyIdno(imUserFriendsMemberField(row, "u", "idno") || val);

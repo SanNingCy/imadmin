@@ -41,7 +41,7 @@ function imLiveOrderInitTable() {
             },
             {
                 field: "tidnoGroup",
-                title: "群idNo",
+                title: "群ID号",
                 sortable: true,
                 formatter: function (val, row) {
                     return val || row.groupIdNo || "-";

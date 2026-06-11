@@ -19,7 +19,7 @@ function imGroupMemberInitTable() {
         columns: [
             {
                 field: "u.idno",
-                title: "用户IDNO",
+                title: "用户ID号",
                 sortable: true,
                 formatter: function (value, row) {
                     return imGroupFormatNestedText(row, "u", "idno", 12);
@@ -34,7 +34,7 @@ function imGroupMemberInitTable() {
             },
             {
                 field: "group.idno",
-                title: "群组IDNO",
+                title: "群组ID号",
                 sortable: true,
                 formatter: function (value, row) {
                     return imGroupFormatNestedText(row, "group", "idno", 12);

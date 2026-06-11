@@ -213,7 +213,7 @@ function imPiamomReportRecordInitDrawerTables() {
         responseHandler: imPageResponse,
         columns: [
             { field: "id", title: "ID", width: 70 },
-            { field: "userIdno", title: "IDNO", width: 100 },
+            { field: "userIdno", title: "ID号", width: 100 },
             { field: "userNickname", title: "昵称", width: 100 },
             { field: "parentId", title: "父评论ID", width: 90 },
             { field: "content", title: "内容", formatter: function (v) { return imFormatText(v, 40); } },
@@ -233,7 +233,7 @@ function imPiamomReportRecordInitDrawerTables() {
         columns: [
             { field: "id", title: "ID", width: 70 },
             { field: "userId", title: "用户ID", width: 160, formatter: function (v) { return imFormatText(v, 24); } },
-            { field: "userIdno", title: "IDNO", width: 100 },
+            { field: "userIdno", title: "ID号", width: 100 },
             { field: "userNickname", title: "昵称", width: 100 },
             { field: "createdAt", title: "时间", width: 150 }
         ]
@@ -285,7 +285,7 @@ function imPiamomReportRecordInitTable(canView, canAudit) {
         modalName: "举报记录",
         columns: [
             { field: "id", title: "ID", sortable: true, width: 70 },
-            { field: "reporterIdno", title: "举报人IDNO", width: 110 },
+            { field: "reporterIdno", title: "举报人ID号", width: 110 },
             { field: "reporterNickname", title: "举报人昵称", width: 120, formatter: function (v) { return imFormatText(v, 16); } },
             { field: "reportTypeName", title: "举报类型", width: 160, formatter: function (v) { return imFormatText(v, 20); } },
             { field: "reason", title: "原因", formatter: function (v) { return imFormatText(v, 30); } },
@@ -300,7 +300,7 @@ function imPiamomReportRecordInitTable(canView, canAudit) {
             { field: "targetType", title: "对象类型", width: 90, formatter: imPiamomFormatTargetType },
             { field: "targetId", title: "对象ID", width: 90 },
             { field: "auditStatus", title: "审核状态", width: 100, formatter: imPiamomFormatAuditStatus, escape: false },
-            { field: "publisherIdno", title: "发布者IDNO", width: 110 },
+            { field: "publisherIdno", title: "发布者ID号", width: 110 },
             { field: "postId", title: "帖子ID", width: 90 },
             {
                 field: "postStatus",
