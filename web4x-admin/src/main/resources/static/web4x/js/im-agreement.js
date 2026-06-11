@@ -17,17 +17,9 @@ function imAgreementQueryParams(params) {
     return $.extend(query, imOmitEmptyParams(formValues));
 }
 
-function imAgreementPlainText(html) {
-    if (!html) return "";
-    return $("<div>").html(html).text();
-}
-
 function imAgreementEllipsis(val, max) {
-    if (!val) return "";
-    var text = String(val);
-    max = max || 40;
-    var short = text.length > max ? text.substring(0, max) + "..." : text;
-    return '<span title="' + text.replace(/"/g, "&quot;") + '">' + short + "</span>";
+    if (!val) return "-";
+    return imFormatText(val, max || 40);
 }
 
 function imAgreementResolveEntity(res, key) {
@@ -250,8 +242,15 @@ function imAgreementInitTable(canView, canEdit) {
             {
                 field: "content",
                 title: "内容",
+                width: 400,
+                escape: false,
                 formatter: function (v) {
-                    return imAgreementEllipsis(imAgreementPlainText(v), 60);
+                    var plain = imHtmlToPlainText(v);
+                    if (!plain) return "-";
+                    var truncated = plain.length > 60 ? plain.substring(0, 60) + "..." : plain;
+                    var escaped = imEscapeHtml(truncated);
+                    var titleAttr = plain.length > 60 ? ' title="' + imEscapeHtml(plain.substring(0, 200)) + '"' : "";
+                    return '<span' + titleAttr + '>' + escaped + '</span>';
                 }
             },
             { field: "updateDate", title: "更新时间", sortable: true },

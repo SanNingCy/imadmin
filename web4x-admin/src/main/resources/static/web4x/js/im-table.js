@@ -95,6 +95,24 @@ function imEscapeHtml(text) {
         .replace(/>/g, "&gt;");
 }
 
+/** 富文本/HTML 转纯文本（列表展示用） */
+function imHtmlToPlainText(html) {
+    if (html == null || html === "") {
+        return "";
+    }
+    var text = $("<div>").html(String(html)).text() || "";
+    return text.replace(/\s+/g, " ").trim();
+}
+
+/** 富文本列表列：去 HTML 标签 + 截断 + 转义展示 */
+function imFormatHtmlText(html, maxLen, emptyText) {
+    var text = imHtmlToPlainText(html);
+    if (!text) {
+        return emptyText != null ? emptyText : "-";
+    }
+    return imFormatText(text, maxLen, emptyText);
+}
+
 /** 限制 td 宽度，防止长文本撑开表格 */
 function imEllipsisCell(maxWidth) {
     var width = imParseColumnWidth(maxWidth);
