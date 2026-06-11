@@ -107,12 +107,18 @@
 		        {
 		            field: 'startTimestamp',
 		            title: '登录时间',
-		            sortable: true
+		            sortable: true,
+		            formatter: function(value) {
+		                return $.common.dateFormat(value, 'yyyy-MM-dd HH:mm:ss');
+		            }
 		        },
 		        {
 		            field: 'lastAccessTime',
 		            title: '最后访问时间',
-		            sortable: true
+		            sortable: true,
+		            formatter: function(value) {
+		                return $.common.dateFormat(value, 'yyyy-MM-dd HH:mm:ss');
+		            }
 		        },
 		        {
 		            title: '操作',
