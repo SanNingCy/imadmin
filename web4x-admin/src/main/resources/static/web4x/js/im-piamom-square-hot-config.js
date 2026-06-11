@@ -12,7 +12,7 @@ var imPiamomHotConfigPendingComplaintNotice = "";
 function imPiamomHotConfigInitEditor(readOnly) {
     if (!imPiamomHotConfigEditorReady) {
         $("#hot-config-complaintNotice-editor").summernote({
-            height: 180,
+            height: 120,
             lang: "zh-CN",
             placeholder: "请输入举报页投诉说明",
             followingToolbar: false,
@@ -111,16 +111,18 @@ function imPiamomHotConfigShowModal(mode, readOnly) {
     layer.open({
         type: 1,
         title: titles[mode] || "热门配置",
-        area: ["760px", "90%"],
+        area: ["760px", "auto"],
         shadeClose: true,
         content: $("#hot-config-modal"),
         btn: readOnly ? ["关闭"] : ["保存", "取消"],
-        success: function () {
+        success: function (layero) {
             imPiamomHotConfigInitEditor(readOnly);
             if (imPiamomHotConfigPendingComplaintNotice && imPiamomHotConfigEditorReady) {
                 $("#hot-config-complaintNotice-editor").summernote("code", imPiamomHotConfigPendingComplaintNotice);
                 imPiamomHotConfigPendingComplaintNotice = "";
             }
+            var $content = layero.find(".layui-layer-content");
+            $content.css({ overflowY: "auto", maxHeight: Math.floor($(window).height() * 0.75) + "px" });
         },
         yes: function (index) {
             if (readOnly) {
@@ -257,7 +259,7 @@ function imPiamomHotConfigRemove(id) {
 }
 
 function imPiamomHotConfigInitTable(canView, canEdit, canDelete) {
-    imInitTable({
+    imPiamomInitTable({
         url: imPiamomApi + "/hotConfig/list",
         showSearch: false,
         pagination: false,

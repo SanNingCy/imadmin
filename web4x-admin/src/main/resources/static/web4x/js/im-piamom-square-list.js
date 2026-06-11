@@ -136,7 +136,7 @@ function imPiamomSquareListInitDrawerTables() {
     }
     imPiamomSquareListDrawerInited = true;
 
-    imInitTable({
+    imPiamomInitTable({
         id: "piamom-square-drawer-comment-table",
         url: imPiamomApi + "/square/comment/page",
         showSearch: false,
@@ -157,7 +157,7 @@ function imPiamomSquareListInitDrawerTables() {
         ]
     });
 
-    imInitTable({
+    imPiamomInitTable({
         id: "piamom-square-drawer-like-table",
         url: imPiamomApi + "/square/like/page",
         showSearch: false,
@@ -200,7 +200,7 @@ function imPiamomSquareListOpenInteractionDrawer(squareId) {
 }
 
 function imPiamomSquareListInitTable(canView, canEdit, canDelete) {
-    imInitTable(imApplyListMediaTableOptions({
+    imPiamomInitTable(imApplyListMediaTableOptions({
         url: imPiamomApi + "/square/page",
         formId: "piamom-square-list-form",
         queryParams: imPiamomSquareListQueryParams,

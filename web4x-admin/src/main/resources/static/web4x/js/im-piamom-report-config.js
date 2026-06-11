@@ -151,7 +151,7 @@ function imPiamomReportConfigRemove(id) {
 }
 
 function imPiamomReportConfigInitTable(canView, canEdit, canDelete) {
-    imInitTable({
+    imPiamomInitTable({
         url: imPiamomApi + "/reportConfig/list",
         showSearch: false,
         pagination: false,

@@ -2,7 +2,6 @@
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
     <th:block th:include="include :: header('广场点赞列表')" />
-    <style>.piamom-table-wrap { overflow-x: auto; }</style>
 </head>
 <body class="gray-bg">
 <div class="container-div">
@@ -29,8 +28,9 @@
 </div>
 
 <th:block th:include="include :: footer" />
+<th:block th:include="include :: bootstrap-table-fixed-columns-js" />
 <script th:src="@{/web4x/js/im-table.js?v=20260605s}"></script>
-<script th:src="@{/web4x/js/im-piamom-common.js?v=20260605s}"></script>
+<script th:src="@{/web4x/js/im-piamom-common.js?v=20260619}"></script>
 <script th:src="@{/web4x/js/im-piamom-square-like.js?v=20260605s}"></script>
 <script th:inline="javascript">
     $(function () {

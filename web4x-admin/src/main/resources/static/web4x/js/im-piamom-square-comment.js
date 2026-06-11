@@ -36,7 +36,7 @@ function imPiamomSquareCommentRemove(id) {
 }
 
 function imPiamomSquareCommentInitTable(canDelete) {
-    imInitTable({
+    imPiamomInitTable({
         url: imPiamomApi + "/square/comment/page",
         formId: "piamom-square-comment-form",
         queryParams: imPiamomSquareCommentQueryParams,

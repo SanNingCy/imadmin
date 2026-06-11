@@ -3,7 +3,6 @@
 <head>
     <th:block th:include="include :: header('用户主页统计')" />
     <style>
-        .piamom-table-wrap { overflow-x: auto; }
         .piamom-drawer-tabs { margin-bottom: 10px; }
         .piamom-drawer-tabs .tab-pane { padding-top: 10px; }
     </style>
@@ -15,7 +14,6 @@
             <form id="piamom-profile-stat-form">
                 <div class="select-list">
                     <ul>
-                        <li>用户ID：<input type="text" name="userId"/></li>
                         <li>ID号：<input type="text" name="userIdno"/></li>
                         <li>
                             <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
@@ -64,9 +62,10 @@
 </div>
 
 <th:block th:include="include :: footer" />
+<th:block th:include="include :: bootstrap-table-fixed-columns-js" />
 <script th:src="@{/web4x/js/im-table.js?v=20260605p}"></script>
-<script th:src="@{/web4x/js/im-piamom-common.js?v=20260605p}"></script>
-<script th:src="@{/web4x/js/im-piamom-profile-stat.js?v=20260605p}"></script>
+<script th:src="@{/web4x/js/im-piamom-common.js?v=20260619}"></script>
+<script th:src="@{/web4x/js/im-piamom-profile-stat.js?v=20260618}"></script>
 <script th:inline="javascript">
     $(function () {
         imPiamomProfileStatInitTable(

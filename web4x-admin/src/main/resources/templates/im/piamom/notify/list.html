@@ -3,7 +3,6 @@
 <head>
     <th:block th:include="include :: header('互动消息')" />
     <style>
-        .piamom-table-wrap { overflow-x: auto; }
         .piamom-detail-table td:first-child { width: 140px; font-weight: 600; background: #f9f9f9; }
     </style>
 </head>
@@ -76,9 +75,10 @@
 </div>
 
 <th:block th:include="include :: footer" />
+<th:block th:include="include :: bootstrap-table-fixed-columns-js" />
 <script th:src="@{/web4x/js/im-table.js?v=20260605n}"></script>
-<script th:src="@{/web4x/js/im-piamom-common.js?v=20260605n}"></script>
-<script th:src="@{/web4x/js/im-piamom-notify-list.js?v=20260605n}"></script>
+<script th:src="@{/web4x/js/im-piamom-common.js?v=20260619}"></script>
+<script th:src="@{/web4x/js/im-piamom-notify-list.js?v=20260618}"></script>
 <script th:inline="javascript">
     $(function () {
         imPiamomNotifyListInitTable([[${@permission.isPermitted('piamom:notify:list:view')}]]);

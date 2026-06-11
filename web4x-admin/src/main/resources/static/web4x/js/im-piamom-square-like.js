@@ -36,7 +36,7 @@ function imPiamomSquareLikeRemove(id) {
 }
 
 function imPiamomSquareLikeInitTable(canDelete) {
-    imInitTable({
+    imPiamomInitTable({
         url: imPiamomApi + "/square/like/page",
         formId: "piamom-square-like-form",
         queryParams: imPiamomSquareLikeQueryParams,

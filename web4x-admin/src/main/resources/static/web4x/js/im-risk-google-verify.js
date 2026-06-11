@@ -48,7 +48,7 @@ function imRiskGoogleVerifyReset(id) {
 }
 
 function imRiskGoogleVerifyInitTable(canReset) {
-    imInitTable({
+    imInitFixedOperateTable({
         url: imRiskGoogleVerifyApi + "/list",
         formId: "google-verify-form",
         queryParams: imRiskGoogleVerifyQueryParams,
@@ -63,8 +63,10 @@ function imRiskGoogleVerifyInitTable(canReset) {
             { field: "twoFactorTime", title: "谷歌验证码时间", sortable: true },
             { field: "createDate", title: "创建时间", sortable: true },
             {
+                field: "operate",
                 title: "操作",
                 align: "center",
+                width: 160,
                 formatter: function (value, row) {
                     if (!canReset) return "-";
                     return '<a class="btn btn-danger btn-xs" href="javascript:void(0)" onclick="imRiskGoogleVerifyReset(\'' + row.id + '\')"><i class="fa fa-refresh"></i>重置谷歌验证码</a>';

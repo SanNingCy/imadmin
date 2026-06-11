@@ -111,6 +111,11 @@ function imPiamomInitMediaEvents() {
         }
         imPiamomPreviewGallery(galleryId, index);
     });
+    $(document).on("click", ".piamom-video-link", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        imPiamomPreviewVideo($(this).attr("data-video-url"));
+    });
 }
 
 /** 表格/弹窗渲染后绑定图片 load error 回退 */
@@ -171,6 +176,15 @@ function imPiamomSetFormReadOnly($form, readOnly) {
     $form.find("input, select, textarea").prop("disabled", !!readOnly);
 }
 
+/** 判断媒体 URL 是否为视频（朋友圈 imageUrls 中可能混入视频地址） */
+function imPiamomIsVideoUrl(src) {
+    if (src == null || src === "") {
+        return false;
+    }
+    var path = String(src).split("?")[0].split("#")[0].toLowerCase();
+    return /\.(mp4|mov|webm|m4v|mkv|avi|flv|m3u8|3gp)$/.test(path);
+}
+
 /**
  * 图片列展示（对齐 im-admin-web MediaCell：flex 换行、展示全部缩略图、点击相册预览）
  * @param value imageUrls 字段值
@@ -182,40 +196,58 @@ function imPiamomFormatMedia(value, cacheKey, max) {
     if (!urls.length) {
         return "-";
     }
+    var items = urls.map(function (url) {
+        return {
+            type: imPiamomIsVideoUrl(url) ? "video" : "image",
+            url: url
+        };
+    });
+    var images = items.filter(function (item) { return item.type === "image"; }).map(function (item) { return item.url; });
     var compact = max != null && max > 0;
-    var display = urls;
+    var display = items;
     var overflow = 0;
-    var moreIndex = 0;
-    if (compact && urls.length > max) {
-        display = urls.slice(0, Math.max(max - 1, 1));
-        overflow = urls.length - display.length;
-        moreIndex = display.length;
+    if (compact && items.length > max) {
+        display = items.slice(0, Math.max(max - 1, 1));
+        overflow = items.length - display.length;
     } else if (compact) {
-        display = urls.slice(0, max);
+        display = items.slice(0, max);
     }
     var thumbSize = compact ? null : (display.length > 4 ? 40 : 48);
     var galleryId = cacheKey != null ? String(cacheKey) : ("g" + Date.now() + Math.random());
-    imPiamomMediaGalleryCache[galleryId] = urls;
+    imPiamomMediaGalleryCache[galleryId] = images;
     var safeGalleryId = imEscapeHtml(galleryId);
     var cellClass = "piamom-media-cell" + (compact ? " piamom-media-cell--compact" : "");
 
     var html = '<div class="' + cellClass + '">';
-    display.forEach(function (src, index) {
-        var safe = src.replace(/"/g, "&quot;");
+    var videoIndex = 0;
+    var shownImageCount = 0;
+    display.forEach(function (item) {
+        if (item.type === "video") {
+            html += imPiamomBuildVideoLink(item.url, videoIndex);
+            videoIndex += 1;
+            return;
+        }
+        var safe = item.url.replace(/"/g, "&quot;");
+        var galleryIndex = images.indexOf(item.url);
         var sizeStyle = thumbSize ? (' style="width:' + thumbSize + "px;height:" + thumbSize + 'px"') : "";
         html += '<img class="piamom-media-img" ' + sizeStyle
-            + ' src="' + safe + '" data-src="' + safe + '" data-gallery="' + safeGalleryId + '" data-index="' + index + '" '
+            + ' src="' + safe + '" data-src="' + safe + '" data-gallery="' + safeGalleryId + '" data-index="' + galleryIndex + '" '
             + 'referrerpolicy="no-referrer" loading="lazy" alt=""/>';
+        shownImageCount += 1;
     });
     if (overflow > 0) {
+        var moreIndex = shownImageCount;
+        if (moreIndex >= images.length) {
+            moreIndex = Math.max(images.length - 1, 0);
+        }
         html += '<span class="piamom-media-more" data-gallery="' + safeGalleryId + '" data-index="' + moreIndex
-            + '" title="共' + urls.length + '张，点击查看">+' + overflow + "</span>";
+            + '" title="共' + items.length + '个，点击查看">+' + overflow + "</span>";
     }
     html += "</div>";
     return html;
 }
 
-/** 缩略图加载失败时显示「查看」链接，新窗口打开原图 */
+/** 缩略图加载失败时显示「查看」：视频弹窗预览，图片新窗口打开 */
 function imPiamomMediaImgError(img, src) {
     if (!img || !src) {
         return;
@@ -223,12 +255,18 @@ function imPiamomMediaImgError(img, src) {
     img.onerror = null;
     img.style.display = "none";
     var link = document.createElement("a");
-    link.href = src;
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    link.className = "piamom-media-fallback";
     link.textContent = "查看";
     link.title = src;
+    if (imPiamomIsVideoUrl(src)) {
+        link.href = "javascript:void(0)";
+        link.className = "piamom-video-link";
+        link.setAttribute("data-video-url", src);
+    } else {
+        link.href = src;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.className = "piamom-media-fallback";
+    }
     if (img.parentNode) {
         img.parentNode.appendChild(link);
     }
@@ -295,6 +333,45 @@ function imPiamomPreviewImage(src) {
         return;
     }
     imPiamomPreviewImageLayer(src);
+}
+
+/** 视频弹窗预览（列表/详情中的「视频1」链接） */
+function imPiamomPreviewVideo(url) {
+    if (!url) {
+        return;
+    }
+    url = imPiamomNormalizeMediaUrl(url);
+    if (!url) {
+        return;
+    }
+    if (typeof layer === "undefined") {
+        window.open(url, "_blank", "noopener,noreferrer");
+        return;
+    }
+    var safeSrc = String(url).replace(/"/g, "&quot;");
+    layer.open({
+        type: 1,
+        title: "视频预览",
+        area: ["720px", "520px"],
+        shadeClose: true,
+        content: '<div style="padding:10px;background:#000;">'
+            + '<video controls autoplay playsinline style="width:100%;max-height:480px;display:block;" src="'
+            + safeSrc + '"></video></div>',
+        end: function () {
+            $(".layui-layer-content video").each(function () {
+                try {
+                    this.pause();
+                } catch (e) {
+                    // ignore
+                }
+            });
+        }
+    });
+}
+
+function imPiamomBuildVideoLink(src, index) {
+    var safe = String(src).replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    return '<a class="piamom-video-link" href="javascript:void(0)" data-video-url="' + safe + '">视频' + (index + 1) + "</a>";
 }
 
 function imPiamomBuildDrawerQueryParams(params, momentId) {
@@ -469,17 +546,23 @@ function imPiamomFormatSquareMedia(imageUrls, video, cacheKey, max) {
     }
     if (videos.length && imgHtml !== "-") {
         var links = videos.map(function (src, i) {
-            var safe = src.replace(/"/g, "&quot;");
-            return '<a class="piamom-video-link" href="' + safe + '" target="_blank" rel="noopener noreferrer">视频' + (i + 1) + "</a>";
+            return imPiamomBuildVideoLink(src, i);
         }).join(" ");
         return imgHtml.replace("</div>", links + "</div>");
     }
     if (videos.length) {
         var onlyLinks = videos.map(function (src, i) {
-            var safe = src.replace(/"/g, "&quot;");
-            return '<a class="piamom-video-link" href="' + safe + '" target="_blank" rel="noopener noreferrer">视频' + (i + 1) + "</a>";
+            return imPiamomBuildVideoLink(src, i);
         }).join(" ");
         return '<div class="piamom-media-cell">' + onlyLinks + "</div>";
     }
     return imgHtml;
+}
+
+/** 广场朋友圈列表：有操作列时冻结右侧，避免横向滚动找按钮 */
+function imPiamomInitTable(options) {
+    if (typeof imInitFixedOperateTable === "function") {
+        return imInitFixedOperateTable(options);
+    }
+    return imInitTable(options);
 }

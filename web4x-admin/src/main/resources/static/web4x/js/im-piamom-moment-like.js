@@ -36,7 +36,7 @@ function imPiamomMomentLikeRemove(id) {
 }
 
 function imPiamomMomentLikeInitTable(canDelete) {
-    imInitTable({
+    imPiamomInitTable({
         url: imPiamomApi + "/moment/like/page",
         formId: "piamom-moment-like-form",
         queryParams: imPiamomMomentLikeQueryParams,

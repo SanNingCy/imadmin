@@ -47,6 +47,10 @@ function imContentMomentsInitVideoEvents() {
 }
 
 function imContentMomentsOpenVideo(url) {
+    if (typeof imPiamomPreviewVideo === "function") {
+        imPiamomPreviewVideo(url);
+        return;
+    }
     if (!url || typeof layer === "undefined") {
         return;
     }

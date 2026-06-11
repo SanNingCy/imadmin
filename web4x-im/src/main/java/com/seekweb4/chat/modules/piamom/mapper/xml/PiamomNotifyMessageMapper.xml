@@ -25,6 +25,7 @@
             <if test="receiverId != null and receiverId != ''">and n.receiver_id = #{receiverId}</if>
             <if test="receiverIdno != null and receiverIdno != ''">and rm.idno like concat('%', #{receiverIdno}, '%')</if>
             <if test="fromUserId != null and fromUserId != ''">and n.from_user_id = #{fromUserId}</if>
+            <if test="fromUserIdno != null and fromUserIdno != ''">and fm.idno like concat('%', #{fromUserIdno}, '%')</if>
             <if test="msgType != null and msgType != ''">and n.msg_type = #{msgType}</if>
             <if test="targetType != null and targetType != ''">and n.target_type = #{targetType}</if>
             <if test="isRead != null">and n.is_read = #{isRead}</if>
@@ -50,6 +51,7 @@
     <select id="selectAdminCount" resultType="java.lang.Long">
         select count(1) from t_piamom_notify_message n
         left join t_member rm on rm.id = n.receiver_id
+        left join t_member fm on fm.id = n.from_user_id
         <include refid="adminWhere"/>
     </select>
 

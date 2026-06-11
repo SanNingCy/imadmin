@@ -64,8 +64,9 @@
 </div>
 
 <th:block th:include="include :: footer" />
-<script th:src="@{/web4x/js/im-table.js?v=20260605k}"></script>
-<script th:src="@{/web4x/js/im-risk-sensitive-word.js?v=20260613}"></script>
+<th:block th:include="include :: bootstrap-table-fixed-columns-js" />
+<script th:src="@{/web4x/js/im-table.js?v=20260622}"></script>
+<script th:src="@{/web4x/js/im-risk-sensitive-word.js?v=20260622}"></script>
 <script th:inline="javascript">
     $(function () {
         var canEdit = [[${@permission.isPermitted('risk:security:sensitive-word:edit')}]];
