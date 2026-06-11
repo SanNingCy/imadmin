@@ -205,7 +205,7 @@ function imRiskSensitiveWordRemove(word) {
 }
 
 function imRiskSensitiveWordInitTable(canView, canEdit, canDelete) {
-    imInitTable({
+    imInitFixedOperateTable({
         url: imRiskSensitiveWordApi + "/list",
         formId: "sensitive-word-form",
         queryParams: imRiskSensitiveWordQueryParams,
@@ -217,8 +217,10 @@ function imRiskSensitiveWordInitTable(canView, canEdit, canDelete) {
             { field: "createDate", title: "创建时间", sortable: true },
             { field: "updateDate", title: "更新时间", sortable: true },
             {
+                field: "operate",
                 title: "操作",
                 align: "center",
+                width: 260,
                 formatter: function (value, row) {
                     var actions = [];
                     if (canView) {

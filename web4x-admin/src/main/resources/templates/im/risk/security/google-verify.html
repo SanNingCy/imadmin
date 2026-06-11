@@ -2,9 +2,6 @@
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
     <th:block th:include="include :: header('用户谷歌安全验证')" />
-    <style>
-        .gv-table-wrap { overflow-x: auto; }
-    </style>
 </head>
 <body class="gray-bg">
 <div class="container-div">
@@ -40,8 +37,9 @@
 </div>
 
 <th:block th:include="include :: footer" />
-<script th:src="@{/web4x/js/im-table.js?v=20260605k}"></script>
-<script th:src="@{/web4x/js/im-risk-google-verify.js?v=20260605k}"></script>
+<th:block th:include="include :: bootstrap-table-fixed-columns-js" />
+<script th:src="@{/web4x/js/im-table.js?v=20260622}"></script>
+<script th:src="@{/web4x/js/im-risk-google-verify.js?v=20260622}"></script>
 <script th:inline="javascript">
     $(function () {
         imRiskGoogleVerifyInitTable([[${@permission.isPermitted('risk:security:google-verify:reset')}]]);

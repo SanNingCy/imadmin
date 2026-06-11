@@ -2,9 +2,6 @@
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
     <th:block th:include="include :: header('用户密保问题')" />
-    <style>
-        .sq-table-wrap { overflow-x: auto; }
-    </style>
 </head>
 <body class="gray-bg">
 <div class="container-div">
@@ -46,8 +43,9 @@
 </div>
 
 <th:block th:include="include :: footer" />
-<script th:src="@{/web4x/js/im-table.js?v=20260605k}"></script>
-<script th:src="@{/web4x/js/im-risk-security-question.js?v=20260605k}"></script>
+<th:block th:include="include :: bootstrap-table-fixed-columns-js" />
+<script th:src="@{/web4x/js/im-table.js?v=20260622}"></script>
+<script th:src="@{/web4x/js/im-risk-security-question.js?v=20260622}"></script>
 <script th:inline="javascript">
     $(function () {
         imRiskSecurityQuestionInitTable(

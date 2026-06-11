@@ -559,87 +559,10 @@ function imPiamomFormatSquareMedia(imageUrls, video, cacheKey, max) {
     return imgHtml;
 }
 
-function imPiamomIsOperateColumn(column) {
-    return !!(column && String(column.title || "").trim() === "操作");
-}
-
-function imPiamomHasOperateColumn(columns) {
-    if (!columns || !$.isArray(columns)) {
-        return false;
-    }
-    for (var i = 0; i < columns.length; i++) {
-        if (imPiamomIsOperateColumn(columns[i])) {
-            return true;
-        }
-    }
-    return false;
-}
-
-/** 冻结列插件依赖 data-field，操作列统一补 field: operate */
-function imPiamomNormalizeOperateColumns(columns) {
-    if (!columns || !$.isArray(columns)) {
-        return columns;
-    }
-    $.each(columns, function (_, col) {
-        if (!imPiamomIsOperateColumn(col) || col.field) {
-            return;
-        }
-        col.field = "operate";
-    });
-    return columns;
-}
-
-function imPiamomResolveOperateWidth(columns) {
-    if (!columns || !$.isArray(columns)) {
-        return null;
-    }
-    for (var i = 0; i < columns.length; i++) {
-        var col = columns[i];
-        if (!imPiamomIsOperateColumn(col)) {
-            continue;
-        }
-        if (typeof imParseColumnWidth === "function") {
-            var width = imParseColumnWidth(col.width);
-            if (width != null) {
-                return width;
-            }
-        }
-        return col.width != null ? col.width : null;
-    }
-    return null;
-}
-
 /** 广场朋友圈列表：有操作列时冻结右侧，避免横向滚动找按钮 */
 function imPiamomInitTable(options) {
-    options = options || {};
-    if (options.columns) {
-        options.columns = imPiamomNormalizeOperateColumns(options.columns);
-    }
-    if (options.fixedColumns == null && imPiamomHasOperateColumn(options.columns)) {
-        options.fixedColumns = true;
-        if (options.fixedRightNumber == null) {
-            options.fixedRightNumber = 1;
-        }
-        var operateWidth = imPiamomResolveOperateWidth(options.columns);
-        if (operateWidth != null) {
-            if (options.operateWidth == null) {
-                options.operateWidth = operateWidth;
-            }
-            if (options.operateMinWidth == null) {
-                options.operateMinWidth = operateWidth;
-            }
-        }
-        var tableId = options.id || "bootstrap-table";
-        var userOnPostBody = options.onPostBody;
-        options.onPostBody = function () {
-            if (typeof userOnPostBody === "function") {
-                userOnPostBody.apply(this, arguments);
-            }
-            var $table = $("#" + tableId);
-            if ($table.length && $table.data("bootstrap.table")) {
-                $table.bootstrapTable("resetView");
-            }
-        };
+    if (typeof imInitFixedOperateTable === "function") {
+        return imInitFixedOperateTable(options);
     }
     return imInitTable(options);
 }

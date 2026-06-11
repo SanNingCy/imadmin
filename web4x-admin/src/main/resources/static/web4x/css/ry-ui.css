@@ -936,6 +936,15 @@ label {
 	white-space: normal;
 }
 
+/** 列表可复制文本 */
+.im-copy-text {
+	cursor: pointer;
+	color: #1ab394;
+}
+.im-copy-text:hover {
+	text-decoration: underline;
+}
+
 /** 操作列全局加宽，避免按钮换行 */
 .select-table .bootstrap-table .fixed-table-container th.im-table-operate-cell,
 .select-table .bootstrap-table .fixed-table-container td.im-table-operate-cell {

@@ -642,6 +642,148 @@ function imBindLaydate(container) {
     });
 }
 
+var imCopyTextEventsBound = false;
+
+/** 复制文本到剪贴板 */
+function imCopyText(text) {
+    if (text == null || text === "") {
+        return;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(String(text)).then(function () {
+            $.modal.msgSuccess("复制成功");
+        }).catch(function () {
+            $.modal.msgWarning("复制失败");
+        });
+        return;
+    }
+    var input = document.createElement("textarea");
+    input.value = String(text);
+    document.body.appendChild(input);
+    input.select();
+    try {
+        document.execCommand("copy");
+        $.modal.msgSuccess("复制成功");
+    } catch (e) {
+        $.modal.msgWarning("复制失败");
+    }
+    document.body.removeChild(input);
+}
+
+/** 列表可复制文本（点击复制完整内容，展示可截断） */
+function imFormatCopyableText(val, maxLen) {
+    if (val == null || val === "") {
+        return "-";
+    }
+    var text = String(val);
+    var display = text;
+    if (maxLen && text.length > maxLen) {
+        display = text.substring(0, maxLen) + "...";
+    }
+    return '<span class="im-copy-text" data-copy-text="' + imEscapeHtml(text)
+        + '" title="点击复制：' + imEscapeHtml(text) + '">' + imEscapeHtml(display) + "</span>";
+}
+
+function imInitCopyTextEvents() {
+    if (imCopyTextEventsBound) {
+        return;
+    }
+    imCopyTextEventsBound = true;
+    $(document).on("click", ".im-copy-text", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        imCopyText($(this).attr("data-copy-text") || $(this).text());
+    });
+}
+
+function imIsOperateColumn(column) {
+    return !!(column && String(column.title || "").trim() === "操作");
+}
+
+function imHasOperateColumn(columns) {
+    if (!columns || !$.isArray(columns)) {
+        return false;
+    }
+    for (var i = 0; i < columns.length; i++) {
+        if (imIsOperateColumn(columns[i])) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/** 冻结列插件依赖 data-field，操作列统一补 field: operate */
+function imNormalizeOperateColumns(columns) {
+    if (!columns || !$.isArray(columns)) {
+        return columns;
+    }
+    $.each(columns, function (_, col) {
+        if (!imIsOperateColumn(col) || col.field) {
+            return;
+        }
+        col.field = "operate";
+    });
+    return columns;
+}
+
+function imResolveOperateColumnWidth(columns) {
+    if (!columns || !$.isArray(columns)) {
+        return null;
+    }
+    for (var i = 0; i < columns.length; i++) {
+        var col = columns[i];
+        if (!imIsOperateColumn(col)) {
+            continue;
+        }
+        var width = imParseColumnWidth(col.width);
+        if (width != null) {
+            return width;
+        }
+        return col.width != null ? col.width : null;
+    }
+    return null;
+}
+
+/** 有操作列时冻结右侧，避免横向滚动找按钮 */
+function imApplyFixedOperateTableOptions(options) {
+    options = options || {};
+    if (options.columns) {
+        options.columns = imNormalizeOperateColumns(options.columns);
+    }
+    if (options.fixedColumns == null && imHasOperateColumn(options.columns)) {
+        options.fixedColumns = true;
+        if (options.fixedRightNumber == null) {
+            options.fixedRightNumber = 1;
+        }
+        var operateWidth = imResolveOperateColumnWidth(options.columns);
+        if (operateWidth != null) {
+            if (options.operateWidth == null) {
+                options.operateWidth = operateWidth;
+            }
+            if (options.operateMinWidth == null) {
+                options.operateMinWidth = operateWidth;
+            }
+        }
+        var tableId = options.id || "bootstrap-table";
+        var userOnPostBody = options.onPostBody;
+        options.onPostBody = function () {
+            if (typeof userOnPostBody === "function") {
+                userOnPostBody.apply(this, arguments);
+            }
+            var $table = $("#" + tableId);
+            if ($table.length && $table.data("bootstrap.table")) {
+                $table.bootstrapTable("resetView");
+            }
+        };
+    }
+    return options;
+}
+
+function imInitFixedOperateTable(options) {
+    imInitCopyTextEvents();
+    return imInitTable(imApplyFixedOperateTableOptions(options || {}));
+}
+
 /**
  * IM 列表页统一初始化（GET + AjaxJson 分页 + JWT 头）
  */
@@ -865,6 +1007,7 @@ function imApplyListMediaTableOptions(options) {
         return;
     }
     var $ = jQuery;
+    imInitCopyTextEvents();
 
     var ruoyiInit = $.table.init;
     var ruoyiResponseHandler = $.table.responseHandler;

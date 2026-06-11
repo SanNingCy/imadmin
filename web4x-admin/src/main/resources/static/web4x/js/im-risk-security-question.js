@@ -162,7 +162,7 @@ function imRiskSecurityQuestionReset(memberId) {
 }
 
 function imRiskSecurityQuestionInitTable(canView, canEdit, canReset) {
-    imInitTable({
+    imInitFixedOperateTable({
         url: imRiskSecurityQuestionApi + "/list",
         formId: "security-question-form",
         queryParams: imRiskSecurityQuestionQueryParams,
@@ -180,8 +180,10 @@ function imRiskSecurityQuestionInitTable(canView, canEdit, canReset) {
             { field: "paypwd", title: "支付密码", sortable: true, class: "sq-ellipsis", formatter: function (v) { return imRiskSecurityQuestionEllipsis(v); } },
             { field: "createDate", title: "创建时间", sortable: true },
             {
+                field: "operate",
                 title: "操作",
                 align: "center",
+                width: 300,
                 formatter: function (value, row) {
                     var actions = [];
                     if (canView) {

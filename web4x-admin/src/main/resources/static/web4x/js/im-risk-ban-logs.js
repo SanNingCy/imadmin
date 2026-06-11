@@ -34,6 +34,10 @@ function imRiskBanLogsEllipsis(val) {
     return '<span class="ban-log-ellipsis-inner" title="' + text.replace(/"/g, "&quot;") + '">' + text + "</span>";
 }
 
+function imRiskBanLogsFormatEqno(val) {
+    return imFormatCopyableText(val, 28);
+}
+
 function imRiskBanLogsRequest(method, ids, successMsg) {
     $.ajax({
         url: imRiskBanLogsApi + (method === "feng" ? "/feng" : "/jie"),
@@ -94,7 +98,7 @@ function imRiskBanLogsBatchJie() {
 
 function imRiskBanLogsInitTable(canBan, canUnban) {
     imInitListMediaPreview();
-    imInitTable({
+    imInitFixedOperateTable({
         url: imRiskBanLogsApi + "/banList",
         formId: "ban-logs-form",
         queryParams: imRiskBanLogsQueryParams,
@@ -106,7 +110,7 @@ function imRiskBanLogsInitTable(canBan, canUnban) {
         },
         columns: [
             { checkbox: true },
-            { field: "eqno", title: "设备号", sortable: true, class: "ban-log-ellipsis", formatter: imRiskBanLogsEllipsis },
+            { field: "eqno", title: "设备号", sortable: true, class: "ban-log-ellipsis", formatter: imRiskBanLogsFormatEqno },
             { field: "idno", title: "ID号", sortable: true, class: "ban-log-ellipsis", formatter: imRiskBanLogsEllipsis },
             { field: "nickname", title: "昵称", sortable: true },
             {
@@ -127,8 +131,10 @@ function imRiskBanLogsInitTable(canBan, canUnban) {
             { field: "state", title: "状态", sortable: true, formatter: imRiskBanLogsFormatState },
             { field: "createDate", title: "注册时间", sortable: true },
             {
+                field: "operate",
                 title: "操作",
                 align: "center",
+                width: 100,
                 formatter: function (value, row) {
                     var actions = [];
                     var isNormal = String(row.state) === "0";
