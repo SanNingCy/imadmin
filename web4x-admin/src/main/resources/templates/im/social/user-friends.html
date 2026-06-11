@@ -1,134 +1,134 @@
-<!DOCTYPE html>
-<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
-<head>
-    <th:block th:include="include :: header('好友关系管理')" />
-    <style>
-        .user-friends-table-wrap { overflow-x: auto; }
-        .user-list-copy { cursor: pointer; color: #1ab394; }
-    </style>
-</head>
-<body class="gray-bg">
-<div class="container-div">
-    <div class="row">
-        <div class="col-sm-12 search-collapse">
-            <form id="user-friends-form">
-                <div class="select-list">
-                    <ul>
-                        <li>ID号：<input type="text" name="idno"/></li>
-                        <li>好友ID：<input type="text" name="friendId"/></li>
-                        <li>
-                            是否免打扰：
-                            <select name="mdr">
-                                <option value="">全部</option>
-                                <option value="1">是</option>
-                                <option value="0">否</option>
-                            </select>
-                        </li>
-                        <li>
-                            是否置顶：
-                            <select name="isTop">
-                                <option value="">全部</option>
-                                <option value="1">是</option>
-                                <option value="0">否</option>
-                            </select>
-                        </li>
-                        <li>
-                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
-                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
-                        </li>
-                    </ul>
-                </div>
-            </form>
-        </div>
-        <div class="btn-group-sm" id="toolbar" role="group">
-            <a class="btn btn-success" onclick="imUserFriendsOpenAdd()" shiro:hasPermission="social:user:friends:add">
-                <i class="fa fa-plus"></i> 添加好友
-            </a>
-        </div>
-        <div class="col-sm-12 select-table table-striped user-friends-table-wrap">
-            <table id="bootstrap-table"></table>
-        </div>
-    </div>
-</div>
-
-<!-- 添加好友 -->
-<div id="user-friends-add-modal" style="display:none;padding:15px 20px;">
-    <form id="user-friends-add-form" class="form-horizontal">
-        <input type="hidden" id="uf-user-id"/>
-        <input type="hidden" id="uf-friend-id"/>
-        <div class="form-group">
-            <label class="col-sm-3 control-label"><span class="text-danger">*</span> 用户：</label>
-            <div class="col-sm-8">
-                <div class="input-group">
-                    <input type="text" class="form-control" id="uf-user-label" readonly placeholder="请选择用户"/>
-                    <span class="input-group-btn">
-                        <button type="button" class="btn btn-default" onclick="imUserFriendsPickUser()"><i class="fa fa-search"></i></button>
-                    </span>
-                </div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-3 control-label"><span class="text-danger">*</span> 好友：</label>
-            <div class="col-sm-8">
-                <div class="input-group">
-                    <input type="text" class="form-control" id="uf-friend-label" readonly placeholder="请选择好友"/>
-                    <span class="input-group-btn">
-                        <button type="button" class="btn btn-default" onclick="imUserFriendsPickFriend()"><i class="fa fa-search"></i></button>
-                    </span>
-                </div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-3 control-label">是否免打扰：</label>
-            <div class="col-sm-8">
-                <select class="form-control" id="uf-mdr">
-                    <option value="">请选择</option>
-                    <option value="1">是</option>
-                    <option value="0">否</option>
-                </select>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-3 control-label">是否置顶：</label>
-            <div class="col-sm-8">
-                <select class="form-control" id="uf-isTop">
-                    <option value="">请选择</option>
-                    <option value="1">是</option>
-                    <option value="0">否</option>
-                </select>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-3 control-label">备注：</label>
-            <div class="col-sm-8"><textarea class="form-control" id="uf-bei" rows="3" maxlength="20"></textarea></div>
-        </div>
-    </form>
-</div>
-
-<!-- 用户单选弹窗（im-member-picker.js） -->
-<div id="im-member-picker-wrap" style="display:none;padding:12px 16px;">
-    <form id="im-member-picker-search-form" class="form-inline" style="margin-bottom:10px;">
-        <div class="form-group" style="margin-right:8px;">
-            <input type="text" class="form-control input-sm" name="idno" placeholder="ID号"/>
-        </div>
-        <div class="form-group" style="margin-right:8px;">
-            <input type="text" class="form-control input-sm" name="nickname" placeholder="昵称"/>
-        </div>
-        <button type="button" class="btn btn-primary btn-sm" onclick="imMemberPickerSearch()"><i class="fa fa-search"></i> 查询</button>
-    </form>
-    <table id="im-member-picker-table"></table>
-</div>
-
-<th:block th:include="include :: footer" />
-<script th:src="@{/web4x/js/im-table.js?v=20260605n}"></script>
-<script th:src="@{/web4x/js/im-member-picker.js?v=20260605n}"></script>
-<script th:src="@{/web4x/js/im-user-friends.js?v=20260605n}"></script>
-<script th:inline="javascript">
-    $(function () {
-        imUserFriendsInitTable(
-            [[${@permission.isPermitted('social:user:friends:delete')}]]
-        );
-    });
-</script>
-</body>
-</html>
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('好友关系管理')" />
+    <style>
+        .user-friends-table-wrap { overflow-x: auto; }
+        .user-list-copy { cursor: pointer; color: #1ab394; }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="user-friends-form">
+                <div class="select-list">
+                    <ul>
+                        <li>ID号：<input type="text" name="idno"/></li>
+                        <li>好友ID：<input type="text" name="friendId"/></li>
+                        <li>
+                            是否免打扰：
+                            <select name="mdr">
+                                <option value="">全部</option>
+                                <option value="1">是</option>
+                                <option value="0">否</option>
+                            </select>
+                        </li>
+                        <li>
+                            是否置顶：
+                            <select name="isTop">
+                                <option value="">全部</option>
+                                <option value="1">是</option>
+                                <option value="0">否</option>
+                            </select>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="imUserFriendsOpenAdd()" shiro:hasPermission="social:user:friends:add">
+                <i class="fa fa-plus"></i> 添加好友
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped user-friends-table-wrap">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<!-- 添加好友 -->
+<div id="user-friends-add-modal" style="display:none;padding:15px 20px;">
+    <form id="user-friends-add-form" class="form-horizontal">
+        <input type="hidden" id="uf-user-id"/>
+        <input type="hidden" id="uf-friend-id"/>
+        <div class="form-group">
+            <label class="col-sm-3 control-label"><span class="text-danger">*</span> 用户：</label>
+            <div class="col-sm-8">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="uf-user-label" readonly placeholder="请选择用户"/>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" onclick="imUserFriendsPickUser()"><i class="fa fa-search"></i></button>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label"><span class="text-danger">*</span> 好友：</label>
+            <div class="col-sm-8">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="uf-friend-label" readonly placeholder="请选择好友"/>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" onclick="imUserFriendsPickFriend()"><i class="fa fa-search"></i></button>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">是否免打扰：</label>
+            <div class="col-sm-8">
+                <select class="form-control" id="uf-mdr">
+                    <option value="">请选择</option>
+                    <option value="1">是</option>
+                    <option value="0">否</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">是否置顶：</label>
+            <div class="col-sm-8">
+                <select class="form-control" id="uf-isTop">
+                    <option value="">请选择</option>
+                    <option value="1">是</option>
+                    <option value="0">否</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">备注：</label>
+            <div class="col-sm-8"><textarea class="form-control" id="uf-bei" rows="3" maxlength="20"></textarea></div>
+        </div>
+    </form>
+</div>
+
+<!-- 用户单选弹窗（im-member-picker.js） -->
+<div id="im-member-picker-wrap" style="display:none;padding:12px 16px;">
+    <form id="im-member-picker-search-form" class="form-inline" style="margin-bottom:10px;">
+        <div class="form-group" style="margin-right:8px;">
+            <input type="text" class="form-control input-sm" name="idno" placeholder="ID号"/>
+        </div>
+        <div class="form-group" style="margin-right:8px;">
+            <input type="text" class="form-control input-sm" name="nickname" placeholder="昵称"/>
+        </div>
+        <button type="button" class="btn btn-primary btn-sm" onclick="imMemberPickerSearch()"><i class="fa fa-search"></i> 查询</button>
+    </form>
+    <table id="im-member-picker-table"></table>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js?v=20260605n}"></script>
+<script th:src="@{/web4x/js/im-member-picker.js?v=20260605n}"></script>
+<script th:src="@{/web4x/js/im-user-friends.js?v=20260611a}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imUserFriendsInitTable(
+            [[${@permission.isPermitted('social:user:friends:delete')}]]
+        );
+    });
+</script>
+</body>
+</html>

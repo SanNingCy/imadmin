@@ -25,6 +25,11 @@ public class WithdrawApplyQueryDto {
     private String userId;
 
     /**
+     * 会员ID号（用于通过idno查询）
+     */
+    private String idno;
+
+    /**
      * 提现交易号
      */
     private String transactionNumber;

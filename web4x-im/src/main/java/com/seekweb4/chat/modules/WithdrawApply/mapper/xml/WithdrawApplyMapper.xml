@@ -134,6 +134,9 @@
             <if test="userId != null and userId != ''">
                 and user_id = #{userId}
             </if>
+            <if test="idno != null and idno != ''">
+                and CAST(user_id AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_general_ci in (select CAST(id AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_general_ci from t_member where idno COLLATE utf8mb4_general_ci = CAST(#{idno} AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_general_ci)
+            </if>
             <if test="transactionNumber != null and transactionNumber != ''">
                 and transaction_number like concat('%', #{transactionNumber}, '%')
             </if>
@@ -178,6 +181,9 @@
             </if>
             <if test="userId != null and userId != ''">
                 and user_id = #{userId}
+            </if>
+            <if test="idno != null and idno != ''">
+                and CAST(user_id AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_general_ci in (select CAST(id AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_general_ci from t_member where idno COLLATE utf8mb4_general_ci = CAST(#{idno} AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_general_ci)
             </if>
             <if test="transactionNumber != null and transactionNumber != ''">
                 and transaction_number like concat('%', #{transactionNumber}, '%')

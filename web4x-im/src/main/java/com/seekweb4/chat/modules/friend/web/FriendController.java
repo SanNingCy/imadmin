@@ -71,7 +71,9 @@ public class FriendController extends BaseController {
 	public AjaxJson list(    Friend friend, HttpServletRequest request, HttpServletResponse response) {
 		// 清理查询参数：将空字符串转换为 null，避免影响查询
 		normalizeQueryParams(friend);
-		Page<Friend> page = friendService.findPage(new Page<Friend>(request, response), friend);
+		Page<Friend> page = new Page<Friend>(request, response);
+		sanitizeFriendOrderBy(page);
+		page = friendService.findPage(page, friend);
 		return AjaxJson.success().put("page",page);
 	}
 
@@ -284,5 +286,19 @@ public class FriendController extends BaseController {
 		}
     }
 
+	/** 好友关系列表仅允许按添加时间排序，避免大表多列排序导致性能问题 */
+	private void sanitizeFriendOrderBy(Page<Friend> page) {
+		String orderBy = page.getOrderBy();
+		if (StringUtils.isBlank(orderBy)) {
+			return;
+		}
+		String[] parts = orderBy.trim().split("\\s+");
+		if (parts.length == 0 || !"createDate".equals(parts[0])) {
+			page.setOrderBy("");
+			return;
+		}
+		String direction = parts.length > 1 && "asc".equalsIgnoreCase(parts[1]) ? "asc" : "desc";
+		page.setOrderBy("a.create_date " + direction);
+	}
 
 }
