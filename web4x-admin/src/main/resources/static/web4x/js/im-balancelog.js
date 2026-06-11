@@ -219,11 +219,6 @@ function imBalanceLogInitPage() {
         imBalanceLogFillTypeSelect(values);
         imBalanceLogApplyUrlUserFilter();
         imBalanceLogInitTable();
-        if ($("#balance-log-form input[name='uid']").val()) {
-            setTimeout(function () {
-                $.table.search();
-            }, 0);
-        }
     });
 }
 

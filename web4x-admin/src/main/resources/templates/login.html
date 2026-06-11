@@ -27,11 +27,11 @@
             <form id="signupForm" autocomplete="off">
                 <div class="login-field">
                     <label class="login-label" for="login-username">账号</label>
-                    <input type="text" id="login-username" name="username" class="form-control login-input" placeholder="请输入账号" value="admin"/>
+                    <input type="text" id="login-username" name="username" class="form-control login-input" placeholder="请输入账号" value=""/>
                 </div>
                 <div class="login-field">
                     <label class="login-label" for="login-password">密码</label>
-                    <input type="password" id="login-password" name="password" class="form-control login-input" placeholder="请输入密码" value="admin123"/>
+                    <input type="password" id="login-password" name="password" class="form-control login-input" placeholder="请输入密码" value=""/>
                 </div>
                 <div class="login-field" th:if="${captchaEnabled==true}">
                     <label class="login-label" for="login-captcha">验证码</label>
