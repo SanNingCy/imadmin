@@ -269,7 +269,7 @@ function imWithdrawApplyInitTable(canView, canReview) {
             {
                 field: "idno",
                 title: "ID号",
-                sortable: true,
+                sortable: false,
                 width: 90,
                 widthUnit: "px",
                 cellStyle: imWithdrawApplyEllipsisCell(90),
@@ -280,7 +280,7 @@ function imWithdrawApplyInitTable(canView, canReview) {
             {
                 field: "nickname",
                 title: "用户昵称",
-                sortable: true,
+                sortable: false,
                 width: 100,
                 widthUnit: "px",
                 cellStyle: imWithdrawApplyEllipsisCell(100),

@@ -24,6 +24,10 @@ var imUserListUploadApi = ctx + "sys/file/webupload/upload?uploadPath=member";
 
 var imUserListMemberMode = "view";
 
+var imUserListSaving = false;
+
+var imUserListBalanceSaving = false;
+
 
 
 function imUserListQueryParams(params) {
@@ -191,7 +195,7 @@ function imUserListInitMemberDatetime() {
 
 function imUserListSetMemberReadOnly(readOnly) {
 
-    $("#user-list-member-form input:not(#ul-idno):not(#ul-icon):not(#ul-qrcode), #user-list-member-form select, #user-list-member-form textarea").each(function () {
+    $("#user-list-member-form input:not(#ul-idno):not(#ul-icon), #user-list-member-form select, #user-list-member-form textarea").each(function () {
 
         var $el = $(this);
 
@@ -217,21 +221,19 @@ function imUserListSetMemberReadOnly(readOnly) {
 
     $("#ul-idno, #ul-balance").prop("readonly", true);
 
-    $("#ul-icon-add-btn, #ul-qrcode-add-btn").toggleClass("disabled", readOnly);
+    $("#ul-icon-add-btn").toggleClass("disabled", readOnly);
 
-    $("#ul-icon-add-btn input, #ul-qrcode-add-btn input").prop("disabled", readOnly);
+    $("#ul-icon-add-btn input").prop("disabled", readOnly);
 
-    $(".ul-image-remove").toggle(!readOnly);
+    $("#ul-icon-preview .ul-image-remove").toggle(!readOnly);
 
     if (readOnly) {
 
-        $("#ul-icon-add-btn, #ul-qrcode-add-btn").hide();
+        $("#ul-icon-add-btn").hide();
 
     } else {
 
-        $("#ul-icon-add-btn").toggle(!$("#ul-icon").val());
-
-        $("#ul-qrcode-add-btn").toggle(!$("#ul-qrcode").val());
+        $("#ul-icon-add-btn").toggle(!$("#ul-icon").val()).show();
 
     }
 
@@ -411,8 +413,6 @@ function imUserListFillMemberForm(info) {
 
     imUserListRefreshImageField("icon", info.icon || "");
 
-    imUserListRefreshImageField("qrcode", info.qrcode || "");
-
     $("#ul-mbname").val(info.mbname || "");
 
     $("#ul-mbda").val(info.mbda || "");
@@ -425,7 +425,7 @@ function imUserListFillMemberForm(info) {
 
 function imUserListCollectMemberPayload() {
 
-    return {
+    var payload = {
 
         id: $("#user-list-member-id").val(),
 
@@ -447,8 +447,6 @@ function imUserListCollectMemberPayload() {
 
         icon: $("#ul-icon").val(),
 
-        qrcode: $("#ul-qrcode").val(),
-
         mbname: $("#ul-mbname").val(),
 
         mbda: $("#ul-mbda").val(),
@@ -456,6 +454,8 @@ function imUserListCollectMemberPayload() {
         eqid: $("#ul-eqid").val()
 
     };
+
+    return payload;
 
 }
 
@@ -489,7 +489,7 @@ function imUserListOpenMember(id, mode) {
 
             imUserListFillMemberForm(imUserListResolveEntity(res, "member"));
 
-            imUserListSetMemberReadOnly(mode === "view");
+            imUserListSetMemberReadOnly(mode === "view", mode === "edit");
 
             var title = mode === "view" ? "查看用户" : "修改用户";
 
@@ -561,6 +561,12 @@ function imUserListOpenMember(id, mode) {
 
 function imUserListSaveMember(layerIndex) {
 
+    if (imUserListSaving) {
+
+        return;
+
+    }
+
     var payload = imUserListCollectMemberPayload();
 
     if (!payload.nickname) {
@@ -579,13 +585,7 @@ function imUserListSaveMember(layerIndex) {
 
     }
 
-    if (!payload.qrcode) {
-
-        $.modal.alertWarning("请上传名片二维码");
-
-        return;
-
-    }
+    imUserListSaving = true;
 
     $.ajax({
 
@@ -616,6 +616,12 @@ function imUserListSaveMember(layerIndex) {
                 $.modal.alertWarning((res && res.msg) ? res.msg : "保存失败");
 
             }
+
+        },
+
+        complete: function () {
+
+            imUserListSaving = false;
 
         },
 
@@ -675,6 +681,14 @@ function imUserListOpenBalance(id) {
 
             }
 
+            if (imUserListBalanceSaving) {
+
+                return;
+
+            }
+
+            imUserListBalanceSaving = true;
+
             $.ajax({
 
                 url: imUserListApi + "/changeMoney",
@@ -712,6 +726,12 @@ function imUserListOpenBalance(id) {
                         $.modal.alertWarning((res && res.msg) ? res.msg : "变更失败");
 
                     }
+
+                },
+
+                complete: function () {
+
+                    imUserListBalanceSaving = false;
 
                 },
 

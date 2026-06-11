@@ -46,8 +46,8 @@ function imPaymentTransactionInitTable() {
         queryParams: imPaymentTransactionQueryParams,
         columns: [
             { field: "id", title: "ID", sortable: true },
-            { field: "idno", title: "ID号", sortable: true },
-            { field: "nickname", title: "用户昵称", sortable: true },
+            { field: "idno", title: "ID号", sortable: false },
+            { field: "nickname", title: "用户昵称", sortable: false },
             { field: "transactionNumber", title: "交易流水号", sortable: true },
             {
                 field: "actualAmount",

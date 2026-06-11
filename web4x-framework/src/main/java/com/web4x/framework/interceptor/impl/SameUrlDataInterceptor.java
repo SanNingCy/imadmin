@@ -1,12 +1,16 @@
 package com.web4x.framework.interceptor.impl;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.springframework.web.util.WebUtils;
 import com.web4x.common.annotation.RepeatSubmit;
 import com.web4x.common.json.JSON;
+import com.web4x.common.utils.StringUtils;
 import com.web4x.framework.interceptor.RepeatSubmitInterceptor;
 
 /**
@@ -28,8 +32,8 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
     @Override
     public boolean isRepeatSubmit(HttpServletRequest request, RepeatSubmit annotation) throws Exception
     {
-        // 本次参数及系统时间
-        String nowParams = JSON.marshal(request.getParameterMap());
+        // 本次参数及系统时间（JSON 请求体一并参与比对，避免连续点击重复提交）
+        String nowParams = buildRepeatParams(request);
         Map<String, Object> nowDataMap = new HashMap<String, Object>();
         nowDataMap.put(REPEAT_PARAMS, nowParams);
         nowDataMap.put(REPEAT_TIME, System.currentTimeMillis());
@@ -79,5 +83,30 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
             return true;
         }
         return false;
+    }
+
+    private String buildRepeatParams(HttpServletRequest request) throws Exception
+    {
+        String paramMap = JSON.marshal(request.getParameterMap());
+        String body = extractRequestBody(request);
+        if (StringUtils.isEmpty(body))
+        {
+            return paramMap;
+        }
+        return paramMap + "|" + body;
+    }
+
+    private String extractRequestBody(HttpServletRequest request)
+    {
+        HttpServletRequest wrapper = WebUtils.getNativeRequest(request, ContentCachingRequestWrapper.class);
+        if (wrapper instanceof ContentCachingRequestWrapper cachingRequest)
+        {
+            byte[] content = cachingRequest.getContentAsByteArray();
+            if (content.length > 0)
+            {
+                return new String(content, StandardCharsets.UTF_8);
+            }
+        }
+        return "";
     }
 }

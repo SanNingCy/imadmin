@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
 
 import cn.wildfirechat.sdk.UserAdmin;
+import com.web4x.common.annotation.RepeatSubmit;
 import com.seekweb4.chat.api.utils.MemberUtils;
 import com.seekweb4.chat.api.utils.QrCodeUtil;
 import com.seekweb4.chat.api.utils.yehuo.ImUtils;
@@ -260,6 +261,7 @@ public class MemberController extends BaseController {
 	 * 保存移动端用户
 	 */
 	@ApiLog("保存移动端用户")
+	@RepeatSubmit
 	@RequiresPermissions(value={"social:user:list:add","social:user:list:edit"},logical=Logical.OR)
 //	@RequiresPermissions(value={"member:member:add","member:member:edit"},logical=Logical.OR)
 	@PostMapping(value = "save", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -314,9 +316,14 @@ public class MemberController extends BaseController {
 				}
 			}
 		}
-		// 清理前端可能传入的带域名的路径，避免把 http(s)://api-fat.seekweb4.net 写入库
-		member.setQrcode(stripDomain(member.getQrcode()));
-		member.setQrcode2(stripDomain(member.getQrcode2()));
+		// 编辑已有用户时不更新名片/登录二维码，避免展示用绝对路径被误写回库
+		if (!member.getIsNewRecord()) {
+			member.setQrcode(null);
+			member.setQrcode2(null);
+		} else {
+			member.setQrcode(stripDomain(member.getQrcode()));
+			member.setQrcode2(stripDomain(member.getQrcode2()));
+		}
 		//新增或编辑表单保存
 		memberService.save(member);//保存
 		// 同步昵称与头像到野火 IM，聊天会话/好友列表读的是 IM portrait 不是 t_member.icon
@@ -538,6 +545,7 @@ public class MemberController extends BaseController {
 	 * @return
 	 * @throws Exception
 	 */
+	@RepeatSubmit
 	@PostMapping(value = "changeMoney", produces = MediaType.APPLICATION_JSON_VALUE)
 	public AjaxJson changeMoney(@RequestBody Member member) throws Exception{
 		Member mm = memberService.get(member.getId());

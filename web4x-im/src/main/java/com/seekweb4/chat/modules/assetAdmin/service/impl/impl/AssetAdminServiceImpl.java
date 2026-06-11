@@ -49,6 +49,19 @@ public class AssetAdminServiceImpl implements AssetAdminService {
             "payment_address", "receiving_address", "payment_status", "create_time", "update_time"
     )));
 
+    /** t_payment_transaction 表真实列，不含关联会员后填充的 idno、nickname */
+    private static final Set<String> PAYMENT_TRANSACTION_ORDER_COLUMNS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+            "id", "user_id", "transaction_number", "actual_amount", "amount", "rate_amount",
+            "payment_status", "rate_info", "payment_address", "receiving_address",
+            "customer_user_name", "customer_uid", "customer_user_id", "is_interior", "create_time", "update_time"
+    )));
+
+    /** t_withdraw_apply 表真实列，不含关联会员后填充的 idno、nickname */
+    private static final Set<String> WITHDRAW_APPLY_ORDER_COLUMNS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+            "id", "user_id", "transaction_number", "coinid", "actual_amount", "amount", "rate_amount",
+            "withdrawal_id", "status", "receiving_address", "remark", "withdrawal_hash", "create_time", "update_time"
+    )));
+
     @Autowired
     private PaymentRateConfigMapper paymentRateConfigMapper;
 
@@ -280,12 +293,10 @@ public class AssetAdminServiceImpl implements AssetAdminService {
         // 设置分页参数
         queryDto.setPageNo((queryDto.getPageNo() - 1) * queryDto.getPageSize());
 
-        // 转换orderBy字段：将驼峰命名转换为下划线命名（数据库列名）
         if (StringUtils.isNotBlank(queryDto.getOrderBy())) {
-            String convertedOrderBy = convertOrderByToUnderscore(queryDto.getOrderBy());
-            queryDto.setOrderBy(convertedOrderBy);
+            queryDto.setOrderBy(OrderByUtils.sanitizeOrderBy(queryDto.getOrderBy(), PAYMENT_TRANSACTION_ORDER_COLUMNS));
         }
-        
+
         // 查询总数
         Long count = paymentTransactionMapper.selectAdminCount(queryDto);
         page.setCount(count);
@@ -333,10 +344,8 @@ public class AssetAdminServiceImpl implements AssetAdminService {
         // 设置分页参数
         queryDto.setPageNo((queryDto.getPageNo() - 1) * queryDto.getPageSize());
 
-        // 转换orderBy字段：将驼峰命名转换为下划线命名（数据库列名）
         if (StringUtils.isNotBlank(queryDto.getOrderBy())) {
-            String convertedOrderBy = convertOrderByToUnderscore(queryDto.getOrderBy());
-            queryDto.setOrderBy(convertedOrderBy);
+            queryDto.setOrderBy(OrderByUtils.sanitizeOrderBy(queryDto.getOrderBy(), WITHDRAW_APPLY_ORDER_COLUMNS));
         }
 
         // 查询总数
@@ -612,10 +621,8 @@ public class AssetAdminServiceImpl implements AssetAdminService {
         // 设置分页参数
         queryDto.setPageNo((queryDto.getPageNo() - 1) * queryDto.getPageSize());
 
-        // 转换orderBy字段：将驼峰命名转换为下划线命名（数据库列名）
         if (StringUtils.isNotBlank(queryDto.getOrderBy())) {
-            String convertedOrderBy = convertOrderByToUnderscore(queryDto.getOrderBy());
-            queryDto.setOrderBy(convertedOrderBy);
+            queryDto.setOrderBy(OrderByUtils.sanitizeOrderBy(queryDto.getOrderBy(), PAYMENT_TRANSACTION_ORDER_COLUMNS));
         }
 
         // 查询总数
