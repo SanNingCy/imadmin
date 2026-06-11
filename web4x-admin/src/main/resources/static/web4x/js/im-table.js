@@ -634,6 +634,11 @@ function imInitTable(options) {
     if (!options.responseHandler) {
         options.responseHandler = imPageResponse;
     }
+    if (!options.formatLoadingMessage) {
+        options.formatLoadingMessage = function () {
+            return '正在加载数据，请稍候...';
+        };
+    }
     $.table.init(options);
     if (options.formId) {
         imBindAmountInputs("#" + options.formId);

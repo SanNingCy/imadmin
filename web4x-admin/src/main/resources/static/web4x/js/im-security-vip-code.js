@@ -331,38 +331,39 @@ function imSecurityVipCodeRemove(id) {
 }
 
 function imSecurityVipCodeInitTable(canView, canEdit, canDelete) {
-    imSecurityVipCodeLoadKeyCardTypes(function () {
-        imInitTable({
+    imInitTable({
             url: imSecurityVipCodeApi + "/list",
             formId: "vip-code-form",
             queryParams: imSecurityVipCodeQueryParams,
             responseHandler: imPageResponse,
             modalName: "会员码",
+            sortName: "createDate",
+            sortOrder: "desc",
             columns: [
-                { field: "typeName", title: "类型名称", sortable: true },
-                { field: "code", title: "兑换码", sortable: true },
-                { field: "day", title: "会员天数", sortable: true },
+                { field: "typeName", title: "类型名称", sortable: false },
+                { field: "code", title: "兑换码", sortable: false },
+                { field: "day", title: "会员天数", sortable: false },
                 {
                     field: "isdui",
                     title: "是否已被兑换",
-                    sortable: true,
+                    sortable: false,
                     formatter: function (v) { return imSecurityVipCodeFormatYesNo(v); }
                 },
                 {
                     field: "u.idno",
                     title: "用户",
-                    sortable: true,
+                    sortable: false,
                     formatter: function (value, row) {
                         return row.u && row.u.nickname ? row.u.nickname : "-";
                     }
                 },
-                { field: "idno", title: "用户ID", sortable: true },
+                { field: "idno", title: "用户ID", sortable: false },
                 {
                     field: "syncStatus",
                     title: "同步状态",
                     formatter: function (v) { return imSecurityVipCodeFormatSyncStatus(v); }
                 },
-                { field: "duiTime", title: "兑换时间", sortable: true },
+                { field: "duiTime", title: "兑换时间", sortable: false },
                 { field: "createDate", title: "添加时间", sortable: true },
                 {
                     title: "操作",
@@ -383,5 +384,5 @@ function imSecurityVipCodeInitTable(canView, canEdit, canDelete) {
                 }
             ]
         });
-    });
+    imSecurityVipCodeLoadKeyCardTypes();
 }

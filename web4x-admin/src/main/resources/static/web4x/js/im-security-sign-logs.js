@@ -29,11 +29,13 @@ function imSecuritySignLogsInitTable() {
         queryParams: imSecuritySignLogsQueryParams,
         responseHandler: imPageResponse,
         modalName: "签到记录",
+        sortName: "createDate",
+        sortOrder: "desc",
         columns: [
             {
                 field: "u.idno",
                 title: "用户ID号",
-                sortable: true,
+                sortable: false,
                 formatter: function (value, row) {
                     if (row.u && row.u.idno) return row.u.idno;
                     return row.idno || "-";
@@ -42,7 +44,7 @@ function imSecuritySignLogsInitTable() {
             {
                 field: "u.nickname",
                 title: "用户",
-                sortable: true,
+                sortable: false,
                 formatter: function (value, row) {
                     if (row.u && row.u.nickname) return row.u.nickname;
                     return row.nickname || "-";
@@ -51,11 +53,11 @@ function imSecuritySignLogsInitTable() {
             {
                 field: "isSign",
                 title: "是否签到",
-                sortable: true,
+                sortable: false,
                 formatter: function (v) { return imSecuritySignLogsFormatYesNo(v); }
             },
-            { field: "money", title: "金额", sortable: true },
-            { field: "date", title: "日期", sortable: true },
+            { field: "money", title: "金额", sortable: false },
+            { field: "date", title: "日期", sortable: false },
             { field: "createDate", title: "创建时间", sortable: true }
         ]
     });

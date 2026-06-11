@@ -214,11 +214,12 @@ function imBalanceLogInitTable() {
 }
 
 function imBalanceLogInitPage() {
+    imBalanceLogApplyUrlUserFilter();
+    imBalanceLogInitTable();
     imBalanceLogLoadTypeDict(function (values) {
         imBalanceLogBuildTypeLabelMap(values);
         imBalanceLogFillTypeSelect(values);
-        imBalanceLogApplyUrlUserFilter();
-        imBalanceLogInitTable();
+        $("#bootstrap-table").bootstrapTable("refresh");
     });
 }
 

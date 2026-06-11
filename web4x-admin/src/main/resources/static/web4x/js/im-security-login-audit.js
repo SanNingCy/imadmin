@@ -72,11 +72,13 @@ function imSecurityLoginAuditInitTable(canView) {
         queryParams: imSecurityLoginAuditQueryParams,
         responseHandler: imPageResponse,
         modalName: "登录记录",
+        sortName: "createDate",
+        sortOrder: "desc",
         columns: [
             {
                 field: "u.idno",
                 title: "ID号",
-                sortable: true,
+                sortable: false,
                 formatter: function (value, row) {
                     return imSecurityLoginAuditNested(row, "idno");
                 }
@@ -92,13 +94,13 @@ function imSecurityLoginAuditInitTable(canView) {
             {
                 field: "u.lianghao",
                 title: "靓号",
-                sortable: true,
+                sortable: false,
                 formatter: function (value, row) {
                     return imSecurityLoginAuditNested(row, "lianghao");
                 }
             },
-            { field: "ip", title: "ip地址", sortable: true },
-            { field: "ipcity", title: "城市", sortable: true },
+            { field: "ip", title: "ip地址", sortable: false },
+            { field: "ipcity", title: "城市", sortable: false },
             { field: "createDate", title: "创建时间", sortable: true },
             {
                 title: "操作",
