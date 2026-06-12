@@ -73,7 +73,8 @@
         a.receiving_Address as receivingAddress,
         a.two_factor_code as twoFactorCode,
         a.point_total as pointTotal,
-        a.two_factor_time as twoFactorTime
+        a.two_factor_time as twoFactorTime,
+        ll.last_login_date AS "lastLoginDate"
     </sql>
 
     <sql id="memberJoins">

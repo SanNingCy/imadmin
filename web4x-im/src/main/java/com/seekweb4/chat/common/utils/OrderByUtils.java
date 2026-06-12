@@ -1,5 +1,6 @@
 package com.seekweb4.chat.common.utils;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
@@ -13,6 +14,12 @@ public final class OrderByUtils {
     private static final Set<String> CAMEL_CASE_COLUMN_WHITELIST = Collections.unmodifiableSet(new HashSet<>(
             Collections.singletonList("coinId")
     ));
+
+    /** 用户列表可排序列（t_member 及登录聚合 ll） */
+    private static final Set<String> MEMBER_LIST_ORDER_COLUMNS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+            "eqno", "city", "idno", "lianghao", "endtime", "nickname", "sex", "sign", "state",
+            "balance", "isvip", "viptime", "create_date", "last_login_date", "model"
+    )));
 
     private OrderByUtils() {
     }
@@ -82,5 +89,16 @@ public final class OrderByUtils {
             }
         }
         return result.toString();
+    }
+
+    /**
+     * 用户列表排序：驼峰转下划线，白名单校验；最近登录时间走登录日志聚合别名 ll。
+     */
+    public static String sanitizeMemberListOrderBy(String orderBy) {
+        String sanitized = sanitizeOrderBy(orderBy, MEMBER_LIST_ORDER_COLUMNS);
+        if (StringUtils.isBlank(sanitized)) {
+            return "";
+        }
+        return sanitized.replaceAll("(?i)\\blast_login_date\\b", "ll.last_login_date");
     }
 }

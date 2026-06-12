@@ -13,6 +13,7 @@ import com.seekweb4.chat.api.utils.yehuo.ImUtils;
 import com.seekweb4.chat.common.utils.DateUtils;
 import com.seekweb4.chat.common.utils.IdGen;
 import com.seekweb4.chat.common.utils.MD5Util;
+import com.seekweb4.chat.common.utils.OrderByUtils;
 import com.seekweb4.chat.common.utils.StringUtils;
 import com.seekweb4.chat.config.properties.AppProperites;
 import com.seekweb4.chat.modules.balancelog.entity.BalanceLog;
@@ -76,6 +77,9 @@ public class MemberService extends CrudService<MemberMapper, Member> {
     }
 
     public Page<Member> findPage(Page<Member> page, Member member) {
+        if (page != null) {
+            page.setOrderBy(OrderByUtils.sanitizeMemberListOrderBy(page.getOrderBy()));
+        }
         return super.findPage(page, member);
     }
 
