@@ -22,6 +22,8 @@ public class SocialUserFriendsViewController {
 
     @RequiresPermissions(value = {
             "social:user:friends:view",
+            "social:user:friends:add",
+            "social:user:friends:delete",
             "friend:friend:list", "friend:friend:view"
     }, logical = Logical.OR)
     @GetMapping(value = {"", "/"})

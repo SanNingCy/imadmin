@@ -1,5 +1,6 @@
 package com.web4x.web.controller.im;
 
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +15,15 @@ public class ImBalanceLogViewController {
 
     private static final String PREFIX = "im/balancelog";
 
-    @RequiresPermissions("asset:fund:balance:view")
+    @RequiresPermissions(value = {
+            "asset:fund:balance:view",
+            "asset:fund:withdraw:view",
+            "asset:fund:payment:view",
+            "rechagelog:rechageLog:list",
+            "asset:fund:deposit:approved",
+            "asset:fund:deposit:reject",
+            "asset:fund:deposit:lock"
+    }, logical = Logical.OR)
     @GetMapping()
     public String balanceLog() {
         return PREFIX + "/balanceLog";

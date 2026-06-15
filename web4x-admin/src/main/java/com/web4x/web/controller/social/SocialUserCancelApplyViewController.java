@@ -1,5 +1,6 @@
 package com.web4x.web.controller.social;
 
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,11 @@ public class SocialUserCancelApplyViewController {
 
     private static final String VIEW_NAME = "im/social/user-cancel-apply";
 
-    @RequiresPermissions("social:user:cancel-apply:view")
+    @RequiresPermissions(value = {
+            "social:user:cancel-apply:view",
+            "social:user:cancel-apply:approved",
+            "social:user:cancel-apply:reject"
+    }, logical = Logical.OR)
     @GetMapping(value = {"", "/"})
     public String cancelApply() {
         return VIEW_NAME;

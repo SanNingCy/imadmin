@@ -1,5 +1,6 @@
 package com.web4x.web.controller.social;
 
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +18,11 @@ public class SocialUserBanViewController {
 
     private static final String VIEW_NAME = "im/social/user-ban";
 
-    @RequiresPermissions("social:user:ban:view")
+    @RequiresPermissions(value = {
+            "social:user:ban:view",
+            "social:user:ban:ban",
+            "social:user:ban:unban"
+    }, logical = Logical.OR)
     @GetMapping(value = {"", "/"})
     public String ban() {
         return VIEW_NAME;
