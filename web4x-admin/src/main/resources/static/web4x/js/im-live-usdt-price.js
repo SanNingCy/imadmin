@@ -6,6 +6,8 @@
 
 var imLiveUsdtPriceApi = imLiveApi + "/usdtPrice";
 
+var imLiveFixedPriceApi = imLiveApi + "/fixedPrice";
+
 var imLiveUsdtPriceTierSeq = 0;
 
 var imLiveUsdtDurationOptions = [];
@@ -16,7 +18,279 @@ var imLiveUsdtTierOptions = [];
 
 function imLiveUsdtPriceQueryParams(params) {
 
-    return imLiveQueryParams("live-usdt-price-form", params);
+    var query = imLiveQueryParams("live-usdt-price-form", params);
+
+    delete query.listPricingMode;
+
+    return query;
+
+}
+
+
+
+function imLiveUsdtPriceGetListPricingMode() {
+
+    return $("#live-usdt-price-search-pricing-mode").val() || "USDT";
+
+}
+
+
+
+function imLiveUsdtPriceIsOdicListMode() {
+
+    return imLiveUsdtPriceGetListPricingMode() === "ODIC";
+
+}
+
+
+
+function imLiveUsdtPriceUpdateListTip() {
+
+    var isOdic = imLiveUsdtPriceIsOdicListMode();
+
+    $("#live-usdt-price-tip-usdt").toggle(!isOdic);
+
+    $("#live-usdt-price-tip-odic").toggle(isOdic);
+
+}
+
+
+
+function imLiveUsdtPriceGetUsdtColumns() {
+
+    return [
+
+        { field: "durationName", title: "时长名称", sortable: true },
+
+        { field: "durationMinutes", title: "会议时长(分)", sortable: true },
+
+        { field: "peopleCount", title: "会议人数", sortable: true },
+
+        {
+
+            field: "costPriceUsdt",
+
+            title: "成本价",
+
+            sortable: true,
+
+            formatter: imLiveFormatUsdt
+
+        },
+
+        {
+
+            field: "salePriceUsdt",
+
+            title: "会议价格",
+
+            sortable: true,
+
+            formatter: imLiveFormatUsdt
+
+        },
+
+        {
+
+            field: "profitUsdt",
+
+            title: "利润",
+
+            sortable: true,
+
+            formatter: function (val, row) {
+
+                if (val == null || val === "") {
+
+                    return "-";
+
+                }
+
+                var num = Number(val);
+
+                if (!Number.isFinite(num)) {
+
+                    return "-";
+
+                }
+
+                var cls = num < 0 ? "text-danger" : "live-usdt-profit-text";
+
+                return '<span class="' + cls + '">' + imLiveFormatUsdt(val) + "</span>";
+
+            }
+
+        },
+
+        { field: "status", title: "状态", sortable: true, formatter: imLiveFormatStatus },
+
+        { field: "createTime", title: "创建时间", sortable: true },
+
+        {
+
+            title: "操作",
+
+            align: "center",
+
+            formatter: function (value, row) {
+
+                var id = row.id;
+
+                return [
+
+                    '<a class="btn btn-info btn-xs" href="javascript:void(0)" onclick="imLiveUsdtPriceOpenModal(\'view\',\'' + id + '\')"><i class="fa fa-search"></i>查看</a> ',
+
+                    '<a class="btn btn-success btn-xs" href="javascript:void(0)" onclick="imLiveUsdtPriceOpenModal(\'edit\',\'' + id + '\')"><i class="fa fa-edit"></i>修改</a> ',
+
+                    '<a class="btn btn-danger btn-xs" href="javascript:void(0)" onclick="imLiveDelete(imLiveUsdtPriceApi,\'' + id + '\',\'确定删除该 USDT 定价吗？\')"><i class="fa fa-remove"></i>删除</a>'
+
+                ].join("");
+
+            }
+
+        }
+
+    ];
+
+}
+
+
+
+function imLiveUsdtPriceGetOdicColumns() {
+
+    return [
+
+        { field: "durationName", title: "会议时长", sortable: true },
+
+        { field: "tierName", title: "会议人数", sortable: true },
+
+        {
+
+            field: "fixedPrice",
+
+            title: "固定配置价格(ODIC)",
+
+            sortable: true,
+
+            formatter: imLiveFormatAmount
+
+        },
+
+        { field: "status", title: "状态", sortable: true, formatter: imLiveFormatStatus },
+
+        { field: "createTime", title: "创建时间", sortable: true },
+
+        {
+
+            title: "操作",
+
+            align: "center",
+
+            formatter: function (value, row) {
+
+                var id = row.id;
+
+                return [
+
+                    '<a class="btn btn-info btn-xs" href="javascript:void(0)" onclick="imLiveFixedPriceOpenModal(\'view\',\'' + id + '\')"><i class="fa fa-search"></i>查看</a> ',
+
+                    '<a class="btn btn-success btn-xs" href="javascript:void(0)" onclick="imLiveFixedPriceOpenModal(\'edit\',\'' + id + '\')"><i class="fa fa-edit"></i>修改</a> ',
+
+                    '<a class="btn btn-danger btn-xs" href="javascript:void(0)" onclick="imLiveDelete(imLiveFixedPriceApi,\'' + id + '\',\'确定删除该 ODIC 固定价格吗？\')"><i class="fa fa-remove"></i>删除</a>'
+
+                ].join("");
+
+            }
+
+        }
+
+    ];
+
+}
+
+
+
+function imLiveUsdtPriceBuildTableOptions() {
+
+    var isOdic = imLiveUsdtPriceIsOdicListMode();
+
+    return {
+
+        url: isOdic ? imLiveFixedPriceApi + "/page" : imLiveUsdtPriceApi + "/page",
+
+        formId: "live-usdt-price-form",
+
+        queryParams: imLiveUsdtPriceQueryParams,
+
+        sortName: "createTime",
+
+        sortOrder: "desc",
+
+        modalName: isOdic ? "ODIC固定价格" : "USDT定价",
+
+        escape: false,
+
+        columns: isOdic ? imLiveUsdtPriceGetOdicColumns() : imLiveUsdtPriceGetUsdtColumns()
+
+    };
+
+}
+
+
+
+function imLiveUsdtPriceReloadTable() {
+
+    imLiveUsdtPriceUpdateListTip();
+
+    var options = imLiveUsdtPriceBuildTableOptions();
+
+    var $table = $("#bootstrap-table");
+
+    if ($table.length && $table.data("bootstrap.table")) {
+
+        $table.bootstrapTable("refreshOptions", {
+
+            url: options.url,
+
+            columns: options.columns,
+
+            pageNumber: 1
+
+        });
+
+        if (typeof table !== "undefined" && table.config) {
+
+            table.config["bootstrap-table"] = $.extend(table.config["bootstrap-table"] || {}, options);
+
+        }
+
+        $table.bootstrapTable("refresh");
+
+        return;
+
+    }
+
+    imInitTable(options);
+
+}
+
+
+
+function imLiveUsdtPriceSearch() {
+
+    imLiveUsdtPriceReloadTable();
+
+}
+
+
+
+function imLiveUsdtPriceResetSearch() {
+
+    $.form.reset();
+
+    $("#live-usdt-price-search-pricing-mode").val("USDT");
+
+    imLiveUsdtPriceReloadTable();
 
 }
 
@@ -81,6 +355,10 @@ function imLiveUsdtPriceLoadOptions(callback) {
         imLiveUsdtPriceFillSelect($("#live-usdt-price-duration-pick"), imLiveUsdtDurationOptions, "快捷选择已有会议时长");
 
         imLiveUsdtPriceFillSelect($("#live-usdt-price-tier-pick"), imLiveUsdtTierOptions, "快捷选择已有人数档位");
+
+        imLiveUsdtPriceFillSelect($("#live-usdt-price-odic-duration"), imLiveUsdtDurationOptions, "请选择会议时长");
+
+        imLiveUsdtPriceFillSelect($("#live-usdt-price-odic-tier"), imLiveUsdtTierOptions, "请选择会议人数");
 
         if (typeof callback === "function") {
 
@@ -468,11 +746,43 @@ function imLiveUsdtPriceRemoveTierRow(seq) {
 
 
 
+function imLiveUsdtPriceGetPricingMode() {
+
+    return $("#live-usdt-price-pricing-mode").val() || "USDT";
+
+}
+
+
+
+function imLiveUsdtPriceApplyPricingModeUi() {
+
+    var isAdd = $("#live-usdt-price-mode").val() === "add";
+
+    var isOdic = isAdd && imLiveUsdtPriceGetPricingMode() === "ODIC";
+
+    $("#live-usdt-price-pricing-mode-group").toggle(isAdd);
+
+    $("#live-usdt-price-usdt-fields").toggle(!isOdic);
+
+    $("#live-usdt-price-odic-fields").toggle(isOdic);
+
+}
+
+
+
 function imLiveUsdtPriceResetModal() {
 
     $("#live-usdt-price-id").val("");
 
     $("#live-usdt-price-mode").val("add");
+
+    $("#live-usdt-price-pricing-mode").val("USDT");
+
+    $("#live-usdt-price-odic-duration").val("");
+
+    $("#live-usdt-price-odic-tier").val("");
+
+    $("#live-usdt-price-odic-value").val("");
 
     $("#live-usdt-price-duration-minutes").val("");
 
@@ -505,6 +815,8 @@ function imLiveUsdtPriceResetModal() {
     $("#live-usdt-price-add-tier").show();
 
     imLiveUsdtPriceAddTierRow();
+
+    imLiveUsdtPriceApplyPricingModeUi();
 
 }
 
@@ -540,6 +852,10 @@ function imLiveUsdtPriceFillModal(info) {
 
     imLiveUsdtPriceUpdateSingleCalc();
 
+    $("#live-usdt-price-pricing-mode-group").hide();
+
+    imLiveUsdtPriceApplyPricingModeUi();
+
 }
 
 
@@ -548,7 +864,7 @@ function imLiveUsdtPriceShowModal(mode, readOnly) {
 
     var titles = {
 
-        add: "新建 USDT 定价",
+        add: "新建会议室定价",
 
         edit: "编辑 USDT 定价",
 
@@ -569,6 +885,12 @@ function imLiveUsdtPriceShowModal(mode, readOnly) {
         content: $("#live-usdt-price-modal"),
 
         btn: readOnly ? ["关闭"] : ["保存", "取消"],
+
+        success: function () {
+
+            imBindAmountInputs("#live-usdt-price-modal-form");
+
+        },
 
         yes: function (index) {
 
@@ -748,9 +1070,95 @@ function imLiveUsdtPriceCollectTiers() {
 
 
 
-function imLiveUsdtPriceSave(layerIndex, mode) {
+function imLiveUsdtPriceSaveOdic(layerIndex) {
 
-    var durationMinutes = imLiveUsdtPriceGetDurationMinutes();
+    var durationId = $("#live-usdt-price-odic-duration").val();
+
+    var tierId = $("#live-usdt-price-odic-tier").val();
+
+    var fixedPrice = $.trim($("#live-usdt-price-odic-value").val());
+
+    var status = $("#live-usdt-price-status").val();
+
+    var remark = $.trim($("#live-usdt-price-remark").val());
+
+    if (!durationId) {
+
+        return $.modal.alertWarning("请选择会议时长");
+
+    }
+
+    if (!tierId) {
+
+        return $.modal.alertWarning("请选择会议人数");
+
+    }
+
+    if (!fixedPrice || !imIsValidDecimalInput(fixedPrice)) {
+
+        return $.modal.alertWarning("请输入有效的 ODIC 固定价格");
+
+    }
+
+    if (status === "" || status == null) {
+
+        return $.modal.alertWarning("请选择状态");
+
+    }
+
+    imLiveAjax({
+
+        url: imLiveFixedPriceApi + "/save",
+
+        type: "POST",
+
+        contentType: "application/json;charset=UTF-8",
+
+        data: JSON.stringify({
+
+            durationId: parseInt(durationId, 10),
+
+            tierId: parseInt(tierId, 10),
+
+            fixedPrice: fixedPrice,
+
+            status: parseInt(status, 10),
+
+            remark: remark || undefined
+
+        }),
+
+        success: function (res) {
+
+            if (res && (res.success === true || res.code === 200)) {
+
+                $.modal.msgSuccess("ODIC 固定价格已保存，请到「会议室价格配置」页面查看");
+
+                layer.close(layerIndex);
+
+                imLiveUsdtPriceLoadOptions();
+
+            } else {
+
+                $.modal.alertWarning((res && res.msg) ? res.msg : "保存失败");
+
+            }
+
+        },
+
+        error: function () {
+
+            $.modal.alertWarning("保存失败");
+
+        }
+
+    });
+
+}
+
+
+
+function imLiveUsdtPriceSave(layerIndex, mode) {
 
     var status = $("#live-usdt-price-status").val();
 
@@ -758,15 +1166,29 @@ function imLiveUsdtPriceSave(layerIndex, mode) {
 
 
 
-    if (!durationMinutes) {
-
-        return $.modal.alertWarning("请输入有效的会议时长");
-
-    }
-
     if (status === "" || status == null) {
 
         return $.modal.alertWarning("请选择状态");
+
+    }
+
+
+
+    if (mode !== "edit" && imLiveUsdtPriceGetPricingMode() === "ODIC") {
+
+        return imLiveUsdtPriceSaveOdic(layerIndex);
+
+    }
+
+
+
+    var durationMinutes = imLiveUsdtPriceGetDurationMinutes();
+
+
+
+    if (!durationMinutes) {
+
+        return $.modal.alertWarning("请输入有效的会议时长");
 
     }
 
@@ -986,117 +1408,17 @@ function imLiveUsdtPriceInitTable() {
 
 
 
-    imInitTable({
+    $(document).on("change", "#live-usdt-price-pricing-mode", function () {
 
-        url: imLiveUsdtPriceApi + "/page",
-
-        formId: "live-usdt-price-form",
-
-        queryParams: imLiveUsdtPriceQueryParams,
-
-        sortName: "createTime",
-
-        sortOrder: "desc",
-
-        modalName: "USDT定价",
-
-        escape: false,
-
-        columns: [
-
-            { field: "durationName", title: "时长名称", sortable: true },
-
-            { field: "durationMinutes", title: "会议时长(分)", sortable: true },
-
-            { field: "peopleCount", title: "会议人数", sortable: true },
-
-            {
-
-                field: "costPriceUsdt",
-
-                title: "成本价",
-
-                sortable: true,
-
-                formatter: imLiveFormatUsdt
-
-            },
-
-            {
-
-                field: "salePriceUsdt",
-
-                title: "会议价格",
-
-                sortable: true,
-
-                formatter: imLiveFormatUsdt
-
-            },
-
-            {
-
-                field: "profitUsdt",
-
-                title: "利润",
-
-                sortable: true,
-
-                formatter: function (val, row) {
-
-                    if (val == null || val === "") {
-
-                        return "-";
-
-                    }
-
-                    var num = Number(val);
-
-                    if (!Number.isFinite(num)) {
-
-                        return "-";
-
-                    }
-
-                    var cls = num < 0 ? "text-danger" : "live-usdt-profit-text";
-
-                    return '<span class="' + cls + '">' + imLiveFormatUsdt(val) + "</span>";
-
-                }
-
-            },
-
-            { field: "status", title: "状态", sortable: true, formatter: imLiveFormatStatus },
-
-            { field: "createTime", title: "创建时间", sortable: true },
-
-            {
-
-                title: "操作",
-
-                align: "center",
-
-                formatter: function (value, row) {
-
-                    var id = row.id;
-
-                    return [
-
-                        '<a class="btn btn-info btn-xs" href="javascript:void(0)" onclick="imLiveUsdtPriceOpenModal(\'view\',\'' + id + '\')"><i class="fa fa-search"></i>查看</a> ',
-
-                        '<a class="btn btn-success btn-xs" href="javascript:void(0)" onclick="imLiveUsdtPriceOpenModal(\'edit\',\'' + id + '\')"><i class="fa fa-edit"></i>修改</a> ',
-
-                        '<a class="btn btn-danger btn-xs" href="javascript:void(0)" onclick="imLiveDelete(imLiveUsdtPriceApi,\'' + id + '\',\'确定删除该 USDT 定价吗？\')"><i class="fa fa-remove"></i>删除</a>'
-
-                    ].join("");
-
-                }
-
-            }
-
-        ]
+        imLiveUsdtPriceApplyPricingModeUi();
 
     });
+
+
+
+    imLiveFillStatusSelect($("#live-fixed-price-status"), false);
+
+    imLiveUsdtPriceReloadTable();
 
 }
 
