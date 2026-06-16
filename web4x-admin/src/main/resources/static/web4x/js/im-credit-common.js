@@ -55,7 +55,7 @@ function imCreditFormatScore(val) {
 
 function imCreditFormatPrice(val) {
     var num = Number(val);
-    return Number.isFinite(num) ? num.toFixed(2) + " ODIC" : "-";
+    return Number.isFinite(num) ? num.toFixed(2) + " USDT" : "-";
 }
 
 function imCreditFormatFlag(val) {
