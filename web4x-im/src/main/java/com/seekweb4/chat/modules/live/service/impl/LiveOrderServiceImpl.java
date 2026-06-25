@@ -11,8 +11,8 @@ import com.seekweb4.chat.modules.live.entity.LiveUserTierConfig;
 import com.seekweb4.chat.modules.live.mapper.LiveOrderRecordMapper;
 import com.seekweb4.chat.modules.live.mapper.LiveTimeDurationConfigMapper;
 import com.seekweb4.chat.modules.live.mapper.LiveUserTierConfigMapper;
-import com.seekweb4.chat.modules.live.service.LiveBillingRuleService;
 import com.seekweb4.chat.modules.live.service.LiveOrderService;
+import com.seekweb4.chat.modules.live.service.LiveUsdtMeetingPriceConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +39,7 @@ public class LiveOrderServiceImpl implements LiveOrderService {
     private LiveUserTierConfigMapper tierConfigMapper;
 
     @Resource
-    private LiveBillingRuleService billingRuleService;
+    private LiveUsdtMeetingPriceConfigService usdtMeetingPriceConfigService;
 
     private static final Set<String> CAMEL_CASE_COLUMN_WHITELIST = new HashSet<>();
 
@@ -53,6 +53,9 @@ public class LiveOrderServiceImpl implements LiveOrderService {
         Long count = orderRecordMapper.selectAdminCount(queryDto);
         page.setCount(count);
         List<LiveOrderRecord> list = orderRecordMapper.selectAdminPageList(queryDto);
+        for (LiveOrderRecord record : list) {
+            enrichUsdtTotalAmount(record);
+        }
         page.setList(list);
         return page;
     }
@@ -85,7 +88,7 @@ public class LiveOrderServiceImpl implements LiveOrderService {
             throw new IllegalArgumentException("人数档位配置已禁用");
         }
 
-        BigDecimal amount = billingRuleService.calcAmount(duration.getDurationValue(), tier.getTierValue());
+        BigDecimal amount = usdtMeetingPriceConfigService.resolveSalePriceUsdt(req.getDurationId(), req.getTierId());
 
         LiveOrderRecord record = new LiveOrderRecord();
         record.setOrderNo(IdGen.getOrderNo());
@@ -163,6 +166,16 @@ public class LiveOrderServiceImpl implements LiveOrderService {
             }
         }
         return result.toString();
+    }
+
+    private void enrichUsdtTotalAmount(LiveOrderRecord record) {
+        if (record == null || record.getDurationId() == null || record.getTierId() == null) {
+            return;
+        }
+        BigDecimal usdtAmount = usdtMeetingPriceConfigService.findSalePriceUsdt(record.getDurationId(), record.getTierId());
+        if (usdtAmount != null) {
+            record.setTotalAmount(usdtAmount);
+        }
     }
 }
 

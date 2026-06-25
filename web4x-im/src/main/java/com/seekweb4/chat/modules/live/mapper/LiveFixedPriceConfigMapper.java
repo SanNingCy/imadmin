@@ -26,4 +26,7 @@ public interface LiveFixedPriceConfigMapper extends BaseMapper<LiveFixedPriceCon
                                 @Param("tierId") Long tierId,
                                 @Param("pricingMode") String pricingMode,
                                 @Param("excludeId") Long excludeId);
+
+    LiveFixedPriceConfig selectActiveUsdtByDurationAndTier(@Param("durationId") Long durationId,
+                                                           @Param("tierId") Long tierId);
 }

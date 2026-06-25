@@ -661,6 +661,8 @@ INSERT INTO `sys_menu_ry` VALUES (2252, '查看', 2251, 10, '#', '', 'F', '0', '
 INSERT INTO `sys_menu_ry` VALUES (2253, '用户主页统计', 2250, 20, '/piamom/profile/stat', '', 'C', '0', '1', NULL, '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
 INSERT INTO `sys_menu_ry` VALUES (2254, '查看', 2253, 10, '#', '', 'F', '0', '1', 'piamom:profile:stat:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
 INSERT INTO `sys_menu_ry` VALUES (2255, '删除', 2253, 20, '#', '', 'F', '0', '1', 'piamom:profile:stat:delete', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2256, '链上支付订单', 2029, 75, '/chainPayOrder', '', 'C', '0', '1', 'asset:fund:chain-pay:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
+INSERT INTO `sys_menu_ry` VALUES (2257, '查看', 2256, 10, '#', '', 'F', '0', '1', 'asset:fund:chain-pay:view', '#', 'admin', '2026-06-06 10:53:01', '', NULL, '');
 
 SET FOREIGN_KEY_CHECKS = 1;
 

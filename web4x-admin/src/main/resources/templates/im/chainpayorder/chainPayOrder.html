@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('链上支付订单')" />
+    <style>
+        #chain-pay-order-detail-modal .detail-label { width: 140px; font-weight: 600; background: #f9f9f9; }
+        #chain-pay-order-detail-modal .detail-value { word-break: break-all; }
+        #chain-pay-order-detail-modal pre { max-height: 160px; overflow: auto; margin: 0; white-space: pre-wrap; word-break: break-all; }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="chain-pay-order-form">
+                <div class="select-list">
+                    <ul>
+                        <li>用户ID：<input type="text" name="userId" placeholder="用户ID"/></li>
+                        <li>ID号：<input type="text" name="idno" placeholder="ID号"/></li>
+                        <li>链上订单号：<input type="text" name="orderId" placeholder="orderId"/></li>
+                        <li>交易Hash：<input type="text" name="txHash" placeholder="txHash"/></li>
+                        <li>付款地址：<input type="text" name="userAddress" placeholder="钱包地址"/></li>
+                        <li>
+                            业务场景：
+                            <select name="scene">
+                                <option value="">全部</option>
+                                <option value="credit_activate">开通信用分</option>
+                                <option value="meeting_create">创建会议</option>
+                                <option value="meeting_extend">延迟会议</option>
+                            </select>
+                        </li>
+                        <li>
+                            订单状态：
+                            <select name="status">
+                                <option value="">全部</option>
+                                <option value="0">待支付</option>
+                                <option value="1">已支付</option>
+                                <option value="2">业务完成</option>
+                                <option value="3">失败</option>
+                                <option value="4">过期</option>
+                            </select>
+                        </li>
+                        <li>
+                            对账状态：
+                            <select name="reconcileStatus">
+                                <option value="">全部</option>
+                                <option value="0">未对账</option>
+                                <option value="1">已对账</option>
+                            </select>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<div id="chain-pay-order-detail-modal" style="display:none;">
+    <div style="padding:15px 20px;max-height:70vh;overflow-y:auto;">
+        <table class="table table-bordered table-condensed">
+            <tbody>
+            <tr><td class="detail-label">主键ID</td><td class="detail-value" id="cpod-id"></td></tr>
+            <tr><td class="detail-label">链上订单号</td><td class="detail-value" id="cpod-orderId"></td></tr>
+            <tr><td class="detail-label">用户ID</td><td class="detail-value" id="cpod-userId"></td></tr>
+            <tr><td class="detail-label">ID号</td><td class="detail-value" id="cpod-idno"></td></tr>
+            <tr><td class="detail-label">用户昵称</td><td class="detail-value" id="cpod-nickname"></td></tr>
+            <tr><td class="detail-label">业务场景</td><td class="detail-value" id="cpod-scene"></td></tr>
+            <tr><td class="detail-label">链ID</td><td class="detail-value" id="cpod-chainId"></td></tr>
+            <tr><td class="detail-label">支付金额(USDT)</td><td class="detail-value" id="cpod-amount"></td></tr>
+            <tr><td class="detail-label">支付金额(ODIC)</td><td class="detail-value" id="cpod-odicAmount"></td></tr>
+            <tr>
+                <td class="detail-label">链上原始金额<br/><span class="text-muted" style="font-weight:normal;font-size:12px;">rawAmount</span></td>
+                <td class="detail-value">
+                    <div id="cpod-rawAmount"></div>
+                    <p class="text-muted" style="margin:6px 0 0;font-size:12px;">合约 pay 使用的 18 位小数整数金额（人类可读金额 × 10<sup>18</sup>），与链上 rawAmount 一致。</p>
+                </td>
+            </tr>
+            <tr><td class="detail-label">代币符号</td><td class="detail-value" id="cpod-tokenSymbol"></td></tr>
+            <tr><td class="detail-label">代币合约</td><td class="detail-value" id="cpod-tokenAddress"></td></tr>
+            <tr><td class="detail-label">订单状态</td><td class="detail-value" id="cpod-status"></td></tr>
+            <tr><td class="detail-label">对账状态</td><td class="detail-value" id="cpod-reconcileStatus"></td></tr>
+            <tr><td class="detail-label">交易Hash</td><td class="detail-value" id="cpod-txHash"></td></tr>
+            <tr><td class="detail-label">付款地址</td><td class="detail-value" id="cpod-userAddress"></td></tr>
+            <tr><td class="detail-label">过期时间</td><td class="detail-value" id="cpod-expireTime"></td></tr>
+            <tr><td class="detail-label">支付时间</td><td class="detail-value" id="cpod-payTime"></td></tr>
+            <tr><td class="detail-label">完成时间</td><td class="detail-value" id="cpod-completeTime"></td></tr>
+            <tr><td class="detail-label">备注</td><td class="detail-value" id="cpod-remark"></td></tr>
+            <tr><td class="detail-label">业务参数</td><td class="detail-value"><pre id="cpod-bizPayload"></pre></td></tr>
+            <tr><td class="detail-label">创建时间</td><td class="detail-value" id="cpod-createTime"></td></tr>
+            <tr><td class="detail-label">更新时间</td><td class="detail-value" id="cpod-updateTime"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js?v=20260624}"></script>
+<script th:src="@{/web4x/js/im-chain-pay-order.js?v=20260626}"></script>
+</body>
+</html>

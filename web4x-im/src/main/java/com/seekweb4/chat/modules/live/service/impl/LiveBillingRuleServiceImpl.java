@@ -6,6 +6,7 @@ import com.seekweb4.chat.modules.live.dto.LiveBillingRuleQueryDto;
 import com.seekweb4.chat.modules.live.entity.LiveBillingRule;
 import com.seekweb4.chat.modules.live.mapper.LiveBillingRuleMapper;
 import com.seekweb4.chat.modules.live.service.LiveBillingRuleService;
+import com.seekweb4.chat.modules.live.service.LiveUsdtMeetingPriceConfigService;
 import com.seekweb4.chat.modules.live.util.LiveAmountRoundingUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,9 @@ public class LiveBillingRuleServiceImpl implements LiveBillingRuleService {
 
     @Resource
     private LiveBillingRuleMapper billingRuleMapper;
+
+    @Resource
+    private LiveUsdtMeetingPriceConfigService usdtMeetingPriceConfigService;
 
     private static final Set<String> CAMEL_CASE_COLUMN_WHITELIST = new HashSet<>();
 
@@ -93,9 +97,13 @@ public class LiveBillingRuleServiceImpl implements LiveBillingRuleService {
         if (durationMinutes == null || durationMinutes <= 0) {
             throw new IllegalArgumentException("durationMinutes 必须大于 0");
         }
+        BigDecimal usdtAmount = usdtMeetingPriceConfigService.findSalePriceUsdtByValue(durationMinutes, tierValue);
+        if (usdtAmount != null) {
+            return usdtAmount;
+        }
         LiveBillingRule rule = getActiveRule();
         if (rule == null || rule.getUnitPrice() == null) {
-            throw new IllegalStateException("未配置启用的计费规则或单价为空");
+            throw new IllegalStateException("未配置启用的 USDT 会议价格或计费规则");
         }
         BigDecimal amount = rule.getUnitPrice().multiply(new BigDecimal(durationMinutes));
         return LiveAmountRoundingUtil.round(amount, rule.getRoundingRule());

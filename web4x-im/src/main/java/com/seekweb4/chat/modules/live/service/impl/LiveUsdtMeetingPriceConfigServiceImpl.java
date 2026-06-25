@@ -350,6 +350,74 @@ public class LiveUsdtMeetingPriceConfigServiceImpl implements LiveUsdtMeetingPri
 
 
 
+    @Override
+
+    public BigDecimal resolveSalePriceUsdt(Long durationId, Long tierId) {
+
+        BigDecimal price = findSalePriceUsdt(durationId, tierId);
+
+        if (price == null) {
+
+            throw new IllegalStateException("未配置该时长与人数档位的 USDT 会议价格");
+
+        }
+
+        return price;
+
+    }
+
+
+
+    @Override
+
+    public BigDecimal findSalePriceUsdt(Long durationId, Long tierId) {
+
+        if (durationId == null || tierId == null) {
+
+            return null;
+
+        }
+
+        LiveFixedPriceConfig config = fixedPriceConfigMapper.selectActiveUsdtByDurationAndTier(durationId, tierId);
+
+        if (config == null || config.getFixedPrice() == null) {
+
+            return null;
+
+        }
+
+        return config.getFixedPrice();
+
+    }
+
+
+
+    @Override
+
+    public BigDecimal findSalePriceUsdtByValue(Integer durationMinutes, Integer tierValue) {
+
+        if (durationMinutes == null || durationMinutes <= 0 || tierValue == null || tierValue <= 0) {
+
+            return null;
+
+        }
+
+        LiveTimeDurationConfig duration = durationConfigMapper.selectByDurationValue(durationMinutes);
+
+        LiveUserTierConfig tier = tierConfigMapper.selectByTierValue(tierValue);
+
+        if (duration == null || tier == null) {
+
+            return null;
+
+        }
+
+        return findSalePriceUsdt(duration.getId(), tier.getId());
+
+    }
+
+
+
     private LiveUsdtFixedPriceVo toVo(LiveFixedPriceConfigVo src) {
 
         LiveUsdtFixedPriceVo vo = new LiveUsdtFixedPriceVo();

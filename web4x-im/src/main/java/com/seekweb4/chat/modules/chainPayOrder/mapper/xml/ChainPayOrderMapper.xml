@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.chainPayOrder.mapper.ChainPayOrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.seekweb4.chat.modules.chainPayOrder.entity.ChainPayOrder">
+        <id column="id" property="id"/>
+        <result column="order_id" property="orderId"/>
+        <result column="user_id" property="userId"/>
+        <result column="scene" property="scene"/>
+        <result column="chain_id" property="chainId"/>
+        <result column="amount" property="amount"/>
+        <result column="odic_amount" property="odicAmount"/>
+        <result column="raw_amount" property="rawAmount"/>
+        <result column="token_symbol" property="tokenSymbol"/>
+        <result column="token_address" property="tokenAddress"/>
+        <result column="payment_type" property="paymentType"/>
+        <result column="biz_payload" property="bizPayload"/>
+        <result column="tx_hash" property="txHash"/>
+        <result column="user_address" property="userAddress"/>
+        <result column="status" property="status"/>
+        <result column="reconcile_status" property="reconcileStatus"/>
+        <result column="expire_time" property="expireTime"/>
+        <result column="pay_time" property="payTime"/>
+        <result column="complete_time" property="completeTime"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, order_id, user_id, scene, chain_id, amount, odic_amount, raw_amount, token_symbol, token_address,
+        payment_type, biz_payload, tx_hash, user_address, status, reconcile_status,
+        expire_time, pay_time, complete_time, remark, create_time, update_time
+    </sql>
+
+    <sql id="Admin_Where_Clause">
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="orderId != null and orderId != ''">
+                and order_id like concat('%', #{orderId}, '%')
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="idno != null and idno != ''">
+                and CAST(user_id AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_general_ci in (
+                    select CAST(id AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_general_ci
+                    from t_member
+                    where idno COLLATE utf8mb4_general_ci = CAST(#{idno} AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_general_ci
+                )
+            </if>
+            <if test="scene != null and scene != ''">
+                and scene = #{scene}
+            </if>
+            <if test="chainId != null">
+                and chain_id = #{chainId}
+            </if>
+            <if test="tokenSymbol != null and tokenSymbol != ''">
+                and token_symbol = #{tokenSymbol}
+            </if>
+            <if test="paymentType != null">
+                and payment_type = #{paymentType}
+            </if>
+            <if test="txHash != null and txHash != ''">
+                and tx_hash like concat('%', #{txHash}, '%')
+            </if>
+            <if test="userAddress != null and userAddress != ''">
+                and user_address like concat('%', #{userAddress}, '%')
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="reconcileStatus != null">
+                and reconcile_status = #{reconcileStatus}
+            </if>
+            <if test="createTimeStart != null">
+                and create_time &gt;= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and create_time &lt;= #{createTimeEnd}
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectAdminPageList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_chain_pay_order
+        <include refid="Admin_Where_Clause"/>
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+        <if test="orderBy == null or orderBy == ''">
+            order by create_time desc
+        </if>
+        <if test="pageNo != null and pageSize != null">
+            limit #{pageNo}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="selectAdminCount" resultType="java.lang.Long">
+        select count(1)
+        from t_chain_pay_order
+        <include refid="Admin_Where_Clause"/>
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_chain_pay_order
+        where id = #{id}
+    </select>
+
+</mapper>

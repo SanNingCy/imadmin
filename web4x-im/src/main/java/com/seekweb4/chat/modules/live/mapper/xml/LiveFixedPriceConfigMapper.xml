@@ -105,9 +105,25 @@
         where is_deleted = 0
           and duration_id = #{durationId}
           and tier_id = #{tierId}
+        <if test="pricingMode != null and pricingMode != ''">
+            and pricing_mode = #{pricingMode}
+        </if>
         <if test="excludeId != null">
             and id != #{excludeId}
         </if>
+    </select>
+
+    <select id="selectActiveUsdtByDurationAndTier" resultMap="BaseResultMap">
+        select id, duration_id, tier_id, fixed_price, pricing_mode, status, remark,
+               create_by, update_by, create_time, update_time, is_deleted
+        from t_live_fixed_price_config
+        where is_deleted = 0
+          and duration_id = #{durationId}
+          and tier_id = #{tierId}
+          and pricing_mode = 'USDT'
+          and status = 1
+        order by update_time desc, id desc
+        limit 1
     </select>
 
     <insert id="insert" parameterType="com.seekweb4.chat.modules.live.entity.LiveFixedPriceConfig" useGeneratedKeys="true" keyProperty="id">

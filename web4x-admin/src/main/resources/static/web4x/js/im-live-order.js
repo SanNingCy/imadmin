@@ -65,9 +65,15 @@ function imLiveOrderInitTable() {
             { field: "tierValue", title: "人数上限", sortable: true },
             {
                 field: "totalAmount",
-                title: "订单总金额",
+                title: "订单总金额(USDT)",
                 sortable: true,
-                formatter: imLiveFormatAmount
+                formatter: imLiveFormatUsdt
+            },
+            {
+                field: "odicAmount",
+                title: "订单总金额(ODIC)",
+                sortable: true,
+                formatter: imLiveFormatOdic
             },
             {
                 field: "liveStatus",

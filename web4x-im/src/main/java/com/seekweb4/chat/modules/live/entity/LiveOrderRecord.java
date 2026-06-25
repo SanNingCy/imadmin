@@ -36,6 +36,9 @@ public class LiveOrderRecord implements Serializable {
 
     private BigDecimal totalAmount;
 
+    /** 本段会议花费的 ODIC 金额（支付时快照，未支付为空） */
+    private BigDecimal odicAmount;
+
     private String groupIdNo;
 
     /** 群展示 idno：按 groupIdNo 匹配 t_group.id（或兼容误存为 idno）；含已逻辑删除群；与 channelId（会议室）无关 */

@@ -78,6 +78,14 @@ function imLiveFormatUsdt(val) {
     return Number.isFinite(num) ? (num.toFixed(4).replace(/\.?0+$/, "") + " USDT") : "-";
 }
 
+function imLiveFormatOdic(val) {
+    if (val == null || val === "") {
+        return "-";
+    }
+    var num = Number(val);
+    return Number.isFinite(num) ? (num.toFixed(2) + " ODIC") : "-";
+}
+
 /** 1 USDT = 1000 分钟通话时长；成本 = 时长(分) × 人数 / 1000 */
 function imLiveCalcUsdtCost(durationMinutes, peopleCount) {
     var minutes = Number(durationMinutes);
