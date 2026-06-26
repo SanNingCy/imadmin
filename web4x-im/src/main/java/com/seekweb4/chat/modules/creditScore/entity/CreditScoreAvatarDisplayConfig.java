@@ -100,4 +100,14 @@ public class CreditScoreAvatarDisplayConfig implements Serializable {
      * 扫码登录校验 IM 验证码：1 开 0 关
      */
     private Integer scanLoginCheckImCode;
+
+    /**
+     * 会员兑换码开关：1开启 0关闭；NULL 视为开启
+     */
+    private Integer vipRedeemEnabled;
+
+    /**
+     * 会员链上购买开关：1开启 0关闭；NULL 视为开启
+     */
+    private Integer vipPurchaseEnabled;
 }

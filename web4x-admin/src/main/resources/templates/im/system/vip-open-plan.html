@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('会员开通套餐')" />
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="vip-open-plan-form">
+                <div class="select-list">
+                    <ul>
+                        <li>套餐名称：<input type="text" name="planName"/></li>
+                        <li>
+                            状态：
+                            <select name="status">
+                                <option value="">全部</option>
+                                <option value="1">已启用</option>
+                                <option value="0">已停用</option>
+                            </select>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" id="vip-open-plan-add-btn" onclick="imVipOpenPlanOpenModal('add')" shiro:hasPermission="ops:system:vip-open-plan:add">
+                <i class="fa fa-plus"></i> 新建
+            </a>
+            <span class="text-muted" style="margin-left:8px;line-height:30px;">仅允许配置一个套餐，如需更换请先删除再新建</span>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<div id="vip-open-plan-modal" style="display:none;">
+    <form id="vip-open-plan-modal-form" class="form-horizontal" style="padding:15px 20px;">
+        <input type="hidden" id="vip-open-plan-id"/>
+        <div class="form-group">
+            <label class="col-sm-4 control-label"><span class="text-danger">*</span> 套餐名称：</label>
+            <div class="col-sm-7"><input type="text" class="form-control" id="vip-open-plan-planName" maxlength="64" placeholder="如月卡/年卡"/></div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label"><span class="text-danger">*</span> 会员天数：</label>
+            <div class="col-sm-7"><input type="number" class="form-control" id="vip-open-plan-durationDays" min="1" step="1"/></div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label"><span class="text-danger">*</span> USDT 价格：</label>
+            <div class="col-sm-7"><input type="number" class="form-control" id="vip-open-plan-price" min="0" step="0.01"/></div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label"><span class="text-danger">*</span> 排序：</label>
+            <div class="col-sm-7"><input type="number" class="form-control" id="vip-open-plan-sortOrder" min="0" step="1" value="0"/><small class="help-block">越小越靠前</small></div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label"><span class="text-danger">*</span> 状态：</label>
+            <div class="col-sm-7">
+                <select class="form-control" id="vip-open-plan-status">
+                    <option value="1">已启用</option>
+                    <option value="0">已停用</option>
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+
+<th:block th:include="include :: footer" />
+<script th:src="@{/web4x/js/im-table.js?v=20260625a}"></script>
+<script th:src="@{/web4x/js/im-vip-open-plan.js?v=20260625a}"></script>
+<script th:inline="javascript">
+    $(function () {
+        imVipOpenPlanInitTable(
+            [[${@permission.isPermitted('ops:system:vip-open-plan:view')}]],
+            [[${@permission.isPermitted('ops:system:vip-open-plan:edit')}]],
+            [[${@permission.isPermitted('ops:system:vip-open-plan:delete')}]]
+        );
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekweb4.chat.modules.vipOpenPlan.mapper.VipOpenPlanMapper">
+
+    <resultMap id="BaseResultMap" type="com.seekweb4.chat.modules.vipOpenPlan.entity.VipOpenPlan">
+        <id column="id" property="id"/>
+        <result column="plan_name" property="planName"/>
+        <result column="duration_days" property="durationDays"/>
+        <result column="price" property="price"/>
+        <result column="status" property="status"/>
+        <result column="sort_order" property="sortOrder"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, plan_name, duration_days, price, status, sort_order,
+        create_time, update_time, create_by, update_by, is_deleted
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_vip_open_plan
+        where id = #{id}
+          and is_deleted = 0
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into t_vip_open_plan(
+            plan_name, duration_days, price, status, sort_order,
+            create_time, update_time, create_by, update_by, is_deleted
+        ) values (
+            #{planName}, #{durationDays}, #{price}, #{status}, #{sortOrder},
+            #{createTime}, #{updateTime}, #{createBy}, #{updateBy}, #{isDeleted}
+        )
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.seekweb4.chat.modules.vipOpenPlan.entity.VipOpenPlan">
+        update t_vip_open_plan
+        <set>
+            <if test="planName != null">plan_name = #{planName},</if>
+            <if test="durationDays != null">duration_days = #{durationDays},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+            update_time = #{updateTime}
+        </set>
+        where id = #{id}
+          and is_deleted = 0
+    </update>
+
+    <select id="selectAdminPageList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_vip_open_plan
+        <where>
+            is_deleted = 0
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="planName != null and planName != ''">
+                and plan_name like concat('%', #{planName}, '%')
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+        <if test="orderBy == null or orderBy == ''">
+            order by sort_order asc, update_time desc, id desc
+        </if>
+        <if test="pageNo != null and pageSize != null">
+            limit #{pageNo}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="selectAdminCount" resultType="java.lang.Long">
+        select count(1)
+        from t_vip_open_plan
+        <where>
+            is_deleted = 0
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="planName != null and planName != ''">
+                and plan_name like concat('%', #{planName}, '%')
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectAllEnabled" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_vip_open_plan
+        where is_deleted = 0
+          and status = 1
+        order by sort_order asc, id asc
+    </select>
+
+    <select id="countActive" resultType="java.lang.Long">
+        select count(1)
+        from t_vip_open_plan
+        where is_deleted = 0
+    </select>
+
+</mapper>

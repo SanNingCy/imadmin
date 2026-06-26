@@ -6,7 +6,8 @@ var imChainPayOrderApi = ctx + "admin/asset/chainPayOrder";
 var IM_CHAIN_PAY_SCENE = {
     credit_activate: "开通信用分",
     meeting_create: "创建会议",
-    meeting_extend: "延迟会议"
+    meeting_extend: "延长会议",
+    vip_open: "开通会员"
 };
 
 var IM_CHAIN_PAY_STATUS = {

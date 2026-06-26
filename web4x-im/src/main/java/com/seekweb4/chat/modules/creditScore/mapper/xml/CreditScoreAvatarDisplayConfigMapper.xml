@@ -23,6 +23,8 @@
         <result column="create_group_count" property="createGroupCount"/>
         <result column="login_second_verify_min_pass" property="loginSecondVerifyMinPass"/>
         <result column="scan_login_check_im_code" property="scanLoginCheckImCode"/>
+        <result column="vip_redeem_enabled" property="vipRedeemEnabled"/>
+        <result column="vip_purchase_enabled" property="vipPurchaseEnabled"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -30,7 +32,8 @@
         new_user_days, new_user_days_v2, new_in_group_days, badge_bg_new_user, badge_bg_regular,
         is_lianghao, is_vip, new_user_join_days, friend_apply_count,
         new_user_create_group_days, new_user_create_group_member_count, create_group_count,
-        login_second_verify_min_pass, scan_login_check_im_code
+        login_second_verify_min_pass, scan_login_check_im_code,
+        vip_redeem_enabled, vip_purchase_enabled
     </sql>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap">
@@ -63,6 +66,8 @@
             <if test="createGroupCount != null">, create_group_count</if>
             <if test="loginSecondVerifyMinPass != null">, login_second_verify_min_pass</if>
             <if test="scanLoginCheckImCode != null">, scan_login_check_im_code</if>
+            <if test="vipRedeemEnabled != null">, vip_redeem_enabled</if>
+            <if test="vipPurchaseEnabled != null">, vip_purchase_enabled</if>
         ) values (
             #{createTime}, #{updateTime}, #{createBy}, #{updateBy}, #{isDeleted},
             #{newUserDays}, #{newUserDaysV2}, #{newInGroupDays}, #{badgeBgNewUser}, #{badgeBgRegular},
@@ -74,6 +79,8 @@
             <if test="createGroupCount != null">, #{createGroupCount}</if>
             <if test="loginSecondVerifyMinPass != null">, #{loginSecondVerifyMinPass}</if>
             <if test="scanLoginCheckImCode != null">, #{scanLoginCheckImCode}</if>
+            <if test="vipRedeemEnabled != null">, #{vipRedeemEnabled}</if>
+            <if test="vipPurchaseEnabled != null">, #{vipPurchaseEnabled}</if>
         )
     </insert>
 
@@ -98,6 +105,8 @@
             <if test="createGroupCount != null">create_group_count = #{createGroupCount},</if>
             <if test="loginSecondVerifyMinPass != null">login_second_verify_min_pass = #{loginSecondVerifyMinPass},</if>
             <if test="scanLoginCheckImCode != null">scan_login_check_im_code = #{scanLoginCheckImCode},</if>
+            <if test="vipRedeemEnabled != null">vip_redeem_enabled = #{vipRedeemEnabled},</if>
+            <if test="vipPurchaseEnabled != null">vip_purchase_enabled = #{vipPurchaseEnabled},</if>
             update_time = #{updateTime}
         </set>
         where id = #{id}

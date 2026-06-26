@@ -42,6 +42,8 @@ public class CreditScoreAvatarDisplayConfigServiceImpl implements CreditScoreAva
         ORDER_BY_COLUMNS.put("createGroupCount", "create_group_count");
         ORDER_BY_COLUMNS.put("loginSecondVerifyMinPass", "login_second_verify_min_pass");
         ORDER_BY_COLUMNS.put("scanLoginCheckImCode", "scan_login_check_im_code");
+        ORDER_BY_COLUMNS.put("vipRedeemEnabled", "vip_redeem_enabled");
+        ORDER_BY_COLUMNS.put("vipPurchaseEnabled", "vip_purchase_enabled");
     }
 
     private static final ZoneId ZONE_CN = ZoneId.of("Asia/Shanghai");
@@ -56,6 +58,7 @@ public class CreditScoreAvatarDisplayConfigServiceImpl implements CreditScoreAva
     /** 与库表 DEFAULT 一致 */
     private static final int DEFAULT_LOGIN_SECOND_VERIFY_MIN_PASS = 1;
     private static final int DEFAULT_SCAN_LOGIN_CHECK_IM_CODE = 0;
+    private static final int DEFAULT_VIP_SWITCH_ENABLED = 1;
     private static final String DEFAULT_BG_NEW = "#E53935";
     private static final String DEFAULT_BG_REGULAR = "#7B1FA2";
 
@@ -135,6 +138,12 @@ public class CreditScoreAvatarDisplayConfigServiceImpl implements CreditScoreAva
         }
         if (c.getScanLoginCheckImCode() == null) {
             c.setScanLoginCheckImCode(DEFAULT_SCAN_LOGIN_CHECK_IM_CODE);
+        }
+        if (c.getVipRedeemEnabled() == null) {
+            c.setVipRedeemEnabled(DEFAULT_VIP_SWITCH_ENABLED);
+        }
+        if (c.getVipPurchaseEnabled() == null) {
+            c.setVipPurchaseEnabled(DEFAULT_VIP_SWITCH_ENABLED);
         }
         return c;
     }
@@ -234,6 +243,12 @@ public class CreditScoreAvatarDisplayConfigServiceImpl implements CreditScoreAva
         if (config.getScanLoginCheckImCode() == null) {
             config.setScanLoginCheckImCode(DEFAULT_SCAN_LOGIN_CHECK_IM_CODE);
         }
+        if (config.getVipRedeemEnabled() == null) {
+            config.setVipRedeemEnabled(DEFAULT_VIP_SWITCH_ENABLED);
+        }
+        if (config.getVipPurchaseEnabled() == null) {
+            config.setVipPurchaseEnabled(DEFAULT_VIP_SWITCH_ENABLED);
+        }
     }
 
     private static CreditScoreAvatarDisplayConfig buildDefaultConfigBean() {
@@ -250,6 +265,8 @@ public class CreditScoreAvatarDisplayConfigServiceImpl implements CreditScoreAva
         c.setCreateGroupCount(DEFAULT_CREATE_GROUP_COUNT);
         c.setLoginSecondVerifyMinPass(DEFAULT_LOGIN_SECOND_VERIFY_MIN_PASS);
         c.setScanLoginCheckImCode(DEFAULT_SCAN_LOGIN_CHECK_IM_CODE);
+        c.setVipRedeemEnabled(DEFAULT_VIP_SWITCH_ENABLED);
+        c.setVipPurchaseEnabled(DEFAULT_VIP_SWITCH_ENABLED);
         return c;
     }
 }

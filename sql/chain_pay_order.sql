@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS `t_chain_pay_order` (
   `id` varchar(64) NOT NULL COMMENT '主键',
   `order_id` varchar(64) NOT NULL COMMENT '链上 orderId，与合约 pay 参数一致',
   `user_id` varchar(64) NOT NULL COMMENT 'IM 用户 ID',
-  `scene` varchar(32) NOT NULL COMMENT 'credit_activate / meeting_create',
+  `scene` varchar(32) NOT NULL COMMENT 'credit_activate / meeting_create / meeting_extend / vip_open',
   `chain_id` int NOT NULL DEFAULT 56 COMMENT '链 ID',
   `amount` decimal(18,2) NOT NULL COMMENT '人类可读支付金额(USDT)',
   `odic_amount` decimal(18,2) DEFAULT NULL COMMENT 'USDT amount 按汇率换算后的 ODIC 金额',
