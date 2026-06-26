@@ -16,7 +16,7 @@ im:
 
 shiro:
   session:
-    expireTime: 30
+    expireTime: 120
     validationInterval: 10
     maxSession: -1
     kickoutAfter: false
