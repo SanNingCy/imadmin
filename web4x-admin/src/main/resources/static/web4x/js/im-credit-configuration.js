@@ -84,6 +84,7 @@ function imCreditConfigurationFillModal(info) {
     $("#credit-config-vipBonusRate").val(info.vipBonusRate != null ? info.vipBonusRate : "");
     $("#credit-config-lianghaoBonusRate").val(info.lianghaoBonusRate != null ? info.lianghaoBonusRate : "");
     $("#credit-config-price").val(info.price != null ? info.price : "");
+    $("#credit-config-priceUsdt").val(info.priceUsdt != null ? info.priceUsdt : "");
     imCreditConfigurationPendingScoreInfo = info.scoreInfo || "";
     if (imCreditConfigurationEditorReady) {
         $("#credit-config-scoreInfo-editor").summernote("code", imCreditConfigurationPendingScoreInfo);
@@ -169,7 +170,7 @@ function imCreditConfigurationValidate() {
         return false;
     }
     if (price === "" || price == null) {
-        $.modal.alertWarning("请输入价格");
+        $.modal.alertWarning("请输入 ODIC 价格");
         return false;
     }
     return true;
@@ -180,6 +181,7 @@ function imCreditConfigurationSave(layerIndex) {
     if (!id) return $.modal.alertWarning("缺少记录ID");
     if (!imCreditConfigurationValidate()) return;
 
+    var priceUsdtRaw = $("#credit-config-priceUsdt").val();
     var payload = {
         id: id,
         initScore: parseFloat($("#credit-config-initScore").val()),
@@ -188,6 +190,9 @@ function imCreditConfigurationSave(layerIndex) {
         price: parseFloat($("#credit-config-price").val()),
         scoreInfo: imCreditConfigurationGetScoreInfo()
     };
+    if (priceUsdtRaw !== "" && priceUsdtRaw != null) {
+        payload.priceUsdt = parseFloat(priceUsdtRaw);
+    }
 
     imCreditAjax({
         url: imCreditConfigurationApi + "/update",
@@ -237,12 +242,31 @@ function imCreditConfigurationInitTable(canView, canEdit, canDelete) {
         queryParams: imCreditConfigurationQueryParams,
         responseHandler: imPageResponse,
         modalName: "信用分基础配置",
+        showSearch: false,
+        showRefresh: true,
+        showColumns: true,
+        showToggle: false,
         columns: [
             { field: "id", title: "id", sortable: true, width: 100 },
             { field: "initScore", title: "初始分", sortable: true, formatter: imCreditFormatScore },
             { field: "vipBonusRate", title: "会员加成", sortable: true, formatter: imCreditFormatPercent },
             { field: "lianghaoBonusRate", title: "靓号加成", sortable: true, formatter: imCreditFormatPercent },
-            { field: "price", title: "价格", sortable: true, formatter: imCreditFormatPrice },
+            {
+                field: "price",
+                title: "ODIC价格",
+                sortable: true,
+                formatter: function (val) {
+                    return imCreditFormatOdicPrice(val);
+                }
+            },
+            {
+                field: "priceUsdt",
+                title: "USDT价格",
+                sortable: true,
+                formatter: function (val) {
+                    return imCreditFormatUsdtPrice(val);
+                }
+            },
             { field: "createTime", title: "创建时间", sortable: true },
             {
                 title: "操作",

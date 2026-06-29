@@ -54,6 +54,15 @@ function imCreditFormatScore(val) {
 }
 
 function imCreditFormatPrice(val) {
+    return imCreditFormatUsdtPrice(val);
+}
+
+function imCreditFormatOdicPrice(val) {
+    var num = Number(val);
+    return Number.isFinite(num) ? num.toFixed(2) + " ODIC" : "-";
+}
+
+function imCreditFormatUsdtPrice(val) {
     var num = Number(val);
     return Number.isFinite(num) ? num.toFixed(2) + " USDT" : "-";
 }

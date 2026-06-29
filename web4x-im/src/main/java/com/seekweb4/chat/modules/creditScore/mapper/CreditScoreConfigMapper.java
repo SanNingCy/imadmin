@@ -12,7 +12,11 @@ public interface CreditScoreConfigMapper extends BaseMapper<CreditScoreConfig> {
 
     CreditScoreConfig selectByPrimaryKey(Long id);
 
+    CreditScoreConfig selectByPrimaryKeyLegacy(Long id);
+
     CreditScoreConfig selectCurrent();
+
+    CreditScoreConfig selectCurrentLegacy();
 
     int insert(CreditScoreConfig record);
 
@@ -21,6 +25,8 @@ public interface CreditScoreConfigMapper extends BaseMapper<CreditScoreConfig> {
     int deleteByPrimaryKey(Long id);
 
     List<CreditScoreConfig> selectAdminPageList(CreditScoreConfigQueryDto queryDto);
+
+    List<CreditScoreConfig> selectAdminPageListLegacy(CreditScoreConfigQueryDto queryDto);
 
     Long selectAdminCount(CreditScoreConfigQueryDto queryDto);
 }

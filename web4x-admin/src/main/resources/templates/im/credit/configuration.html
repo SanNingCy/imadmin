@@ -25,6 +25,7 @@
                 </div>
             </form>
         </div>
+        <div class="btn-group-sm" id="toolbar" role="group"></div>
         <div class="col-sm-12 select-table table-striped credit-config-table-wrap">
             <table id="bootstrap-table"></table>
         </div>
@@ -55,12 +56,22 @@
             </div>
         </div>
         <div class="form-group">
-            <label class="col-sm-3 control-label">价格：</label>
+            <label class="col-sm-3 control-label">ODIC价格：</label>
             <div class="col-sm-8">
                 <div class="input-group">
-                    <input type="number" class="form-control" id="credit-config-price" min="0" step="0.01" placeholder="请输入价格"/>
+                    <input type="number" class="form-control" id="credit-config-price" min="0" step="0.01" placeholder="旧版展示、余额扣款"/>
+                    <span class="input-group-addon">ODIC</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">USDT价格：</label>
+            <div class="col-sm-8">
+                <div class="input-group">
+                    <input type="number" class="form-control" id="credit-config-priceUsdt" min="0" step="0.01" placeholder="链上支付、新版展示（选填）"/>
                     <span class="input-group-addon">USDT</span>
                 </div>
+                <span class="help-block m-b-none">链上开通信用分使用此价格；未填则链上支付不可用，不影响 ODIC 余额扣款</span>
             </div>
         </div>
         <div class="form-group">
@@ -74,9 +85,9 @@
 
 <th:block th:include="include :: footer" />
 <th:block th:include="include :: summernote-js" />
-<script th:src="@{/web4x/js/im-table.js?v=20260605r}"></script>
-<script th:src="@{/web4x/js/im-credit-common.js?v=20260605r}"></script>
-<script th:src="@{/web4x/js/im-credit-configuration.js?v=20260613}"></script>
+<script th:src="@{/web4x/js/im-table.js?v=20260625}"></script>
+<script th:src="@{/web4x/js/im-credit-common.js?v=20260625}"></script>
+<script th:src="@{/web4x/js/im-credit-configuration.js?v=20260625b}"></script>
 <script th:inline="javascript">
     $(function () {
         imCreditConfigurationInitTable(

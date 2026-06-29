@@ -1085,7 +1085,9 @@ function imApplyListMediaTableOptions(options) {
             || path.indexOf('/grouphongbaolog/') > -1
             || path.indexOf('/signset/') > -1
             || path.indexOf('/admin/piamom/') > -1
-            || path.indexOf('/admin/live/') > -1)
+            || path.indexOf('/admin/live/') > -1
+            || path.indexOf('/admin/creditScore/') > -1
+            || path.indexOf('/creditScore/') > -1)
         {
             imTableBeforeSend(xhr);
         }

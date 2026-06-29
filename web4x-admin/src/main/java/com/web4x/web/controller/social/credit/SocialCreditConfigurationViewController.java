@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping({
         "/configuration",
-        "/social/credit/configuration", "/credit/configuration",
-        "/creditScore/config", "/admin/creditScore/config"
+        "/social/credit/configuration",
+        "/credit/configuration"
 })
 public class SocialCreditConfigurationViewController {
 

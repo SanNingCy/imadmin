@@ -29,6 +29,7 @@ public class CreditScoreConfigServiceImpl implements CreditScoreConfigService {
         ORDER_BY_COLUMNS.put("vipBonusRate", "vip_bonus_rate");
         ORDER_BY_COLUMNS.put("lianghaoBonusRate", "lianghao_bonus_rate");
         ORDER_BY_COLUMNS.put("price", "price");
+        ORDER_BY_COLUMNS.put("priceUsdt", "price_usdt");
         ORDER_BY_COLUMNS.put("scoreInfo", "score_info");
     }
 
@@ -45,19 +46,20 @@ public class CreditScoreConfigServiceImpl implements CreditScoreConfigService {
         queryDto.setPageSize(ps);
         Long count = creditScoreConfigMapper.selectAdminCount(queryDto);
         page.setCount(count == null ? 0L : count);
-        List<CreditScoreConfig> list = creditScoreConfigMapper.selectAdminPageList(queryDto);
-        page.setList(list);
+        page.setList(selectPageListSafe(queryDto));
         return page;
     }
 
     @Override
     public CreditScoreConfig getCurrent() {
-        return creditScoreConfigMapper.selectCurrent();
+        return selectOneSafe(() -> creditScoreConfigMapper.selectCurrent(),
+                () -> creditScoreConfigMapper.selectCurrentLegacy());
     }
 
     @Override
     public CreditScoreConfig getById(Long id) {
-        return creditScoreConfigMapper.selectByPrimaryKey(id);
+        return selectOneSafe(() -> creditScoreConfigMapper.selectByPrimaryKey(id),
+                () -> creditScoreConfigMapper.selectByPrimaryKeyLegacy(id));
     }
 
     @Override
@@ -112,6 +114,50 @@ public class CreditScoreConfigServiceImpl implements CreditScoreConfigService {
             joiner.add(column + " " + direction);
         }
         return joiner.length() == 0 ? null : joiner.toString();
+    }
+
+    private List<CreditScoreConfig> selectPageListSafe(CreditScoreConfigQueryDto queryDto) {
+        try {
+            return creditScoreConfigMapper.selectAdminPageList(queryDto);
+        } catch (Exception e) {
+            if (!isMissingPriceUsdtColumn(e)) {
+                throw e;
+            }
+            log.warn("t_credit_score_config.price_usdt 列不存在，列表使用兼容查询；请执行 sql/credit_score_config_price_usdt.sql");
+            return creditScoreConfigMapper.selectAdminPageListLegacy(sanitizeLegacyOrderBy(queryDto));
+        }
+    }
+
+    private CreditScoreConfig selectOneSafe(java.util.function.Supplier<CreditScoreConfig> primary,
+                                           java.util.function.Supplier<CreditScoreConfig> legacy) {
+        try {
+            return primary.get();
+        } catch (Exception e) {
+            if (!isMissingPriceUsdtColumn(e)) {
+                throw e;
+            }
+            log.warn("t_credit_score_config.price_usdt 列不存在，详情使用兼容查询；请执行 sql/credit_score_config_price_usdt.sql");
+            return legacy.get();
+        }
+    }
+
+    private CreditScoreConfigQueryDto sanitizeLegacyOrderBy(CreditScoreConfigQueryDto queryDto) {
+        String orderBy = queryDto.getOrderBy();
+        if (orderBy != null && orderBy.contains("price_usdt")) {
+            queryDto.setOrderBy(orderBy.replace("price_usdt", "id"));
+        }
+        return queryDto;
+    }
+
+    private boolean isMissingPriceUsdtColumn(Throwable e) {
+        while (e != null) {
+            String msg = e.getMessage();
+            if (msg != null && msg.contains("price_usdt")) {
+                return true;
+            }
+            e = e.getCause();
+        }
+        return false;
     }
 }
 

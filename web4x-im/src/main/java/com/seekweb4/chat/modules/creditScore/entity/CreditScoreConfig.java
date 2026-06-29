@@ -48,9 +48,14 @@ public class CreditScoreConfig implements Serializable {
     private BigDecimal lianghaoBonusRate;
 
     /**
-     * 开通信用分代币价格
+     * 开通信用分 ODIC 价格（旧版展示、余额扣款）
      */
     private BigDecimal price;
+
+    /**
+     * 链上开通信用分 USDT 价格（链上支付、新版展示）
+     */
+    private BigDecimal priceUsdt;
 
     /**
      * 信用分说明
